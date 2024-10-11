@@ -4,7 +4,6 @@ import subprocess
 import hashlib
 from tqdm import tqdm
 
-BASE_PATH = '/network/scratch/n/nizar.islah/' # path to your scratch
 
 def replace_torch_version(row):
     if row['library'] == 'torch':
@@ -96,4 +95,9 @@ def main():
 
 
 if __name__ == "__main__":
+    args = sys.argv
+    if len(args) != 2:
+        print("Usage: python create_venvs.py <BASE_PATH>")
+        sys.exit(1)
+    BASE_PATH = args[1]
     main()
