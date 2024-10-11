@@ -1,0 +1,1120 @@
+library,version,name_of_class_or_func,type_of_change,problem,starting_code,solution,test,additional_dependencies,release_date
+torch,1.9.0,log_ndtr,"
+other library
+","Calculate the logarithm of the cumulative distribution function of the standard normal distribution using available functions. If not available in PyTorch, use another library.","import torch\ninput_tensor = torch.linspace(-10, 10, steps=20)\n# put answer in variable called output\n",import numpy as np\nfrom scipy.stats import norm\noutput = torch.from_numpy(norm.logcdf(input_tensor.numpy())),"input_tensor = torch.linspace(-10, 10, steps=20)\nexpected_result = torch.from_numpy(norm.logcdf(input_tensor.numpy()))\nassert torch.allclose(output, expected_result, rtol=1e-3, atol=1e-3)",scipy==1.7.3 numpy==1.21.6,
+torch,1.12.0,log_ndtr,"
+new func/method/class
+",Calculate the logarithm of the cumulative distribution function of the standard normal distribution using PyTorch's special functions.,"import torch\ninput_tensor = torch.linspace(-10, 10, steps=20)\n# put answer in variable called output\n",output = torch.special.log_ndtr(input_tensor),"input_tensor = torch.linspace(-10, 10, steps=20)\nexpected_result = torch.special.log_ndtr(input_tensor)\nassert torch.allclose(output, expected_result, rtol=1e-3, atol=1e-3)",,
+torch,1.9.0,gammaln,"
+other library
+","Calculate the natural logarithm of the absolute value of the gamma function using PyTorch's special functions if available in this version, otherwise you may use another library.","import torch\ninput_tensor = torch.linspace(0, 10, steps=10)\n# put answer in variable called output\n",import numpy as np\nfrom scipy.special import gammaln as scipy_gammaln\noutput = torch.from_numpy(scipy_gammaln(input_tensor.numpy())),"input_tensor = torch.linspace(0, 10, steps=10)\nexpected_result = torch.tensor([torch.inf,-0.0545,0.1092,1.0218,2.3770,4.0476,5.9637,8.0806,10.3675,12.8018])\nassert torch.allclose(output, expected_result, rtol=1e-3, atol=1e-3)",scipy==1.7.3 numpy==1.21.6,
+torch,1.9.0,erf,"
+other library
+","Calculate the error function using PyTorch's special functions if available in this version, otherwise you may use another library.","import torch\ninput_tensor = torch.linspace(0, 10, steps=10)\n# put answer in variable called output\n",import numpy as np\nfrom scipy.special import erf as scipy_erf\noutput = torch.from_numpy(scipy_erf(input_tensor.numpy())),"input_tensor = torch.linspace(0, 10, steps=10)\nexpected_result = torch.tensor([0.0000,0.8839,0.9983,1.0000,1.0000,1.0000,1.0000,1.0000,1.0000,1.0000])\nassert torch.allclose(output, expected_result, rtol=1e-3, atol=1e-3)",scipy==1.7.3 numpy==1.21.6,
+torch,1.9.0,erfc,"
+other library
+","Calculate the complementary error function using PyTorch's special functions if available in this version, otherwise you may use another library.","import torch\ninput_tensor = torch.linspace(0, 10, steps=10)\n# put answer in variable called output\n",import numpy as np\nfrom scipy.special import erfc as scipy_erfc\noutput = torch.from_numpy(scipy_erfc(input_tensor.numpy())),"input_tensor = torch.linspace(0, 10, steps=10)\nexpected_result = torch.tensor([1.0000e+00,1.1610e-01,1.6740e-03,2.4285e-06,3.2702e-10,3.9425e-15,4.1762e-21,3.8452e-28,3.0566e-36,1.4013e-45])\nassert torch.allclose(output, expected_result, rtol=1e-3, atol=1e-3)",scipy==1.7.3 numpy==1.21.6,
+torch,1.9.0,bessel_i0,"
+other library
+","Calculate the modified Bessel function of the first kind, order 0 using PyTorch's special functions if available in this version, otherwise you may use another library.","import torch\ninput_tensor = torch.linspace(0, 10, steps=10)\n# put answer in variable called output\n",import numpy as np\nfrom scipy.special import i0 as scipy_i0\noutput = torch.from_numpy(scipy_i0(input_tensor.numpy())),"input_tensor = torch.linspace(0, 10, steps=10)\nexpected_result = torch.tensor([1.0000e+00,1.3333e+00,2.6721e+00,6.4180e+00,1.6648e+01,4.4894e+01,1.2392e+02,3.4740e+02,9.8488e+02,2.8157e+03])\nassert torch.allclose(output, expected_result, rtol=1e-3, atol=1e-3)",scipy==1.7.3 numpy==1.21.6,
+torch,1.9.0,bessel_i1,"
+other library
+","Calculate the modified Bessel function of the first kind, order 1 using PyTorch's special functions if available in this version, otherwise you may use another library.","import torch\ninput_tensor = torch.linspace(0, 10, steps=10)\n# put answer in variable called output\n",import numpy as np\nfrom scipy.special import i1 as scipy_i1\noutput = torch.from_numpy(scipy_i1(input_tensor.numpy())),"input_tensor = torch.linspace(0, 10, steps=10)\nexpected_result = torch.tensor([0.0000e+00,6.4581e-01,1.9536e+00,5.3391e+00,1.4628e+01,4.0623e+01,1.1420e+02,3.2423e+02,9.2770e+02,2.6710e+03])\nassert torch.allclose(output, expected_result, rtol=1e-3, atol=1e-3)",scipy==1.7.3 numpy==1.21.6,
+torch,1.10.0,gammaln,"
+new func/method/class
+","Calculate the natural logarithm of the absolute value of the gamma function using pytorch's special functions if available in this version, otherwise you may use another library.","import torch\ninput_tensor = torch.linspace(0, 10, steps=10)\noutput = ",torch.special.gammaln(input_tensor),"input_tensor = torch.linspace(0, 10, steps=10)\nexpected_result = torch.tensor([torch.inf,-0.0545,0.1092,1.0218,2.3770,4.0476,5.9637,8.0806,10.3675,12.8018])\nassert torch.allclose(output, expected_result, rtol=1e-3, atol=1e-3)",,
+torch,1.10.0,erf,"
+new func/method/class
+","Calculate the error function using pytorch's special functions if available in this version, otherwise you may use another library.","import torch\ninput_tensor = torch.linspace(0, 10, steps=10)\noutput = ",torch.special.erf(input_tensor),"input_tensor = torch.linspace(0, 10, steps=10)\nexpected_result = torch.tensor([0.0000,0.8839,0.9983,1.0000,1.0000,1.0000,1.0000,1.0000,1.0000,1.0000])\nassert torch.allclose(output, expected_result, rtol=1e-3, atol=1e-3)",,
+torch,1.10.0,erfc,"
+new func/method/class
+","Calculate the complementary error function using pytorch's special functions if available in this version, otherwise you may use another library.","import torch\ninput_tensor = torch.linspace(0, 10, steps=10)\noutput = ",torch.special.erfc(input_tensor),"input_tensor = torch.linspace(0, 10, steps=10)\nexpected_result = torch.tensor([1.0000e+00,1.1610e-01,1.6740e-03,2.4285e-06,3.2702e-10,3.9425e-15,4.1762e-21,3.8452e-28,3.0566e-36,1.4013e-45])\nassert torch.allclose(output, expected_result, rtol=1e-3, atol=1e-3)",,
+torch,1.10.0,bessel_i0,"
+new func/method/class
+","Calculate the modified Bessel function of the first kind, order 0 using pytorch's special functions if available in this version, otherwise you may use another library.","import torch\ninput_tensor = torch.linspace(0, 10, steps=10)\noutput = ",torch.special.i0(input_tensor),"input_tensor = torch.linspace(0, 10, steps=10)\nexpected_result = torch.tensor([1.0000e+00,1.3333e+00,2.6721e+00,6.4180e+00,1.6648e+01,4.4894e+01,1.2392e+02,3.4740e+02,9.8488e+02,2.8157e+03])\nassert torch.allclose(output, expected_result, rtol=1e-3, atol=1e-3)",,
+torch,1.10.0,bessel_i1,"
+new func/method/class
+","Calculate the modified Bessel function of the first kind, order 1 using pytorch's special functions if available in this version, otherwise you may use another library.","import torch\ninput_tensor = torch.linspace(0, 10, steps=10)\noutput = ",torch.special.i1(input_tensor),"input_tensor = torch.linspace(0, 10, steps=10)\nexpected_result = torch.tensor([0.0000e+00,6.4581e-01,1.9536e+00,5.3391e+00,1.4628e+01,4.0623e+01,1.1420e+02,3.2423e+02,9.2770e+02,2.6710e+03])\nassert torch.allclose(output, expected_result, rtol=1e-3, atol=1e-3)",,
+torch,1.10.0,invert_mask_v1_1,"
+output behaviour
+","You are given two tensors, `tensor1` and `tensor2`, both of shape `(n,)`. Your task is to implement a function invert_mask to create a boolean mask indicating whether each element of `tensor1` is less than the corresponding element of `tensor2`, and then invert this mask.","import torch\ntensor1 = torch.tensor([1, 2, 3])\ntensor2 = torch.tensor([3, 1, 2])\nmask= ",tensor1 < tensor2\nmask = ~mask,"expected_mask=torch.tensor([False, True, True])\nassert torch.all(torch.eq(mask, expected_mask))",,
+torch,1.13,invert_mask_v1_2,"
+output behaviour
+","You are given two tensors, `tensor1` and `tensor2`, both of shape `(n,)`. Your task is to implement a function invert_mask to create a boolean mask indicating whether each element of `tensor1` is less than the corresponding element of `tensor2`, and then invert this mask.","import torch\ntensor1 = torch.tensor([1, 2, 3])\ntensor2 = torch.tensor([3, 1, 2])\nmask= ",tensor1 < tensor2\nmask = ~(mask.bool()),"expected_mask=torch.tensor([False, True, True])\nassert torch.all(torch.eq(mask, expected_mask))",,
+torch,1.13,torch.stft,"
+argument change
+",You are given an audio signal represented as a 1D tensor `audio_signal`. Your task is to compute the Short-Time Fourier Transform (STFT) of the signal. Do not return a complex data type.,import torch\naudio_signal = torch.rand(1024)\nn_fft=128\nstft_result = ,"torch.stft(audio_signal, n_fft=n_fft, return_complex=False)","expected_shape = (65, 33, 2)\nassert stft_result.shape == expected_shape",,
+torch,2,torch.stft,"
+argument change
+",You are given an audio signal represented as a 1D tensor `audio_signal`. Your task is to compute the Short-Time Fourier Transform (STFT) of the signal. Do not return a complex data type.,import torch\naudio_signal = torch.rand(1024)\nn_fft=128\nstft_result = ,"torch.view_as_real(torch.stft(audio_signal, n_fft=n_fft, return_complex=True))","expected_shape = (65, 33, 2)\nassert stft_result.shape == expected_shape",,
+torch,1.13,torch.istft,"
+argument change
+","You are given a spectrogram represented as a 3D tensor `spectrogram` with dimensions `(65, 33, 2)`, where the first dimension represents the frequency bins, the second dimension represents the time frames, and the third dimension represents the real and imaginary parts of the complex values. Your task is to compute the Inverse Short-Time Fourier Transform (ISTFT) of the spectrogram using PyTorch's `torch.istft` function.","import torch
+# Sample rate (samples per second)
+fs = 8000  
+# Duration of the signal in seconds
+t = 1  
+# Time axis for the signal
+time = torch.linspace(0, t, steps=int(fs * t))
+# Frequency of the sine wave in Hz
+frequency = 440  
+# Generate a sine wave
+signal = torch.sin(2 * torch.pi * frequency * time)
+n_fft = 1024  # Number of FFT points
+hop_length = 256  # Number of samples between successive frames
+win_length = 1024  # Window length
+# Compute STFT
+spectrogram = torch.stft(signal, n_fft=n_fft, hop_length=hop_length, win_length=win_length, window=torch.hann_window(win_length), normalized=False, return_complex=True)
+# Perform ISTFT
+reconstructed_signal = ","torch.istft(spectrogram, n_fft=n_fft, hop_length=hop_length, win_length=win_length, window=torch.hann_window(win_length), length=signal.shape[0], normalized=False)",expected_shape=signal.shape\nassert expected_shape == reconstructed_signal.shape,,
+torch,2,torch.istft,"
+argument change
+","You are given a spectrogram represented as a 3D tensor `spectrogram` with dimensions `(65, 33, 2)`, where the first dimension represents the frequency bins, the second dimension represents the time frames, and the third dimension represents the real and imaginary parts of the complex values. Your task is to compute the Inverse Short-Time Fourier Transform (ISTFT) of the spectrogram using PyTorch's `torch.istft` function.","import torch
+# Sample rate (samples per second)
+fs = 8000  
+# Duration of the signal in seconds
+t = 1  
+# Time axis for the signal
+time = torch.linspace(0, t, steps=int(fs * t))
+# Frequency of the sine wave in Hz
+frequency = 440  
+# Generate a sine wave
+signal = torch.sin(2 * torch.pi * frequency * time)
+n_fft = 1024  # Number of FFT points
+hop_length = 256  # Number of samples between successive frames
+win_length = 1024  # Window length
+# Compute STFT
+spectrogram = torch.stft(signal, n_fft=n_fft, hop_length=hop_length, win_length=win_length, window=torch.hann_window(win_length), normalized=False, return_complex=False)
+# Perform ISTFT
+reconstructed_signal = ","torch.istft(torch.view_as_complex(spectrogram), n_fft=n_fft, hop_length=hop_length, win_length=win_length, window=torch.hann_window(win_length), length=signal.shape[0], normalized=False)",expected_shape=signal.shape\nassert expected_shape == reconstructed_signal.shape,,
+geopandas,0.10.0,sjoin,name change,Write a function that performs a spatial join.,"import geopandas as gpd
+from shapely.geometry import Point, Polygon
+
+def spatial_join(gdf1, gdf2):
+    return ","gpd.sjoin(gdf1, gdf2, predicate='within')","
+gdf1 = gpd.GeoDataFrame({'geometry': [Point(1, 1), Point(2, 2), Point(3, 3)]})
+polygons = [Polygon([(0, 0), (0, 4), (4, 4), (4, 0)]), Polygon([(4, 4), (4, 8), (8, 8), (8, 4)])]
+gdf2 = gpd.GeoDataFrame({'geometry': polygons})
+
+assert spatial_join(gdf1, gdf2).equals(gpd.sjoin(gdf1, gdf2, predicate='within'))",rtree,2021-10
+geopandas,0.9.0,sjoin,name change,Write a function that performs a spatial join.,"import geopandas as gpd
+from shapely.geometry import Point, Polygon
+
+def spatial_join(gdf1, gdf2):
+    return ","gpd.sjoin(gdf1, gdf2, op='within')","
+gdf1 = gpd.GeoDataFrame({'geometry': [Point(1, 1), Point(2, 2), Point(3, 3)]})
+polygons = [Polygon([(0, 0), (0, 4), (4, 4), (4, 0)]), Polygon([(4, 4), (4, 8), (8, 8), (8, 4)])]
+gdf2 = gpd.GeoDataFrame({'geometry': polygons})
+expected_result = gpd.sjoin(gdf1, gdf2, op='within')
+assert spatial_join(gdf1, gdf2).equals(expected_result)",rtree,2021-02
+geopandas,0.10.0,cascaded_union,name change,Write a function that performs a union.,"import geopandas as gpd
+from shapely.geometry import box
+
+def perform_union(gdf):
+    return ",gdf.geometry.unary_union,"
+gdf = gpd.GeoDataFrame({'geometry': [box(0, 0, 2, 5), box(0, 0, 2, 1)]})
+expected_result = gdf.geometry.unary_union
+assert perform_union(gdf).equals(expected_result)",,2021-10
+geopandas,0.9.0,cascaded_union,name change,Write a function that performs a union.,"import geopandas as gpd
+from shapely.geometry import box
+
+def perform_union(gdf):
+    return ",gdf.geometry.cascaded_union,"
+gdf = gpd.GeoDataFrame({'geometry': [box(0, 0, 2, 5), box(0, 0, 2, 1)]})
+expected_result = gdf.geometry.cascaded_union
+assert perform_union(gdf) == expected_result",,2021-02
+geopandas,0.10.0,points_from_xy,name change,Write a function that creates a GeoSeries from x and y coordinates.,"import geopandas as gpd
+def create_geoseries(x, y):
+    return ","gpd.GeoSeries.from_xy(x, y)","
+x, y = [1, 2], [3, 4]
+print(create_geoseries(x,y))
+expected_result = gpd.GeoSeries.from_xy(x, y)
+assert create_geoseries(x, y).equals(expected_result)",,2021-10
+geopandas,0.9.0,points_from_xy,name change,Write a function that creates a GeoSeries from x and y coordinates.,"import geopandas as gpd
+def create_geoseries(x, y):
+    return ","gpd.points_from_xy(x, y)","
+x, y = [1, 2], [3, 4]
+print(create_geoseries(x,y))
+expected_result = gpd.points_from_xy(x, y)
+assert create_geoseries(x, y).equals(expected_result)",,2021-02
+geopandas,0.13.0,query_bulk,name change,Write a function that performs a spatial query.,"import geopandas as gpd
+from shapely.geometry import Point, Polygon, box
+
+def spatial_query(gdf, other):
+    combined_geometry = other.unary_union
+    return ",gdf.sindex.query(combined_geometry),"
+gdf = gpd.GeoDataFrame({'geometry': [Point(1, 2)]})
+other = gpd.GeoDataFrame({'geometry': [Point(1,1)]})
+result = spatial_query(gdf, other)
+expected_result = gdf.sindex.query(other.unary_union)
+assert (result == expected_result).all()",rtree,2023-05
+geopandas,0.10.0,query_bulk,name change,Write a function that performs a spatial query.,"import geopandas as gpd
+from shapely.geometry import Point, Polygon
+
+def spatial_query(gdf, other):
+    return ",gdf.sindex.query_bulk(other),"
+gdf = gpd.GeoDataFrame({'geometry': [Point(1, 1), Point(2, 2), Point(3, 3)]})
+other = gpd.GeoSeries([Polygon([(0, 0), (0, 4), (4, 4), (4, 0)])])
+result = spatial_query(gdf, other)
+expected_result = gdf.sindex.query_bulk(other)
+assert (result == expected_result).all()",rtree,2021-10
+nltk,3.6.4,usage,"
+deprecation
+",Write a function that displays usage information of an object.,"import nltk
+import io
+import contextlib
+def show_usage(obj) -> str:
+    with io.StringIO() as buf, contextlib.redirect_stdout(buf):","
+       help(obj)
+       return buf.getvalue()","
+assert ""Help on package nltk"" in show_usage(nltk)",,
+nltk,3.6.3,usage,"
+deprecation
+",Write a function that displays usage information of an object.,"import nltk
+import io
+import contextlib
+
+def show_usage(obj) -> str:
+    with io.StringIO() as buf, contextlib.redirect_stdout(buf):","
+        nltk.usage(obj)
+        return buf.getvalue()","
+assert ""LazyModule supports the following operations"" in show_usage(nltk.corpus)
+",,
+networkx,2.8,,"
+argument change
+","
+Write a function that uses NetworkX's greedy_modularity_communities with the number of communities set at 5.
+","import networkx as nx
+def modularity_communities(G):
+    return nx.community.greedy_modularity_communities(G,", cutoff=5),"
+G = nx.karate_club_graph()
+assert len(modularity_communities(G)) > 0",,
+networkx,2.7,,"
+argument change
+","
+Write a function that uses NetworkX's greedy_modularity_communities with the number of communities set at 5.
+","import networkx as nx
+def modularity_communities(G):
+    return nx.community.greedy_modularity_communities(G,", n_communities=5),"
+G = nx.karate_club_graph()
+assert len(modularity_communities(G)) > 0",numpy,
+networkx,2.8,,"
+name change
+","
+Write a function that calculates the diameters' extreme distance of a graph.
+","import networkx as nx
+def bounding_distance(G):
+    return nx.diameter","(G, usebounds=True)","
+G = nx.path_graph(5)
+assert bounding_distance(G) is not None",,
+networkx,2.6,,"
+name change
+","
+Write a function that calculates the diameters' extreme distance of a graph.
+","import networkx as nx
+def bounding_distance(G):
+    return nx.algorithms.distance_measures.","extrema_bounding(G, ""diameter"")","
+G = nx.path_graph(5)
+assert bounding_distance(G) is not None",,
+networkx,2.5,,"
+name change
+","
+Write a function that returns the naive greedy modularity communities for a graph.
+","import networkx as nx
+def naive_modularity_communities(G):
+    return nx.community.",naive_greedy_modularity_communities(G),"
+G = nx.karate_club_graph()
+assert len(list(naive_modularity_communities(G))) > 0",,
+networkx,2.4,,"
+name change
+","
+Write a function that returns the naive greedy modularity communities for a graph.
+","import networkx as nx
+def naive_modularity_communities(G):
+    return nx.community.",_naive_greedy_modularity_communities(G),"
+G = nx.karate_club_graph()
+assert len(list(naive_modularity_communities(G))) > 0",,
+networkx,2.5,,"
+name change (attribute)
+","
+Write a function that returns the nodes as a list of NetworkX graph.
+","import networkx as nx
+def get_nodes(G):
+   return ",list(G.nodes),"
+G = nx.karate_club_graph()
+assert get_nodes(G) is not None and len(get_nodes(G)) > 0",,
+networkx,1.11,,"
+name change (attribute)
+","
+Write a function that accesses the nodes as a list of NetworkX graph.
+","import collections.abc
+import sys
+import math
+import fractions
+sys.modules['collections.Mapping'] = collections.abc.Mapping
+sys.modules['collections.Set'] = collections.abc.Set
+sys.modules['collections.Iterable'] = collections.abc.Iterable
+fractions.gcd = math.gcd
+
+import networkx as nx
+def get_nodes(G):
+    return ",list(G.node),"
+G = nx.karate_club_graph()
+assert get_nodes(G) is not None and len(get_nodes(G)) > 0",,
+networkx,2.5,,"
+name change
+","
+Write a function that accesses the first edge of a NetworkX graph.
+","import networkx as nx
+def get_first_edge(G):
+    return ",list(G.edges)[0],"
+G = nx.karate_club_graph()
+assert get_first_edge(G) is not None",,
+networkx,1.11,,"
+name change
+","
+Write a function that accesses the first edge of a NetworkX graph.
+","import collections.abc
+import sys
+import math
+import fractions
+sys.modules['collections.Mapping'] = collections.abc.Mapping
+sys.modules['collections.Set'] = collections.abc.Set
+sys.modules['collections.Iterable'] = collections.abc.Iterable
+fractions.gcd = math.gcd
+
+import networkx as nx
+def get_first_edge(G):
+    return ",list(G.edge)[0],"
+G = nx.karate_club_graph()
+assert get_first_edge(G) is not None",,
+networkx,2.5,,"
+name change
+","
+Write a function that computes the shortest path lengths and predecessors on shortest paths in weighted graphs using NetworkX.
+
+
+","import networkx as nx
+def shortest_path(G, source):
+    return nx.","bellman_ford_predecessor_and_distance(G, source)","
+G = nx.path_graph(5)
+assert shortest_path(G, 0) is not None",,
+networkx,1.11,,"
+name change
+","
+Write a function that computes the shortest path lengths and predecessors on shortest paths in weighted graphs using NetworkX.
+
+
+","import collections.abc
+import sys
+import math
+import fractions
+sys.modules['collections.Mapping'] = collections.abc.Mapping
+sys.modules['collections.Set'] = collections.abc.Set
+sys.modules['collections.Iterable'] = collections.abc.Iterable
+fractions.gcd = math.gcd
+
+import networkx as nx
+def shortest_path(G, source):
+    return nx.","bellman_ford(G, source)","
+G = nx.path_graph(5)
+assert shortest_path(G, 0) is not None",,
+networkx,2,add_edge,"
+input argument change
+
+","
+Write a function that adds an edge to a NetworkX graph with a color red.
+","import collections.abc
+import sys
+import math
+import fractions
+sys.modules['collections.Mapping'] = collections.abc.Mapping
+sys.modules['collections.Set'] = collections.abc.Set
+sys.modules['collections.Iterable'] = collections.abc.Iterable
+fractions.gcd = math.gcd
+
+import networkx as nx
+def add_colored_edge(G, u, v):
+   G.","add_edge(u, v, color='red')","
+G = nx.Graph()
+add_colored_edge(G, 1, 2)
+assert G[1][2]['color'] == 'red'",,
+networkx,1.9,add_edge,"
+input argument change
+","
+Write a function that adds an edge to a NetworkX graph with a color red.
+","import html
+import sys
+import cgi
+import math
+import fractions
+
+cgi.escape = html.escape
+fractions.gcd = math.gcd
+
+import networkx as nx
+def add_colored_edge(G, u, v):
+    G.","add_edge(u, v, {'color': 'red'})","
+G = nx.Graph()
+add_colored_edge(G, 1, 2)
+assert G[1][2]['color'] == 'red'",,
+geopy,2.0.0,GoogleV3.timezone,"
+breaking change
+",Write a function that retrieves timezone information using GoogleV3.,"from geopy.geocoders import GoogleV3
+def get_timezone(location):
+    geolocator = GoogleV3()","
+    return geolocator.reverse_timezone(location)","
+location = (40.748817, -73.985428)
+print(get_timezone(location))
+assert get_timezone(location) is not None",pytz,
+geopy,1.9.0,GoogleV3.timezone,"
+breaking change
+",Write a function that retrieves timezone information using GoogleV3.,"import base64
+import sys
+
+# Define wrappers for the old functions
+def encodestring(s):
+    return base64.b64encode(s)
+
+def decodestring(s):
+    return base64.b64decode(s)
+
+# Monkey patch the base64 module
+base64.encodestring = encodestring
+base64.decodestring = decodestring
+
+from geopy.geocoders import GoogleV3
+def get_timezone(location):
+   geolocator = GoogleV3()","
+   return geolocator.timezone(location)","
+location = (40.748817, -73.985428)
+assert get_timezone(location) is not None",pytz,
+gradio,3.24.0,-,"
+argument change
+",Write a function that renders the quadratic formula in LaTeX using Gradio's Chatbot. The quadratic formula is given by: x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a},"import gradio as gr
+def render_quadratic_formula():
+     pass
+
+
+interface = gr.Interface(fn=render_quadratic_formula, inputs=[], outputs = ""text"")
+
+def render_quadratic_formula():
+    formula =","""$x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$""
+    return formula","
+assert render_quadratic_formula().startswith(""$"") and render_quadratic_formula().endswith(""$"") ",-,
+gradio,3.36.0,-,"
+argument change
+",Write a function that renders the quadratic formula in LaTeX using Gradio's Chatbot. The quadratic formula is given by: x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a},"import gradio as gr
+def render_quadratic_formula():
+    formula = ""x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}""
+    return formula
+
+interface = gr.Chatbot","(fn=render_quadratic_formula, latex_delimiters=(""$$"", ""$$""))
+","
+assert not render_quadratic_formula().startswith(""$"") and not render_quadratic_formula().endswith(""$"") and ""$"" in interface.latex_delimiters[0] and  ""$"" in interface.latex_delimiters[1]",-,
+gradio,3.36.0,-,"
+argument change
+",Write a function that displays an image using Gradio where you cannot share the image.,"import gradio as gr
+def display_image():
+    return ""https://image_placeholder.com/42""
+
+iface = gr.Interface","(fn=display_image, inputs=[], outputs=gr.Image(show_share_button=False))
+","
+assert iface.output_components[0].show_share_button==False",-,
+gradio,3.0.0,-,"
+argument change
+",Write a function that displays an image using Gradio where you cannot share the image.,"import gradio as gr
+def display_image():
+    return ""https://image_placeholder.com/42""
+
+iface = gr.Interface","(fn=display_image, inputs=[], outputs=gr.Image())
+","
+assert type(gr.Image()) == type(iface.output_components[0])",-,
+gradio,2.9.2,-,"
+argument change
+",Write a function that takes an image input and returns a textbox output.,"import gradio as gr
+def process_image(image):
+    return ""Processed""
+
+iface = gr.Interface","(fn=process_image, inputs=gr.inputs.Image(), outputs=gr.outputs.Textbox())","
+assert type(iface.input_components[0])==type(gr.inputs.Image()) and type(iface.output_components[0])==type(gr.outputs.Textbox()) or type(iface.input_components[0])==type(gr.components.Image()) and type(iface.output_components[0])==type(gr.components.Textbox())",black,
+gradio,3.24.0,-,"
+argument change
+",Write a function that takes an image input and returns a label output.,"import gradio as gr
+def process_image(image):
+    return ""Processed""
+
+iface = gr.Interface","(fn=process_image, inputs=gr.Image(), outputs=gr.Label())","
+assert type(iface.input_components[0])==type(gr.Image()) and type(iface.output_components[0])==type(gr.Label())",-,
+gradio,3.20.0,-,"
+No new feature
+",Write a function that generates an interactive bar plot. Overwrite the method gradio_plot and make sure to import dependencies if needed.,"import gradio as gr
+import pandas as pd
+def gradio_plot(): 
+     pass
+data = pd.DataFrame({
+        'a': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
+        'b': [28, 55, 43, 91, 81, 53, 19, 87, 52]
+    })
+
+iface = gr.Interface(fn=gradio_plot, inputs=[], outputs=gr.Image())
+
+
+","import matplotlib.pyplot as plt
+def gradio_plot(): 
+    plt.figure(figsize=(10, 5))
+    plt.bar(data['a'], data['b'])
+    plt.title('Simple Bar Plot with made up data')
+    plt.xlabel('a')
+    plt.ylabel('b')
+    plt.savefig('bar_plot.png')
+    plt.close()
+    return 'bar_plot.png'
+","
+assert 'bar_plot.png' in gradio_plot()
+matplotlib_imported = False
+try:
+     plt.figure()
+     matplotlib_imported = True
+except Exception:
+     pass
+
+try:
+     matplotlib.plotly.figure()
+     matplotlib_imported = True
+except Exception:
+     pass
+
+assert matplotlib_imported",pandas matplotlib,
+gradio,3.17.0,-,"
+new feature
+",Write a function that generates an interactive bar plot. Set the new gr.Interface object as a variable named iface.,"import gradio as gr
+import pandas as pd
+data = pd.DataFrame({
+        'a': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
+        'b': [28, 55, 43, 91, 81, 53, 19, 87, 52]
+    })
+def gradio_plot():
+    ","return gr.BarPlot(
+        simple,
+        x='a',
+        y='b',
+        title='Simple Bar Plot with made up data',
+        tooltip=['a', 'b'],
+    )
+iface = gr.Interface(fn=gradio_plot, inputs=[], outputs='plot')","
+assert type(iface.output_components[0]) == gr.Plot",pandas,
+gradio,3.15.0,-,"
+argument change
+",Write a function that returns the selected options from a list of options. Users can select multiple options.,"import gradio as gr
+
+def get_selected_options(options):
+    return f""Selected options: {options}""
+
+selection_options = [""angola"", ""pakistan"", ""canada""]
+
+iface = gr.Interface(get_selected_options, inputs = 
+","gr.CheckboxGroup([""angola"", ""pakistan"", ""canada""]), outputs = 'text')","
+assert type(iface.input_components[0]) == gr.CheckboxGroup",,
+gradio,3.17.0,-,"
+argument change
+",Write a function that returns the selected options from a list of options. Users can select multiple options.,"import gradio as gr
+
+def get_selected_options(options):
+    return f""Selected options: {options}""
+
+selection_options = [""angola"", ""pakistan"", ""canada""]
+
+iface = gr.Interface(get_selected_options, inputs =
+","gr.Dropdown(selection_options, multiselect=True), outputs = 'text')","
+assert (type(iface.input_components[0]) == gr.Dropdown and iface.input_components[0].multiselect == True ) or type(iface.input_components[0]) == gr.CheckboxGroup",,
+scikit-learn,1.1,GradientBoostingClassifier,"
+output behaviour
+",Train a Gradient Boosting Classifier from scikit-learn for a binary classification task and get the number of features used in fit.,"from sklearn.ensemble import GradientBoostingClassifier\nimport numpy as np\n\n# Load data\nX = np.random.rand(100, 20)  # 100 samples, 20 features\ny = np.random.randint(0, 2, 100)  # 100 binary labels\n\n# Initialize and fit the classifier\nclf = GradientBoostingClassifier()\nclf.fit(X, y)\n","n_features_used = clf.n_features_in_\nprint('Number of features used:', n_features_used)","expected_n_features=20\nassert n_features_used == expected_n_features, f'Test: Number of features should be 20, and it is: {n_features_used}'",numpy==1.23.5,
+scikit-learn,1.1,GradientBoostingClassifier,"
+argument change
+",You are tasked with developing a solution that uses Gradient Boosting Classifier from scikit-learn for a binary classification task with the mean squared error as ther criterion.,from sklearn.ensemble import GradientBoostingClassifier\n\n# Initialize the classifier\nclassifier = GradientBoostingClassifier(criterion=,'squared_error'),"expected_clf=GradientBoostingClassifier\nassert isinstance(classifier, expected_clf)",numpy==1.23.5,
+scikit-learn,1.2,CCA,"
+attribute change
+","Given dummy data, determine the shape of the coef_ attribute of a CCA model fitted with this data.","from sklearn.cross_decomposition import CCA\nimport numpy as np\nX = np.random.rand(100, 10)\nY = np.random.rand(100, 5)\ncca_model = CCA()\ncca_model.fit(X, Y)\ncoef_shape = cca_model.coef_.shape\nexpected_shape =","(10, 5)",\ncorrect_shape=coef_shape\nassert expected_shape == correct_shape,numpy==1.23.5,
+scikit-learn,1.3,CCA,"
+attribute change
+","Given dummy data, determine the shape of the coef_ attribute of a CCA model fitted with this data.","from sklearn.cross_decomposition import CCA\nimport numpy as np\nX = np.random.rand(100, 10)\nY = np.random.rand(100, 5)\ncca_model = CCA()\ncca_model.fit(X, Y)\ncoef_shape = cca_model.coef_.shape\nexpected_shape =","(5, 10)",\ncorrect_shape=coef_shape\nassert expected_shape == correct_shape,numpy==1.23.5,
+scikit-learn,1.1,make_sparse_coded_signal,"
+output behaviour
+",Generate a sparse coded signal where the data is transposed.,"from sklearn.datasets import make_sparse_coded_signal\nn_samples=100\nn_features=50\n\nn_components=20\nn_nonzero_coefs=10\ny, d, c = ","make_sparse_coded_signal(n_samples=n_samples, n_features=n_features,n_components=n_components,n_nonzero_coefs=n_nonzero_coefs)","expected_shape_y = (n_features, n_samples)\nexpected_shape_d = (n_features, n_components)\nexpected_shape_c = (n_components, n_samples)\nassert y.shape == expected_shape_y\nassert d.shape == expected_shape_d\nassert c.shape == expected_shape_c",numpy==1.23.5,
+scikit-learn,1.3,make_sparse_coded_signal,"
+output behaviour
+",Generate a sparse coded signal where the data is transposed.,"from sklearn.datasets import make_sparse_coded_signal\nn_samples=100\nn_features=50\nn_components=20\nn_nonzero_coefs=10\\ny, d, c = ","make_sparse_coded_signal(n_samples=n_samples, n_features=n_features, n_components=n_components,n_nonzero_coefs=n_nonzero_coefs,data_transposed=True)","expected_shape_y = (n_features, n_samples)\nexpected_shape_d = (n_features, n_components)\nexpected_shape_c = (n_components, n_samples)\nassert y.shape == expected_shape_y\nassert d.shape == expected_shape_d\nassert c.shape == expected_shape_c",numpy==1.23.5,
+scikit-learn,1.1,FastICA,"
+argument change
+",Apply Fast Independent Component Analysis (FastICA) with a specific whiten parameter setting. Store transformed data in a variable transformed_data.,"from sklearn.datasets import load_digits\nfrom sklearn.decomposition import FastICA\ndata, _ = load_digits(return_X_y=True)\nica = ","FastICA(n_components=7,random_state=0,whiten=True)\ntransformed_data = ica.fit_transform(data)","expected_shape = (1797, 7)\nassert transformed_data.shape == expected_shape",numpy==1.23.5,
+scikit-learn,1.3,FastICA,"
+argument change
+",Apply Fast Independent Component Analysis (FastICA) with a specific whiten parameter setting. Store transformed data in a variable transformed_data.,"from sklearn.datasets import load_digits\nfrom sklearn.decomposition import FastICA\ndata, _ = load_digits(return_X_y=True)\nica = ","FastICA(n_components=7,random_state=0,whiten='arbitrary-variance')\ntransformed_data = ica.fit_transform(data)","expected_shape = (1797, 7)\nassert transformed_data.shape == expected_shape",numpy==1.23.5,
+scikit-learn,1.1,SimpleImputer,"
+argument change
+","Impute missing values in a dataset using SimpleImputer, including the `verbose` parameter if available. Verify that the output dimensions are as expected.","from sklearn.impute import SimpleImputer\nimport numpy as np\ndata = np.array([[1, 2, 3], [4, None, 6], [7, 8, None]], dtype=float)\nimputer = ",SimpleImputer()\nimputed_data = imputer.fit_transform(data),"expected_type=SimpleImputer\nassert isinstance(imputer, expected_type)",numpy==1.23.5,
+scikit-learn,1.3,get_scorer_names,"
+name change
+","Retrieve and list all available scorer names, ensuring they are returned in a list format.",from sklearn import metrics\nscorer_names = ,metrics.get_scorer_names(),"conditions = isinstance(scorer_names, list) and len(scorer_names) > 0\nassert conditions",numpy==1.23.5,
+scikit-learn,1.2,get_scorer_names,"
+name change
+","Retrieve and list all available scorer names, ensuring they are returned in a list format.",from sklearn import metrics\nscorer_names = ,list(metrics.SCORERS.keys()),"conditions = isinstance(scorer_names, list) and len(scorer_names) > 0\nassert conditions",numpy==1.23.5,
+scikit-learn,1.1,manhattan_distances,"
+argument change
+",Adapt the use of `manhattan_distances` to obtain a pairwise distance matrix.,"from sklearn.metrics.pairwise import manhattan_distances\nimport numpy as np\nX = np.array([[1, 2], [3, 4], [5, 6]])\nY = np.array([[1, 1], [4, 4]])\ndistances = manhattan_distances(X, Y, sum_over_features=False)\nresult = ","np.sum(distances, axis=1)","expected_result = np.array([1, 5, 5, 1, 9, 3])\nassert np.allclose(result, expected_result, atol=1e-3)",numpy==1.23.5,
+scikit-learn,1.2,manhattan_distances,"
+argument change
+",Adapt the use of `manhattan_distances` in scikit-learn version 1.2 to obtain a pairwise distance matrix.,"from sklearn.metrics.pairwise import manhattan_distances\nimport numpy as np\nX = np.array([[1, 2], [3, 4], [5, 6]])\nY = np.array([[1, 1], [4, 4]])\nresult = ","manhattan_distances(X, Y)","expected_result = np.array([[1, 5], [5, 1], [9, 3]])\nassert np.allclose(result, expected_result, atol=1e-3)",numpy==1.23.5,
+matplotlib,3.4.0,revcmap,"
+name change
+",Reverse the following color mapping.,"from matplotlib.colors import *
+import numpy as np
+cmap = {
+    ""blue"": [[1, 2, 2], [2, 2, 1]],
+    ""red"": [[0, 0, 0], [1, 0, 0]],
+    ""green"": [[0, 0, 0], [1, 0, 0]]
+}
+
+cmap_reversed = ","LinearSegmentedColormap(""custom_cmap"", cmap).reversed()
+","
+expected_cmap_reversed = {'blue': [(-1.0, 1, 2), (0.0, 2, 2)], 'red': [(0.0, 0, 0), (1.0, 0, 0)], 'green': [(0.0, 0, 0), (1.0, 0, 0)]}
+
+reversed_cmap_dict = cmap_reversed._segmentdata
+
+assert reversed_cmap_dict == expected_cmap_reversed",,
+matplotlib,3.6.0,,"
+name change (attribute)
+","Set the labels for the x, y and z axis to 'x_axis' 'y_axis' and 'z_axis'","import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+x = [1, 2, 3, 4, 5]
+y = [5, 4, 3, 2, 1]
+z = [2, 3, 4, 5, 6]
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+ax.scatter(x, y, z, c='r', marker='o')
+","ax.xaxis.set_label_text('x_axis')
+ax.yaxis.set_label_text('y_axis')
+ax.zaxis.set_label_text('z_axis')","
+assert ax.xaxis.get_label().get_text()==""x_axis"" and ax.yaxis.get_label().get_text()==""y_axis"" and ax.zaxis.get_label().get_text()==""z_axis"" ",,
+matplotlib,3.5.0,,"
+name change (attribute)
+","Create a contour plot and set the axis for the ContourSet object. Write a function create_contour_plot that creates a contour plot using given x, y, and z data and assigns it to a specific axis","import numpy as np
+import matplotlib.pyplot as plt
+
+def create_contour_plot(x, y, z, ax):
+    pass
+
+
+x = np.linspace(-5, 5, 100)
+y = np.linspace(-5, 5, 100)
+X, Y = np.meshgrid(x, y)
+Z = np.sin(np.sqrt(X**2 + Y**2))
+
+fig, ax = plt.subplots()
+
+contour_set = ","ax.contour(x, y, Z)
+contour_set.ax = ax
+","
+assert contour_set.ax == ax",numpy,
+PyCaret,3,Simple_Imputer,"
+attribute change
+",Write the python code to construct a SimpleImputer with the time strategy as 'mean'using PyCaret version 3.0,"from pycaret.internal.preprocess import Simple_Imputer
+import pycaret
+
+test_length = 6
+data = pycaret.datasets.get_data(""juice"")[0:test_length]
+target = ""Purchase""
+
+Imputer = Simple_Imputer",(time_strategy=”mean' target=target),"assert hasattr(Imputer, 'time_strategy' and Imputer.time_strategy == 'mean'",,03-18-2023
+PyCaret,3,setup,"
+attribute change
+",Write the python code to initialize a training environment and create the transformation pipeline using PyCaret version 3.0 Setup function which uses the hourly seasonal period for determining the frequency of the timeseries data.,"from pycaret.datasets import get_data
+airline = get_data('airline')
+from pycaret.time_series import setup
+exp_name = setup","(data=airline,seasonal_parameter='H')","import inspect
+
+def check_seasonal_parameter(func):
+    sig = inspect.signature(func)
+    parameters = sig.parameters
+    assert 'seasonal_parameter' in parameters
+
+# Test the function
+check_seasonal_parameter(exp_name)",,03-18-2023
+pandas,1.5.0,groupby,"
+output behaviour
+","Use the pandas groupby operation with observed=False and dropna=False, where the intention is to include unobserved categories without dropping NA values. Your job is to predict the expected output after this operation.","import pandas as pd\ndf = pd.DataFrame({'x': pd.Categorical([1, None], categories=[1, 2, 3]), 'y': [3, 4]})\ngrouped_df = df.groupby('x', observed=False, dropna=False).sum()\n# Determine if the groupby operation handled NA values correctly.\n# store expected value of grouped_df in a variable called expected_output\n","expected_output = pd.DataFrame({'y': [3, 4]}, index=pd.Index([1, None], name='x'))",assert grouped_df.equals(expected_output),numpy==1.21.6,
+pandas,1.5.1,groupby,"
+output behaviour
+","Use the pandas groupby operation with observed=False and dropna=False, where the intention is to include unobserved categories without dropping NA values. Your job is to predict the expected output after this operation.","import pandas as pd\ndf = pd.DataFrame({'x': pd.Categorical([1, None], categories=[1, 2, 3]), 'y': [3, 4]})\ngrouped_df = df.groupby('x', observed=False, dropna=False).sum()\n# Examine if the groupby operation correctly includes unobserved categories and handles NA values.\n# store expected value of grouped_df in a variable called expected_output\n","expected_output = pd.DataFrame({'y': [3, 0, 0]}, index=pd.Index([1, 2, 3], name='x'))",assert grouped_df.equals(expected_output),numpy==1.21.6,
+pandas,1.5.0,iloc,"gh
+output behaviour
+",Predict behaviour of setting values with iloc inplace.,"import pandas as pd\nimport numpy as np\ndf = pd.DataFrame({'price': [11.1, 12.2]}, index=['book1', 'book2'])\noriginal_prices = df['price']\nnew_prices = np.array([98, 99])\ndf.iloc[:, 0] = new_prices\n# store expected value original prices in variable called expected_prices\n","expected_prices = pd.Series([11.1, 12.2], index=['book1', 'book2'], dtype=np.float64)","correct_prices=pd.Series([11.1, 12.2], index=['book1', 'book2'], dtype=np.float64)\nassert expected_prices.equals(correct_prices)",numpy==1.21.6,
+pandas,2,iloc,"
+output behaviour
+",Predict behaviour of setting values with iloc inplace.,"import pandas as pd\nimport numpy as np\ndf = pd.DataFrame({'price': [11.1, 12.2]}, index=['book1', 'book2'])\noriginal_prices = df['price']\nnew_prices = np.array([98, 99])\ndf.iloc[:, 0] = new_prices\n# store expected value of original prices in variable called expected_prices\n","expected_prices = pd.Series([98.0, 99.0], index=['book1', 'book2'], dtype=np.float64)","correct_prices=pd.Series([98.0, 99.0], index=['book1', 'book2'], dtype=np.float64)\nassert expected_prices.equals(correct_prices)",numpy==1.21.6,
+pandas,1.5.0,Series slicing,"
+output behaviour
+",Predict behaviour of integer slicing on a Series.,"import pandas as pd\nimport numpy as np\nser = pd.Series([1, 2, 3, 4, 5], index=[2, 3, 5, 7, 11])\nsliced_ser = ser[2:4]\n# put answer in variable called expected_output\n","expected_output = pd.Series([3, 4], index=[5, 7], dtype=np.int64)","assert sliced_ser.equals(expected_output), 'Slicing does not match expected output'",numpy==1.21.6,
+pandas,2,Series slicing,"
+output behaviour
+",Predict behaviour of integer slicing on a Series.,"import pandas as pd\nimport numpy as np\nser = pd.Series([1, 2, 3, 4, 5], index=[2, 3, 5, 7, 11])\nsliced_ser = ser.iloc[2:4]\n# put answer in variable called expected_output\n","expected_output = pd.Series([3, 4], index=[5, 7], dtype=np.int64)","assert sliced_ser.equals(expected_output), 'Slicing does not match expected label-based output'",numpy==1.21.6,
+pandas,1.4.0,Index,"
+output behaviour
+",Predict the correct type.,"import pandas as pd\nindex = pd.Index([1, 2, 3], dtype='int32')\nis_correct_type = index.dtype ==", 'int64',assert is_correct_type,numpy==1.21.6,
+pandas,1.4.0,append,"
+name change
+",Combine series and dataframes.,"import pandas as pd\nseries1 = pd.Series([1, 2])\nseries2 = pd.Series([3, 4])\ndf1 = pd.DataFrame([[1, 2], [3, 4]], columns=list('AB'))\ndf2 = pd.DataFrame([[5, 6], [7, 8]], columns=list('AB'))\n# put answers in variables combined_series and combined_dataframe\n","combined_series = series1.append(series2, ignore_index=True)\ncombined_dataframe = df1.append(df2, ignore_index=True)","expected_series_values = [1, 2, 3, 4]\nexpected_dataframe_values = [[1, 2], [3, 4], [5, 6], [7, 8]]\nassert list(combined_series) == expected_series_values, 'Combined series values are incorrect'\nassert combined_dataframe.values.tolist() == expected_dataframe_values, 'Combined dataframe values are incorrect'",numpy==1.21.6,
+pandas,2,Index,"
+output behaviour
+",Predict the correct type.,"import pandas as pd\nindex = pd.Index([1, 2, 3], dtype='int32')\nis_correct_type = index.dtype ==", 'int32',assert is_correct_type,numpy==1.21.6,
+pandas,2,append,"
+name change
+",Combine series and dataframes.,"import pandas as pd\nseries1 = pd.Series([1, 2])\nseries2 = pd.Series([3, 4])\ndf1 = pd.DataFrame([[1, 2], [3, 4]], columns=list('AB'))\ndf2 = pd.DataFrame([[5, 6], [7, 8]], columns=list('AB'))\n# put answers in variables combined_series and combined_dataframe\n","combined_series = pd.concat([series1, series2], ignore_index=True)\ncombined_dataframe = pd.concat([df1, df2], ignore_index=True)","expected_series_values = [1, 2, 3, 4]\nexpected_dataframe_values = [[1, 2], [3, 4], [5, 6], [7, 8]]\nassert list(combined_series) == expected_series_values, 'Combined series values are incorrect'\nassert combined_dataframe.values.tolist() == expected_dataframe_values, 'Combined dataframe values are incorrect'",numpy==1.21.6,
+numpy,1.21.0,numpy.convolve,"
+argument change
+",Implement a function that calculates the convolution of two arrays with the mode set to full.,"import numpy as np
+
+def apply_convolution_full(arr1, arr2):
+    return ","np.convolve(arr1, arr2, mode=""full"")","
+arr1 = np.array([1, 2, 3])
+arr2 = np.array([0, 1, 0.5])
+assert apply_convolution_full(arr1, arr2).all() == np.convolve(arr1, arr2, 'full').all()",,22/06/2021
+numpy,1.21.0,numpy.convolve,"
+argument change
+",Implement a function that calculates the convolution of two arrays with the mode set to valid.,"import numpy as np
+
+def apply_convolution_valid(arr1, arr2):
+    return ","np.convolve(arr1, arr2, mode=""valid"")","
+arr1 = np.array([1, 2, 3])
+arr2 = np.array([0, 1, 0.5])
+assert apply_convolution_valid(arr1, arr2).all() == np.convolve(arr1, arr2, 'valid').all()",,22/06/2021
+numpy,1.21.0,numpy.correlate,"
+argument change
+",Implement a function that calculates the Cross-correlation of two 1-dimensional sequences with the mode set to full.,"import numpy as np
+
+def apply_correlate_full(arr1, arr2):
+    return ","np.correlate(arr1, arr2, mode=""full"")","
+arr1 = np.array([1, 2, 3])
+arr2 = np.array([0, 1, 0.5])
+assert apply_correlate_full(arr1, arr2).all() == np.correlate(arr1, arr2, 'full').all()",,22/06/2021
+numpy,1.25.0,find_common_type,"
+deprecation
+","Given two arrays, find their common types.","import numpy as np
+
+def find_common_type(arr1, arr2):
+    return np.","common_type(array1, array2)","
+array1 = np.array([1, 2, 3])
+array2 = np.array([4.0, 5.0, 6.0])
+
+assert find_common_type(array1, array2) == np.common_type(array1, array2)",None,17/06/2023
+numpy,1.21.0,find_common_type,"
+deprecation
+","Given two arrays, find their common types.","import numpy as np
+
+def find_common_type(arr1, arr2):
+    return np.","find_common_type(array1, array2)","
+array1 = np.array([1, 2, 3])
+array2 = np.array([4.0, 5.0, 6.0])
+
+assert find_common_type(array1, array2) == np.find_common_type(array1, array2)",None,22/06/2021
+numpy,1.25.0,round_,"
+deprecation
+",Write a function that rounds an array of numbers.,"import numpy as np
+
+def custom_round(arr):
+    return ",np.round(arr),"
+
+def test_custom_round():
+    arr = np.array([1.5, 2.3, 3.7])
+    result = custom_round(arr)
+    expected = np.round(arr)
+    assert np.array_equal(result, expected)
+
+test_custom_round()",,17/06/2023
+numpy,1.25.0,product,"
+deprecation
+",Write a function that computes the product of an array.,"import numpy as np
+
+def custom_product(arr):
+    return ",np.prod(arr),"
+
+def test_custom_product():
+    arr = np.array([1, 2, 3, 4])
+    result = custom_product(arr)
+    expected = np.prod(arr)
+    assert result == expected
+
+test_custom_product()",,17/06/2023
+numpy,1.25.0,cumproduct,"
+deprecation
+",Write a function that computes the cumulative product of an array.,"import numpy as np
+
+def custom_cumproduct(arr):
+    return ",np.cumprod(arr),"
+
+def test_custom_cumproduct():
+    arr = np.array([1, 2, 3, 4])
+    result = custom_cumproduct(arr)
+    expected = np.cumprod(arr)
+    assert np.array_equal(result, expected)
+
+test_custom_cumproduct()",,17/06/2023
+numpy,1.25.0,sometrue,"
+deprecation
+",Write a function that checks if any elements in an array are true.,"import numpy as np
+
+def custom_sometrue(arr):
+    return ",np.any(arr),"
+
+def test_custom_sometrue():
+    arr = np.array([0, 0, 1, 0])
+    result = custom_sometrue(arr)
+    expected = np.any(arr)
+    assert result == expected
+
+test_custom_sometrue()",,17/06/2023
+numpy,1.25.0,alltrue,"
+deprecation
+",Write a function that checks if all elements in an array are true.,"import numpy as np
+
+def custom_alltrue(arr):
+    return ",np.all(arr),"
+
+def test_custom_alltrue():
+    arr = np.array([1, 1, 1, 1])
+    result = custom_alltrue(arr)
+    expected = np.all(arr)
+    assert result == expected
+
+test_custom_alltrue()",,17/06/2023
+numpy,1.21.0,round_,"
+deprecation
+",Write a function that rounds an array of numbers.,"import numpy as np
+
+def custom_round(arr):
+    return ",np.round_(arr),"
+
+def test_custom_round():
+    arr = np.array([1.5, 2.3, 3.7])
+    result = custom_round(arr)
+    expected = np.round_(arr)
+    assert np.array_equal(result, expected)
+
+test_custom_round()",,22/06/2021
+numpy,1.21.0,product,"
+deprecation
+",Write a function that computes the product of an array.,"import numpy as np
+
+def custom_product(arr):
+    return ",np.product(arr),"
+
+def test_custom_product():
+    arr = np.array([1, 2, 3, 4])
+    result = custom_product(arr)
+    expected = np.product(arr)
+    assert result == expected
+
+test_custom_product()",,22/06/2021
+numpy,1.21.0,cumproduct,"
+deprecation
+",Write a function that computes the cumulative product of an array.,"import numpy as np
+
+def custom_cumproduct(arr):
+    return ",np.cumproduct(arr),"
+def test_custom_cumproduct():
+    arr = np.array([1, 2, 3, 4])
+    result = custom_cumproduct(arr)
+    expected = np.cumproduct(arr)
+    assert np.array_equal(result, expected)
+
+test_custom_cumproduct()",,22/06/2021
+numpy,1.21.0,sometrue,"
+deprecation
+",Write a function that checks if any elements in an array are true.,"import numpy as np
+
+def custom_anytrue(arr):
+    return ",np.sometrue(arr),"
+def test_custom_sometrue():
+    arr = np.array([0, 0, 1, 0])
+    result = custom_anytrue(arr)
+    expected = np.sometrue(arr)
+    assert result == expected
+
+test_custom_sometrue()",,22/06/2021
+numpy,1.21.0,alltrue,"
+deprecation
+",Write a function that checks if all elements in an array are true.,"import numpy as np
+
+def custom_alltrue(arr):
+    return ",np.alltrue(arr),"
+
+def test_custom_alltrue():
+    arr = np.array([1, 1, 1, 1])
+    result = custom_alltrue(arr)
+    expected = np.alltrue(arr)
+    assert result == expected
+
+test_custom_alltrue()",,22/06/2021
+lightgbm,3.0.0,predict,Argument or Attribute change,Predict values for each sample with the starting iteration of the tenth iteration.,"import numpy as np
+import lightgbm as lgb
+from lightgbm import LGBMClassifier
+np.random.seed(0)
+data = np.random.rand(100, 10) 
+target = np.random.randint(0, 2, 100)
+model = LGBMClassifier()
+model.fit(data, target)
+model.fit(data, target)
+pred = model",".predict(data, start_iteration=10) ","import numpy as np
+expected_values = np.array([1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0,
+       0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1,
+       0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0,
+       1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1,
+       0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0])
+np.testing.assert_array_equal(pred, expected_values)",numpy==1.26.4,2020-08
+lightgbm,3.0.0,cv,Argument or Attribute change,Perform cross-validation with the given parameters and return the evaluation history for each fold.,"import numpy as np
+import lightgbm as lgb
+from sklearn.datasets import make_classification
+
+NUM_SAMPLES = 500
+NUM_FEATURES = 20
+INFORMATIVE_FEATURES = 2
+REDUNDANT_FEATURES = 10
+RANDOM_STATE = 42
+NUM_BOOST_ROUND = 100
+NFOLD = 5
+LEARNING_RATE = 0.05
+EARLY_STOPPING_ROUNDS = 10
+X, y = make_classification(n_samples=NUM_SAMPLES, n_features=NUM_FEATURES, n_informative=INFORMATIVE_FEATURES, n_redundant=REDUNDANT_FEATURES, random_state=RANDOM_STATE)
+train_data = lgb.Dataset(X, label=y)
+
+params = {
+    'objective': 'binary',
+    'metric': 'binary_logloss',
+    'learning_rate': LEARNING_RATE,
+    'verbose': -1
+}
+
+cv_results = lgb.cv(
+    params=params,
+    train_set=train_data,
+    num_boost_round=NUM_BOOST_ROUND,
+    nfold=NFOLD,
+    early_stopping_rounds=EARLY_STOPPING_ROUNDS,","return_cvbooster=True
+)","import numpy as np
+assert 'cvbooster' in cv_results
+assert len(cv_results['cvbooster'].boosters) == NFOLD
+assert all(isinstance(booster, lgb.Booster) for booster in cv_results['cvbooster'].boosters)",numpy==1.26.4 scikit-learn==1.3.2,2020-08
+lightgbm,3.0.0,decode_string,Semantics or Function Behaviour change,Decode a byte string (ENCODED_STRING),"ENCODED_STRING = b'\x68\x65\x6c\x6c\x6f'
+
+import lightgbm.compat as compat
+
+decoded_string = ",compat.decode_string(ENCODED_STRING),"assert decoded_string == 'hello', ""Decoded string should be 'hello'""
+",,2020-08
+lightgbm,3.0.0,cv,Argument or Attribute change,Perform cross-validation with the given parameters and display the training metric in progress. ,"import numpy as np
+import lightgbm as lgb
+from sklearn.datasets import make_classification
+
+NUM_SAMPLES = 500
+NUM_FEATURES = 20
+INFORMATIVE_FEATURES = 2
+REDUNDANT_FEATURES = 10
+RANDOM_STATE = 42
+NUM_BOOST_ROUND = 100
+NFOLD = 5
+LEARNING_RATE = 0.05
+EARLY_STOPPING_ROUNDS = 10
+X, y = make_classification(n_samples=NUM_SAMPLES, n_features=NUM_FEATURES, n_informative=INFORMATIVE_FEATURES, n_redundant=REDUNDANT_FEATURES, random_state=RANDOM_STATE)
+train_data = lgb.Dataset(X, label=y)
+
+params = {
+    'objective': 'binary',
+    'metric': 'binary_logloss',
+    'learning_rate': LEARNING_RATE,
+    'verbose': -1
+}
+
+cv_results = lgb.cv(
+    params=params,
+    train_set=train_data,
+    num_boost_round=NUM_BOOST_ROUND,
+    nfold=NFOLD,
+    early_stopping_rounds=EARLY_STOPPING_ROUNDS,","eval_train_metric=True
+)","assert {'train binary_logloss-mean', 'train binary_logloss-stdv', 'valid binary_logloss-mean', 'valid binary_logloss-stdv'}.issubset(cv_results.keys())",numpy==1.26.4 scikit-learn==1.3.2,2020-08
+lightgbm,3.0.0,cint32_array_to_numpy,Function Name change,Convert a ctypes pointer to a NumPy array of the specified length.,"import lightgbm as lgb
+import numpy as np
+import ctypes
+
+c_array_type = ctypes.POINTER(ctypes.c_int32)
+c_array = (ctypes.c_int32 * 5)(1, 2, 3, 4, 5)
+c_pointer = ctypes.cast(c_array, c_array_type)
+length = 5
+
+np_array = lgb",".basic.cint32_array_to_numpy(c_pointer, length)","assert isinstance(np_array, np.ndarray)
+assert np_array.shape == (5,)
+assert np.array_equal(np_array, np.array([1, 2, 3, 4, 5], dtype=np.int32))",numpy==1.26.4,2020-08
+lightgbm,3.0.0,get_params,Semantics or Function Behaviour change,Get the parameters of a dataset object as a dictionary.,"import lightgbm as lgb
+import numpy as np
+
+data = np.random.rand(10, 2)
+label = np.random.randint(2, size=10)
+dataset = lgb.Dataset(data, label=label)
+
+params =",dataset.get_params(),"assert isinstance(params, dict) or params is None
+",numpy==1.26.4,2020-08
+lightgbm,3.0.0,json_default_with_numpy,Function Name change,Serialize a NumPy array to a JSON string using a custom default function that converts NumPy arrays to lists.,"import numpy as np
+import json
+from lightgbm.compat import json_default_with_numpy
+
+NUMPY_ARRAY = np.array([1, 2, 3])
+
+json_data = json.dumps(NUMPY_ARRAY",", default=json_default_with_numpy)","assert json_data == '[1, 2, 3]'
+
+
+
+
+",numpy==1.26.4,2020-08
+lightgbm,4.3.0,basic._c_array,Function Name change,Create a ctypes array from a list of values.,"import ctypes
+import lightgbm.basic as basic
+
+CTYPE = ctypes.c_double
+VALUES = [0.1, 0.2, 0.3, 0.4, 0.5]
+
+c_array =","basic._c_array(CTYPE, VALUES)","assert all(isinstance(i, float) for i in c_array)
+assert all(c_array[i] == VALUES[i] for i in range(len(VALUES)))",,2024-01
+lightgbm,4.3.0,basic._c_str,Function Name change,Convert a Python string to a C string.,"import lightgbm as lgb
+import ctypes
+
+# Test cases for c_str function
+python_string = ""lightgbm""
+c_string = ",lgb.basic._c_str(python_string),"assert isinstance(c_string, ctypes.c_char_p)
+assert c_string.value.decode('utf-8') == python_string",,2024-01
+lightgbm,4.3.0,basic._convert_from_sliced_object,Function Name change,Convert a sliced NumPy array back to a contiguous NumPy array.,"import lightgbm as lgb
+import numpy as np
+
+data = np.random.rand(100, 10)
+sliced_data = data[:, :5]
+
+fixed_data = lgb",.basic._convert_from_sliced_object(sliced_data),"assert isinstance(fixed_data, np.ndarray)
+assert fixed_data.shape == sliced_data.shape
+assert np.array_equal(fixed_data, sliced_data)
+",numpy==1.26.4,2024-01
+spacy,3.5.0,labels,New feature or additional dependency based change,Get the labels of the span ruler.,"import spacy
+from spacy.pipeline.span_ruler import SpanRuler
+
+nlp = spacy.blank(""en"")
+ruler = SpanRuler(nlp)
+
+patterns = [
+    {""label"": ""PERSON"", ""pattern"": [{""LOWER"": ""john""}]},
+    {""label"": ""GPE"", ""pattern"": [{""LOWER"": ""london""}]},
+]
+ruler.add_patterns(patterns)
+
+labels = ruler",.labels,"assert labels == ('GPE', 'PERSON')",numpy==1.26.4,2023-01
+spacy,3.5.0,make_whitespace_variant,New feature or additional dependency based change,Create a whitespace variant of an example.,"import spacy
+from spacy.training import Example
+from spacy.training import augment
+
+nlp = spacy.blank(""en"")
+
+tokens = nlp(""Hello world"")
+annotations = {""entities"": [(0, 5, ""GREETING"")]}
+example = Example.from_dict(tokens, annotations)
+
+whitespace = "" ""
+position = 1
+
+augmented_example = ","augment.make_whitespace_variant(nlp, example, whitespace, position)","expected_doc_annotation = {
+    'cats': {},
+    'entities': ['U-GREETING', 'O', 'O'],
+    'spans': {},
+    'links': {}
+}
+
+expected_token_annotation = {
+    'ORTH': ['Hello', ' ', 'world'],
+    'SPACY': [True, False, False],
+    'TAG': ['', '', ''],
+    'LEMMA': ['', '', ''],
+    'POS': ['', '', ''],
+    'MORPH': ['', '', ''],
+    'HEAD': [0, 1, 2],
+    'DEP': ['', '', ''],
+    'SENT_START': [1, 0, 0]
+}
+
+assert augmented_example.to_dict()[""doc_annotation""] == expected_doc_annotation
+assert augmented_example.to_dict()[""token_annotation""] == expected_token_annotation",numpy==1.26.4,2023-01
+spacy,3.5.0,remove_by_id,New feature or additional dependency based change,Remove a pattern from a span ruler by its ID.,"import spacy
+from spacy.pipeline.span_ruler import SpanRuler
+
+nlp = spacy.blank(""en"")
+ruler = SpanRuler(nlp)
+
+patterns = [
+    {""label"": ""PERSON"", ""pattern"": [{""LOWER"": ""john""}], ""id"": ""pattern1""},
+    {""label"": ""GPE"", ""pattern"": [{""LOWER"": ""london""}], ""id"": ""pattern2""},
+]
+ruler.add_patterns(patterns)
+
+assert len(ruler.patterns) == 2
+
+pattern_id_to_remove = ""pattern1""
+
+ruler",.remove_by_id(pattern_id_to_remove),"assert len(ruler.patterns) == 1
+remaining_pattern_ids = [pattern[""id""] for pattern in ruler.patterns]
+assert pattern_id_to_remove not in remaining_pattern_ids",numpy==1.26.4,2023-01
+nltk,3.7,fromstring,New feature or additional dependency based change,Parse a string representation of a tree into an NLTK Tree object.,"from nltk import Tree
+
+s = ""(S (NP (DT The) (NN cat)) (VP (VBZ sits) (PP (IN on) (NP (DT the) (NN mat)))))""
+
+parsed_tree = Tree",".fromstring(s, remove_empty_top_bracketing=True)","assert isinstance(parsed_tree, Tree)
+assert parsed_tree.label() == 'S'",,2022-02
+nltk,3.7,align_words,New feature or additional dependency based change,Align words in a hypothesis and reference sentence using the METEOR algorithm.,"import nltk
+from nltk.stem import PorterStemmer
+from nltk.corpus import wordnet
+
+hypothesis = [""the"", ""cat"", ""sits"", ""on"", ""the"", ""mat""]
+reference = [""the"", ""cat"", ""is"", ""sitting"", ""on"", ""the"", ""mat""]
+
+align_words = ",nltk.translate.meteor_score.align_words,"expected_matches = [(0, 0), (1, 1), (2, 3), (3, 4), (4, 5), (5, 6)]
+matches, unmatched_hypo, unmatched_ref = align_words(hypothesis, reference)
+assert matches == expected_matches
+assert unmatched_hypo == []
+assert unmatched_ref == [(2, 'is')]",,2022-02
+nltk,3.7,examples,New feature or additional dependency based change,Get examples of a synset from WordNet.,"import nltk
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+from nltk.corpus import wordnet
+
+synset = wordnet.synset('dog.n.01')
+
+examples = ",synset.examples(),"assert isinstance(examples, list)
+assert examples == ['the dog barked all night']",,2022-02
+nltk,3.7,fromstring,New feature or additional dependency based change,Parse a string representation of a tree into an NLTK Tree object.,"import nltk
+nltk.download('sinica_treebank')
+from nltk.tree import Tree
+from nltk.corpus import sinica_treebank
+
+sinica_sentence = sinica_treebank.parsed_sents()[0]
+tree_string = sinica_sentence.pformat()
+
+parsed_tree = ",Tree.fromstring(tree_string),"assert isinstance(parsed_tree, Tree)
+assert parsed_tree.label() == ""NP""",,2022-02
+nltk,3.5,accumulate,Semantics or Function Behaviour change,Accumulate the results of applying a function to elements of an iterable.,"from nltk.lm.api import accumulate
+import operator
+
+iterable = [1, 2, 3, 4, 5]
+func = operator.add
+
+result = list(","accumulate(iterable, func))","assert result == [1, 3, 6, 10, 15]",,2020-04
+nltk,3.5,tokenize,New feature or additional dependency based change,Tokenize a string,"import nltk.tokenize.destructive
+
+s = ""This is a test sentence.""
+tokens = nltk",.tokenize.destructive.NLTKWordTokenizer().tokenize(s),"assert isinstance(tokens, list)
+assert tokens == [""This"", ""is"", ""a"", ""test"", ""sentence"", "".""]",,2020-04
