@@ -35,10 +35,10 @@ def codegen(
         TimeElapsedColumn(),
     ) as p:
             
-        if not args.prefetched:
+        if not args.datatype_jsonl:
             dataset = load_dataset(data_path)
         else:
-            # prefetched data
+            # datatype_jsonl data
             with open(data_path, "r") as f:
                 dataset = [json.loads(line) for line in f]
                 dataset = [(d["task_id"], d) for d in dataset]
@@ -79,7 +79,7 @@ def codegen(
             n_existing = existing_data.get(task_id, 0)
             nsamples = n_samples - n_existing
 
-            if args.prefetched:
+            if args.datatype_jsonl:
                 prompt = task["prompt"]
             elif args.oracle:
                 prompt = get_prompt_doc(task, not model.is_direct_completion())
@@ -147,7 +147,7 @@ def main():
     parser.add_argument("--temperature", default=0.0, type=float)
     parser.add_argument("--greedy", action="store_true")
     parser.add_argument("--strip_newlines", action="store_true")
-    parser.add_argument('--prefetched', action='store_true')
+    parser.add_argument('--datatype_jsonl', action='store_true')
     parser.add_argument('--feedback', action='store_true')
     parser.add_argument('--oracle', action='store_true')
     parser.add_argument("--resume", action='store_true')

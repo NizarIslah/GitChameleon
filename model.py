@@ -6,8 +6,6 @@ from warnings import warn
 
 import openai
 import os
-os.environ['TRANSFORMERS_CACHE'] = '/network/scratch/n/nizar.islah/huggingface'
-os.environ['HF_HOME'] = '/network/scratch/n/nizar.islah/huggingface'
 
 
 try:
@@ -127,7 +125,7 @@ class VllmDecoder(DecoderBase):
         if self.tokenizer_name is None:
             self.tokenizer_name = self.name
 
-        self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name, **kwargs, legacy=self.tokenizer_legacy, cache_dir=SCRATCH)
+        self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name, **kwargs, legacy=self.tokenizer_legacy)
         if self.tokenizer.chat_template is None:
             self.eos += extra_eos_for_direct_completion(dataset)
         self.llm = LLM(model=name, max_model_len=self.max_new_tokens, **kwargs)
@@ -188,12 +186,12 @@ class HfTorchDecoder(DecoderBase):
         if self.tokenizer_name is None:
             self.tokenizer_name = self.name
         
-        self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name, **kwargs, legacy=self.tokenizer_legacy, cache_dir=SCRATCH)
+        self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name, **kwargs, legacy=self.tokenizer_legacy)
         
         if self.tokenizer.chat_template is None:
             self.eos += extra_eos_for_direct_completion(dataset)
 
-        self.model = AutoModelForCausalLM.from_pretrained(name, **kwargs, cache_dir=SCRATCH)
+        self.model = AutoModelForCausalLM.from_pretrained(name, **kwargs)
         self.model = self.model.to(self.device)
 
     def is_direct_completion(self) -> bool:
@@ -247,7 +245,7 @@ class GenenralHfTorchDecoder(HfTorchDecoder):
         self.eos += ["\n```\n"]
         print(f"EOS strings: {self.eos}")
         self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name if self.tokenizer_name else self.name,
-                                                       **kwargs, legacy=self.tokenizer_legacy, cache_dir=SCRATCH)
+                                                       **kwargs, legacy=self.tokenizer_legacy)
 
     def codegen(
         self, prompts: List[str], do_sample: bool = True, num_samples: int = 200
