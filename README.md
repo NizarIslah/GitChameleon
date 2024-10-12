@@ -5,11 +5,16 @@ The dataset is in csv format located in ```data/combined_dataset.csv```. These a
 ## Running evals:
 1st step: In ``` create_venvs.py ```. Modify the BASE_PATH to your scratch folder and then run it as ```python create_venvs.py```. This prepares all the library package versions needed to do evaluation with code execution criteria. Then, you are ready to run the main script.
 
-The main script for running evaluations is ```fast_model_generate_eval.py```. Here is an example of how to call it:
+The main script for running generations and evaluations are ```generate.py``` and ```evaluate.py```, respectively.
+
+Example generation, to generate 100 outputs per dataset sample with temperature sampling 0.8:
+```
+python generate.py --n_samples 100 --temperature=0.8 --model $model --data_path $data_path --save_path $save_path
+```
 
 If you want to evaluate:
 ```
-python3.10 fast_model_generate_eval.py  --evaluate-mode --seed=0 --data-path=$data_path --output-path=$out_dir --model-name=$model_name --temperature=0.3
+python evaluate.py  --evaluate-mode --data-path=$data_path --output-path=$out_dir --model-name=$model_name --temperature=$temperature
 ```
 ```data_path```: path to the dataset (csv)
 
