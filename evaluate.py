@@ -276,11 +276,6 @@ def run_script(python_executable, py_file='temp.py'):
         os.remove(py_file)
     except Exception as e:
         print(e)
-    # # for testingpurposes
-    # print("----Parsed code-----")
-    # print(parsed_code)
-    # print("----end of parsed code----")
-    # print("Exit code: ", exit_code, "compile code: ", compile_code, "error_log: ", error_log)
     return 1-exit_code, 1-compile_code, parsed_code, error_log # 1 = pass, 0 = fail
 
 
@@ -670,60 +665,3 @@ if __name__ == "__main__":
         print("Saved results to: ", eval_save_file)
         print(f"final_pass @ {options.k}: ", eval_df[f"{options.model_name.split('/')[-1]}_pass_at_{options.k}"].mean())
         print(f"final_compile @ {options.k}: ", eval_df[f"{options.model_name.split('/')[-1]}_compile_at_{options.k}"].mean())
-
-    regen_save_file = save_file.split(".csv")[0] + "regen.csv"
-  
-    # evaluate error log regeneration
-    if options.error_log_evaluate:
-        # has outputs and 1st eval and error logs
-        assert os.path.exists(options.json_out_file), "Json out file does not exist."
-        outputs = None
-        if '/' in options.model_name:
-            model_name = options.model_name.split('/')[-1]
-        else:
-            model_name = options.model_name
-        outputs = defaultdict(list)
-        with open(options.json_out_file, 'r') as f:
-            k = 0
-            cur_task_id = 0
-            for line_idx, line in enumerate(f):
-                if line_idx < start_idx:
-                    continue
-                resp = json.loads(line)
-                task_id = resp["task_id"]
-                if task_id != cur_task_id:
-                    k = 0
-                    cur_task_id = task_id
-                try:
-                    solution = sanitize(resp["solution"])
-                except Exception as e:
-                    print("Error: ", e)
-                    solution = resp["solution"]
-                outputs[f"{model_name}_regen_output_{k}"].append(solution)
-                k += 1
-
-        if outputs is not None:
-            output_df = pd.DataFrame(outputs)
-            if options.cot:
-                output_df = output_df.map(lambda x: extract_code_cot(x) if x is not None else x)
-
-            df = pd.merge(df, output_df, left_index=True, right_index=True)
-
-        print(df.head())
-
-        df = add_ranking_index(df, options.model_name.split('/')[-1], options.n_generate, regen=True)
-        try:
-            # grandparent of options.data_path
-            repo_dir = os.path.dirname(os.path.dirname(options.data_path))
-            df['env_id'] = pd.read_csv(f'{repo_dir}/updated_libraries.csv')['env_id']
-        except Exception as e:
-            print("Error: ", e)
-            exit(1)
-        # no need to run model, just evaluate the model outputs
-        eval_save_file = regen_save_file.split(".csv")[0] + "_eval.csv"
-
-        eval_df = evaluate_model(options, df, save_dir + '/' + eval_save_file, regen=True, bs=options.batch_size)
-        eval_df.to_csv(save_dir + '/' + eval_save_file, index=False)
-        print("Saved results to: ", eval_save_file)
-        print(f"feedback pass @ {options.k}: ", eval_df[f"{options.model_name.split('/')[-1]}_regen_pass_at_{options.k}"].mean())
-        print(f"feedback compile @ {options.k}: ", eval_df[f"{options.model_name.split('/')[-1]}_regen_compile_at_{options.k}"].mean())
