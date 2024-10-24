@@ -15,13 +15,20 @@ python generate.py --n_samples 100 --temperature 0.8 --model $model --data_path 
 ```
 Then you will get a .jsonl file containing the generated outputs.
 
+Here's a complete example using google's codegemma-7b as the model.
+
+```
+mkdir results
+python generate.py --n_samples 1 --temperature 0.0 --model google/codegemma-7b-it --data_path data/combined_dataset.csv --save_path results/codegemma-7b-it-0.0_outputs.jsonl
+```
+
 For standard evaluation:
 ```
 python evaluate.py  --evaluate-mode --json_out_file $json_outputs --data-path=$data_path --output-path=$out_dir --model-name=$model_name --temperature=$temperature
 ```
 ```data_path```: path to the dataset (csv)
 
-```json_out_file```: path to generated outputs (result of ```python generate.py```)
+```json_out_file```: path to generated outputs (result of ```python generate.py```. In the completed example above, that would be "results/codegemma-7b-it-0.0_outputs.jsonl")
 
 ```evaluate-mode```: means you only run eval metrics (eg. pass @ k), not model inference. You must already have generated outputs from your model formatted correctly (see further instructions on how to format)
 
