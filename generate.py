@@ -6,6 +6,7 @@ import wandb
 
 from model import DecoderBase, make_model
 from utils import get_prompt, write_jsonl, load_dataset, get_prompt_doc
+from sanitize import sanitize
 from rich.progress import (
     BarColumn,
     MofNCompleteColumn,
@@ -106,6 +107,11 @@ def codegen(
                     num_samples=max(batch_nsamples),
                 )
                 assert outputs, "No outputs from model!"
+
+                try:
+                    outputs = [sanitize(output) for output in outputs]
+                except Exception as e:
+                    print("Could not sanitize outputs:", e)
                 
                 samples = []
                 for task_id, content, nsamples, task_outputs in zip(batch_task_ids, batch_prompts, batch_nsamples, outputs):
