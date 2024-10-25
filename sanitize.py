@@ -13,9 +13,6 @@ from tree_sitter_languages import get_parser
 import tree_sitter_python
 from tqdm import tqdm
 from tree_sitter import Language, Node, Parser
-from utils import get_prompt, get_prompt_feedback
-from extract_results_from_wandb import extract_table_from_wandb
-from download_jsons import extract_json_from_wandb
 
 
 CLASS_TYPE = "class_definition"
