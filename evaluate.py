@@ -633,7 +633,7 @@ if __name__ == "__main__":
         df = add_ranking_index(df, options.model_name.split('/')[-1], options.n_generate)
         try:
             repo_dir = os.path.dirname(os.path.dirname(options.data_path))
-            df['env_id'] = pd.read_csv(f'{repo_dir}/updated_libraries.csv')['env_id']
+            df['env_id'] = pd.read_csv(f'{repo_dir}/data/updated_libraries.csv')['env_id']
         except Exception as e:
             print("Error: ", e)
             exit(1)
