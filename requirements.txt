@@ -20,4 +20,3 @@ tree_sitter_languages
 pqdm
 seaborn
 tree_sitter_python
-openai_request
