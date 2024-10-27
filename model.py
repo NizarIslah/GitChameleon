@@ -4,14 +4,7 @@ from abc import ABC, abstractmethod
 from typing import List
 from warnings import warn
 
-import openai
 import os
-
-
-try:
-    import google.generativeai as genai
-except ImportError:
-    warn("GoogleGenAI decoder will not work. Fix by `pip install google-generativeai`")
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -20,8 +13,6 @@ try:
     from vllm import LLM, SamplingParams
 except ImportError:
     warn("VLLM decoder will not work. Fix by `pip install vllm`")
-
-import openai_request
 
 EOS = [
     "<|endoftext|>",
@@ -112,7 +103,6 @@ class DecoderBase(ABC):
     def __str__(self) -> str:
         return self.name
 
-SCRATCH="/network/scratch/n/nizar.islah/"
 class VllmDecoder(DecoderBase):
     def __init__(self, name: str, dataset: str, tp: int, **kwargs) -> None:
         super().__init__(name, **kwargs)
@@ -254,56 +244,6 @@ class GenenralHfTorchDecoder(HfTorchDecoder):
         return HfTorchDecoder.codegen(self, prompts, do_sample, num_samples)
 
 
-class OpenAIChatDecoder(DecoderBase):
-    def __init__(self, name: str, base_url=None, **kwargs) -> None:
-        super().__init__(name, **kwargs)
-        self.client = openai.OpenAI(base_url=base_url)
-
-    def codegen(
-        self, prompts: List[str], do_sample: bool = True, num_samples: int = 200
-    ) -> List[str]:
-        if do_sample:
-            assert self.temperature > 0, "Temperature must be positive for sampling"
-
-        # construct prompt
-        fmt = "json_object" if self.name == "gpt-4-1106-preview" else "text"
-        all_outputs = []
-        for message in tqdm(prompts):
-            
-            outputs = []
-            while len(outputs) < num_samples:
-                print(len(outputs))
-                ret = openai_request.make_auto_request(
-                    self.client,
-                    message=message,
-                    model=self.name,
-                    max_tokens=self.max_new_tokens,
-                    temperature=self.temperature,
-                    n=1,
-                    response_format={"type": fmt},
-                )
-                for item in ret.choices:
-                    content = item.message.content
-                    # if json serializable
-                    if fmt == "json_object":
-                        try:
-                            json_data = json.loads(content)
-                            if json_data.get("code", None) is not None:
-                                outputs.append(prompt + "\n" + json_data["code"])
-                                continue
-
-                            print(f"'code' field not found in: {json_data}")
-                        except Exception as e:
-                            print(e)
-                    outputs.append(content)
-            all_outputs.append(outputs)
-    
-        return all_outputs
-
-    def is_direct_completion(self) -> bool:
-        return False
-
-
 class MistralChatDecoder(DecoderBase):
     def __init__(self, name: str, **kwargs) -> None:
         super().__init__(name, **kwargs)
@@ -391,87 +331,6 @@ class AnthropicMessageDecoder(AnthropicDecoder):
             all_outputs.append(outputs)
         return outputs
 
-
-class GoogleGenAIDecoder(DecoderBase, ABC):
-    def __init__(self, name: str, **kwargs) -> None:
-        super().__init__(name, **kwargs)
-        genai.configure(api_key=os.environ['GOOGLE_API_KEY'])
-
-    def is_direct_completion(self) -> bool:
-        return False
-    
-
-class GeminiDecoder(GoogleGenAIDecoder):
-    def codegen(
-        self, prompts: List[str], do_sample: bool = True, num_samples: int = 200
-    ) -> List[str]:
-        kwargs = {}
-        if do_sample:
-            assert self.temperature > 0, "Temperature must be positive for sampling"
-            kwargs["top_p"] = 0.95
-            kwargs["temperature"] = self.temperature
-        else:
-            self.temperature = 0
-
-        genai_config = genai.GenerationConfig(
-            max_output_tokens=self.max_new_tokens,
-            **kwargs,
-        )
-
-        safety_settings = [
-            {
-                "category": "HARM_CATEGORY_DANGEROUS",
-                "threshold": "BLOCK_NONE",
-            },
-            {
-                "category": "HARM_CATEGORY_HARASSMENT",
-                "threshold": "BLOCK_NONE",
-            },
-            {
-                "category": "HARM_CATEGORY_HATE_SPEECH",
-                "threshold": "BLOCK_NONE",
-            },
-            {
-                "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-                "threshold": "BLOCK_NONE",
-            },
-            {
-                "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-                "threshold": "BLOCK_NONE",
-            },
-        ]
-        
-        model = genai.GenerativeModel(model_name=self.name, generation_config=genai_config, safety_settings=safety_settings)
-        
-        all_outputs = []
-        
-        for message in tqdm(prompts):
-            outputs = []
-
-            for _ in range(num_samples):
-                while True:
-                    try:
-                        response = model.generate_content(
-                            message,
-                            generation_config=genai_config
-                    )
-                        output = response.candidates[0].content.parts[0].text
-                        outputs.append(output)
-                        break
-                    except Exception as e:
-                        if "list index out of range" in str(e):
-                            # append dummy response
-                            outputs.append("NO_RESPONSE")
-                            break
-                        else:
-                            print(e)
-                            continue
-
-            all_outputs.append(outputs)
-
-        return all_outputs
-
-
 def make_model(
     model: str,
     backend: str,
@@ -508,13 +367,6 @@ def make_model(
             tokenizer_legacy=tokenizer_legacy,
             cot=cot,
         )
-    elif backend == "openai":
-        return OpenAIChatDecoder(
-            name=model,
-            temperature=temperature,
-            base_url=base_url,
-            cot=cot,
-        )
     elif backend == "mistral":
         return MistralChatDecoder(
             name=model,
@@ -523,12 +375,6 @@ def make_model(
         )
     elif backend == "anthropic":
         return AnthropicMessageDecoder(
-            name=model,
-            temperature=temperature,
-            cot=cot,
-        )
-    elif backend == "google":
-        return GeminiDecoder(
             name=model,
             temperature=temperature,
             cot=cot,
