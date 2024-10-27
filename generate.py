@@ -109,7 +109,7 @@ def codegen(
                 assert outputs, "No outputs from model!"
 
                 try:
-                    outputs = [sanitize(output) for output in outputs]
+                    outputs = [[sanitize(x) for x in output] for output in outputs]
                 except Exception as e:
                     print("Could not sanitize outputs:", e)
                 
