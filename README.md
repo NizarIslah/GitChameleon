@@ -3,9 +3,9 @@ GitChameleon: A Benchmark for version-conditioned code generation
 ## Downloading the dataset
 The dataset is in csv format located in ```data/combined_dataset.csv```. These are the examples used in our benchmark.
 ## Running evals:
-step 0: Create a python3.10 environment and do ```pip install -r requirements.txt```
+step 0: Create a `python3.10` environment, e.g. with conda ```conda create -n GitChameleon python=3.10```, and do ```pip install -r requirements.txt```
 
-step 1: Run```python create_venvs.py <BASE_PATH>```, modifying the BASE_PATH to your scratch folder. This prepares all the library package versions needed to do evaluation with code execution criteria. Then, you are ready to run the main script.
+step 1: Run```python create_venvs.py <EVAL_ENV_PATH>```, modifying the `EVAL_ENV_PATH` to your scratch folder. This prepares all the library package versions needed to do evaluation with code execution criteria. Then, you are ready to run the main script.
 
 The main script for running generations and evaluations are ```generate.py``` and ```evaluate.py```, respectively.
 We support all models that are supported by vllm.
@@ -18,8 +18,8 @@ Then you will get a .jsonl file containing the generated outputs.
 Here's a complete example using google's codegemma-7b as the model.
 
 ```
-mkdir results
-python generate.py --n_samples 1 --temperature 0.0 --model google/codegemma-7b-it --data_path data/combined_dataset.csv --save_path results/codegemma-7b-it-0.0_outputs.jsonl
+mkdir outputs
+python generate.py --n_samples 1 --temperature 0.0 --model google/codegemma-7b-it --data_path data/combined_dataset.csv --save_path outputs/codegemma-7b-it-temp_0.0.jsonl
 ```
 
 For standard evaluation:
