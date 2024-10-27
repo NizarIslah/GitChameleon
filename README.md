@@ -15,11 +15,11 @@ python generate.py --n_samples 100 --temperature 0.8 --model $model --data_path 
 ```
 Then you will get a .jsonl file containing the generated outputs.
 
-Here's a complete example using google's codegemma-7b as the model.
+Here's a complete example using Qwen/Qwen2-7B-Instruct as the model.
 
 ```
 mkdir results
-python generate.py --n_samples 1 --temperature 0.0 --model google/codegemma-7b-it --data_path data/combined_dataset.csv --save_path results/codegemma-7b-it-0.0_outputs.jsonl
+python generate.py --n_samples 1 --temperature 0.0 --model Qwen/Qwen2-7B-Instruct --data_path data/combined_dataset.csv --save_path results/codegemma-7b-it-0.0_outputs.jsonl
 ```
 
 For standard evaluation:
