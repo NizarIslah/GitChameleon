@@ -70,7 +70,7 @@ def main():
     print(f"Number of unique environments: {df['env_id'].nunique()}")
 
     # Save the updated CSV
-    df.to_csv('updated_libraries.csv', index=False)
+    df.to_csv('data/updated_libraries.csv', index=False)
     print("Updated CSV with virtual environment IDs saved.")
 
     # check that the python executable exists for each venv
