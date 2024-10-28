@@ -1,6 +1,4 @@
-# GitChameleonEval
-
-## GitChameleon: A Benchmark for Version-Conditioned Code Generation
+# GitChameleon: A Benchmark for Version-Conditioned Code Generation
 
 ### Downloading the Dataset
 
