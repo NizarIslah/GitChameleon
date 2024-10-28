@@ -55,7 +55,7 @@ python generate.py --n_samples 5 --temperature 0.8 --model bigcode/starcoder2-15
 For standard evaluation:
 
 ```bash
-python evaluate.py --evaluate-mode --json-out-file $json_outputs --output-path $out_dir --model-name $model_name --temperature $temperature
+python evaluate.py --json-out-file $json_outputs --output-path $out_dir --model-name $model_name --temperature $temperature
 ```
 
 **Parameter Descriptions**:
