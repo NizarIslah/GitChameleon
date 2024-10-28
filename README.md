@@ -1,37 +1,93 @@
 # GitChameleonEval
-GitChameleon: A Benchmark for version-conditioned code generation
-## Downloading the dataset
-The dataset is in csv format located in ```data/combined_dataset.csv```. These are the examples used in our benchmark.
-## Running evals:
-step 0: Create a `python3.10` environment, e.g. with conda ```conda create -n GitChameleon python=3.10```, and do ```pip install -r requirements.txt```
 
-step 1: Run```python create_venvs.py <EVAL_ENV_PATH>```, modifying the `EVAL_ENV_PATH` to your scratch folder. This prepares all the library package versions needed to do evaluation with code execution criteria. Then, you are ready to run the main script.
+## GitChameleon: A Benchmark for Version-Conditioned Code Generation
 
-The main script for running generations and evaluations are ```generate.py``` and ```evaluate.py```, respectively.
-We support all models that are supported by vllm.
-Example generation, to generate 100 outputs per dataset sample with temperature sampling 0.8:
-```
-python generate.py --n_samples 100 --temperature 0.8 --model $model --data_path $data_path --save_path $save_path
-```
-Then you will get a .jsonl file containing the generated outputs.
+### Downloading the Dataset
 
-Here's a complete example using Qwen/Qwen2-7B-Instruct as the model.
+The dataset used in our benchmark is available in CSV format at `data/combined_dataset.csv`.
 
+### Setting Up the Environment
+
+1. **Create a Python 3.10 Environment**:
+
+   - (optional) Use conda to create the environment:
+     ```
+     conda create -n GitChameleon python=3.10
+     ```
+   - Install the required packages:
+     ```
+     pip install -r requirements.txt
+     ```
+
+2. **Prepare Virtual Environments for Evaluation**:
+
+   - Run the following script to populate the `eval_envs/` directory with the necessary Python libraries:
+     ```
+     python create_venvs.py
+     ```
+
+   This step sets up the specific library versions required for evaluation using code execution criteria.
+
+### Running Generations and Evaluations
+
+- **Main Scripts**:
+  - `generate.py`: Runs the model to generate outputs.
+  - `evaluate.py`: Evaluates the generated outputs.
+
+We support all models that are compatible with VLLM.
+
+#### Example: Generating Outputs
+
+To generate the code generations:
+
+```bash
+python generate.py --n_samples $n_samples --temperature $temperature --model $model --save_path $save_path
 ```
-mkdir results
-python generate.py --n_samples 1 --temperature 0.0 --model Qwen/Qwen2-7B-Instruct --data_path data/combined_dataset.csv --save_path results/qwen2-7b-instruct-0.0_outputs.jsonl
+
+This command will create a `.jsonl` file with the generated outputs.
+
+**Complete Example**: Generating with `bigcode/starcoder2-15b-instruct-v0.1`, using `VLLM` as the backend on a GPU (with enough memory)  using 5 samples and a temperature of 0.8:
+
+```bash
+python generate.py --n_samples 5 --temperature 0.8 --model bigcode/starcoder2-15b-instruct-v0.1 --save_path generations/Starcoder2-instruct-v1.0_temperature0.8.jsonl
 ```
+
+#### Example: Running Evaluations
 
 For standard evaluation:
+
+```bash
+python evaluate.py --evaluate-mode --json-out-file $json_outputs --output-path $out_dir --model-name $model_name --temperature $temperature
 ```
-python evaluate.py  --evaluate-mode --json_out_file $json_outputs --data-path=$data_path --output-path=$out_dir --model-name=$model_name --temperature=$temperature
+
+**Parameter Descriptions**:
+
+- `--model-name`: Name of the model used.
+- `--json-out-file`: Path to the generated outputs (e.g., `generations/starcoder2-15b-instruct-v0.1_temperature0.0.jsonl`).
+- `--evaluate-mode`: Indicates that only evaluation metrics (e.g., pass\@k) will be run. Pre-generated outputs are required.
+- `--output-path`: Directory to save the evaluation results.
+- `--n-jobs`: Number of parallel evaluation jobs (`-1` uses all available CPUs).
+
+**Finishing the Example**:
+
+```bash
+python evaluate.py --evaluate-mode --json-out-file generations/starcoder2-15b-instruct-v0.1_temperature0.8.jsonl --output-path results/starcoder2-15b-instruct-v0.1_temp0.0.csv --model-name bigcode/starcoder2-15b-instruct-v0.1 --temperature 0.8
 ```
-```data_path```: path to the dataset (csv)
 
-```json_out_file```: path to generated outputs (result of ```python generate.py```. In the completed example above, that would be "results/codegemma-7b-it-0.0_outputs.jsonl")
+### To-Do Items
 
-```evaluate-mode```: means you only run eval metrics (eg. pass @ k), not model inference. You must already have generated outputs from your model formatted correctly (see further instructions on how to format)
+- Set default values for file paths to reduce manual entry.
+- Clarify if `evaluate.py` can run the full pipeline without `--evaluate-mode`.
+- Specify the number of CPUs used in generation.
 
-```output-path```: path to save eval results
+### Supported Backends
 
-```model-name```: name of your model
+Currently supported backend:
+
+- `vllm`
+
+Planned support:
+
+- `hf`, `openai`, `mistral`, `anthropic`, `google`
+
+

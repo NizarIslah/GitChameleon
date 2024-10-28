@@ -15,10 +15,11 @@ from rich.progress import (
     TimeElapsedColumn,
 )
 
+
 def codegen(
     model: DecoderBase,
     save_path: str,
-    data_path: str,
+    dataset_path: str,
     cot=False,
     greedy=False,
     strip_newlines=False,
@@ -35,12 +36,12 @@ def codegen(
         TextColumn("•"),
         TimeElapsedColumn(),
     ) as p:
-            
+
         if not args.datatype_jsonl:
-            dataset = load_dataset(data_path)
+            dataset = load_dataset(dataset_path)
         else:
             # datatype_jsonl data
-            with open(data_path, "r") as f:
+            with open(dataset_path, "r") as f:
                 dataset = [json.loads(line) for line in f]
                 dataset = [(d["task_id"], d) for d in dataset]
 
@@ -59,8 +60,10 @@ def codegen(
             with open(save_path, "r") as f:
                 for line in f:
                     item = json.loads(line)
-                    existing_data[item["task_id"]] = existing_data.get(item["task_id"], 0) + 1
-        
+                    existing_data[item["task_id"]] = (
+                        existing_data.get(item["task_id"], 0) + 1
+                    )
+
         # from dataset
         if isinstance(dataset, dict):
             dataset_ = dataset.items()
@@ -92,13 +95,17 @@ def codegen(
                 batch_prompts.append(prompt)
                 batch_task_ids.append(task_id)
                 batch_nsamples.append(nsamples)
-                
+
                 log = f"Codegen: {p_name} @ {model}"
                 if n_existing > 0:
                     log += f" (resuming from {n_existing})"
                 p.console.print(log)
-            
-            if (len(batch_prompts) == batch_size) or (id_num == len(dataset) - 1) or (id_range and id_num == id_range[1] - 1):
+
+            if (
+                (len(batch_prompts) == batch_size)
+                or (id_num == len(dataset) - 1)
+                or (id_range and id_num == id_range[1] - 1)
+            ):
                 if not batch_prompts:
                     break
                 outputs = model.codegen(
@@ -112,22 +119,28 @@ def codegen(
                     outputs = [[sanitize(x) for x in output] for output in outputs]
                 except Exception as e:
                     print("Could not sanitize outputs:", e)
-                
+
                 samples = []
-                for task_id, content, nsamples, task_outputs in zip(batch_task_ids, batch_prompts, batch_nsamples, outputs):
+                for task_id, content, nsamples, task_outputs in zip(
+                    batch_task_ids, batch_prompts, batch_nsamples, outputs
+                ):
                     if model.is_direct_completion():
-                        samples.extend([
-                            dict(task_id=task_id, solution=content+completion)
-                            for completion in task_outputs[:nsamples]
-                        ])
+                        samples.extend(
+                            [
+                                dict(task_id=task_id, solution=content + completion)
+                                for completion in task_outputs[:nsamples]
+                            ]
+                        )
                     else:
-                        samples.extend([
-                            dict(task_id=task_id, solution=completion)
-                            for completion in task_outputs[:nsamples]
-                        ])
+                        samples.extend(
+                            [
+                                dict(task_id=task_id, solution=completion)
+                                for completion in task_outputs[:nsamples]
+                            ]
+                        )
                 print(f"Generated {len(samples)} samples")
                 write_jsonl(save_path, samples, append=True)
-            
+
                 # Clear batches
                 batch_prompts = []
                 batch_task_ids = []
@@ -139,13 +152,16 @@ def codegen(
         wandb.log({"generated": len(samples)})
         wandb.finish()
 
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--wandb-project', type=str, default='GitChameleon')
-    parser.add_argument('--wandb-entity', type=str, default='cl4code')
-    parser.add_argument('--disable-wandb', action='store_true', default=False)
+    parser.add_argument("--wandb-project", type=str, default="GitChameleon")
+    parser.add_argument("--wandb-entity", type=str, default="cl4code")
+    parser.add_argument("--disable-wandb", action="store_true", default=False)
     parser.add_argument("--model", required=True, type=str)
-    parser.add_argument("--data_path", default="data/combined_dataset.csv", type=str)
+    parser.add_argument(
+        "--dataset_path", default="dataset/combined_dataset.csv", type=str
+    )
     parser.add_argument("--save_path", default=None, type=str)
     parser.add_argument("--cot", action="store_true")
     parser.add_argument("--bs", default=1, type=int)
@@ -153,13 +169,20 @@ def main():
     parser.add_argument("--temperature", default=0.0, type=float)
     parser.add_argument("--greedy", action="store_true")
     parser.add_argument("--strip_newlines", action="store_true")
-    parser.add_argument('--datatype_jsonl', action='store_true')
-    parser.add_argument('--feedback', action='store_true')
-    parser.add_argument('--oracle', action='store_true')
-    parser.add_argument("--resume", action='store_true')
+    parser.add_argument("--datatype_jsonl", action="store_true")
+    parser.add_argument("--feedback", action="store_true")
+    parser.add_argument("--oracle", action="store_true")
+    parser.add_argument("--resume", action="store_true")
     parser.add_argument("--id_range", nargs=2, type=int)
-    parser.add_argument("--backend", default="vllm", type=str, choices=["vllm", "hf", "openai", "mistral", "anthropic", "google"])
-    parser.add_argument("--base_url", default=None, type=str)
+    parser.add_argument(
+        "--backend",
+        default="vllm",
+        type=str,
+        choices=["vllm", "hf", "openai", "mistral", "anthropic", "google"],
+    )  # TODO: are these even implemented?
+    parser.add_argument(
+        "--base_url", default=None, type=str
+    )  # TODO: is this even implemented?
     parser.add_argument("--tp", default=1, type=int)
     parser.add_argument("--trust_remote_code", action="store_true")
     parser.add_argument("--tokenizer_legacy", action="store_true")
@@ -169,8 +192,12 @@ def main():
 
     # wandb
     if not args.disable_wandb:
-        wandb.init(project=args.wandb_project, entity=args.wandb_entity, name=args.model, config=vars(args))
-        
+        wandb.init(
+            project=args.wandb_project,
+            entity=args.wandb_entity,
+            name=args.model,
+            config=vars(args),
+        )
 
     if args.greedy or (args.temperature == 0 and args.n_samples == 1):
         args.temperature = 0
@@ -193,11 +220,14 @@ def main():
         trust_remote_code=args.trust_remote_code,
         tokenizer_name=args.tokenizer_name,
         tokenizer_legacy=args.tokenizer_legacy,
-        cot=args.cot
+        cot=args.cot,
     )
-    
+
     if not args.save_path:
-        save_path = args.model.replace("/", "--") + f"--gitchameleon--{args.backend}-{args.temperature}-{args.n_samples}"
+        save_path = (
+            args.model.replace("/", "--")
+            + f"--gitchameleon--{args.backend}-{args.temperature}-{args.n_samples}"
+        )
         if args.cot:
             save_path += f"--cot"
         if args.feedback:
@@ -209,7 +239,7 @@ def main():
     codegen(
         model=model_runner,
         save_path=save_path,
-        data_path=args.data_path,
+        dataset_path=args.dataset_path,
         cot=args.cot,
         greedy=args.greedy,
         strip_newlines=args.strip_newlines,
@@ -217,7 +247,7 @@ def main():
         resume=args.resume,
         id_range=args.id_range,
         batch_size=args.bs,
-        args=args
+        args=args,
     )
 
 

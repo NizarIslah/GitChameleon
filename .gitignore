@@ -163,4 +163,6 @@ cython_debug/
 
 # added 
 eval_venvs/
+generations/
+results/
 wandb/
