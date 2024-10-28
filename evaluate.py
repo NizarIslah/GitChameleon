@@ -3,11 +3,9 @@ import argparse
 import pandas as pd
 import sys
 import numpy as np
-# import virtualenv
 import py_compile
 from tqdm import tqdm
 from joblib import Parallel, delayed
-# autotokensizer
 import re
 import os
 import time
@@ -17,36 +15,11 @@ import json
 from collections import defaultdict
 from sanitize import sanitize
 
-col_pass_pattern = "pass"
-output_pattern = "output"
-parsed_code_pattern = "parsed_code"
-def pass_cols(table):
-    return [col for col in table.columns if col_pass_pattern in col and output_pattern in col and "regen" not in col]
-def out_cols(table):
-    return [col for col in table.columns if output_pattern in col and "compile" not in col and "pass" not in col]
-def parsed_code_cols(table):
-    return [col for col in table.columns if parsed_code_pattern in col]
-
-def validate_tables(table1, table2, model_name):
-    # table 1 is after regen, table 2 is after evaluate
-    # check if the  pass indices of table1 are at least as much as the pass indices of table2
-    pass_indices1 = table1[pass_cols(table1)].sum(axis=1) > 0
-    pass_indices2 = table2[pass_cols(table2)].sum(axis=1) > 0
-    # print(pass_indices1, pass_indices2)
-    assert np.all(pass_indices1 == pass_indices2), f"Pass indices are not the same, {sum(pass_indices1)}, {sum(pass_indices2)}"
-
-    print(table1[f'{model_name}_pass_at_10'].mean(), table2[f'{model_name}_pass_at_10'].mean())
-
-
-library_specific_instructions = {
-    "gradio" : "Do not launch a gradio interface."
-}
 
 def parse_option():
     parser = argparse.ArgumentParser()
     parser.add_argument('--model-url', type=str, default='')
     parser.add_argument('--model-name', type=str, default="")
-    # make model names as a list argument
     parser.add_argument('--model-names', type=str, nargs='+', default=[], help="List of model names to evaluate")
     parser.add_argument('--instruct', default=False, action='store_true')
     parser.add_argument('--size', type=int, default=0)
@@ -69,7 +42,6 @@ def parse_option():
     parser.add_argument('--scratch', type=str, default="")
     parser.add_argument('--disable-wandb', action='store_true', default=False)
     parser.add_argument('--output-path', type=str, default="results.csv")
-    parser.add_argument('--evaluate-mode', action='store_true', default=False)
     parser.add_argument('--cot', action='store_true', default=False)
     parser.add_argument('--cot-output-path', type=str, default="cot_generations.jsonl")
     parser.add_argument('--resume', action='store_true', default=False)
@@ -584,84 +556,84 @@ if __name__ == "__main__":
         save_file = options.library + '_' + save_file
 
 
-    if options.evaluate_mode:
-        outputs = None
-        print("---Evaluation---")
-        if options.cot:
-            # greedy, 1 file, "solution"
+    outputs = None
+    print("---Evaluation---")
+    if options.cot:
+        # greedy, 1 file, "solution"
+        model_name = options.model_name.split('/')[-1]
+        outputs = defaultdict(list)
+        with open(options.cot_output_path, 'r') as f:
+            for line_idx, line in enumerate(f):
+                resp = json.loads(line)
+                for k in range(options.n_generate):
+                    outputs[f"{model_name}_output_{k}"].append(sanitize(resp["solution"]))
+
+    else:
+        assert os.path.exists(options.json_out_file), "Json out file does not exist."
+        if '/' in options.model_name:
             model_name = options.model_name.split('/')[-1]
-            outputs = defaultdict(list)
-            with open(options.cot_output_path, 'r') as f:
-                for line_idx, line in enumerate(f):
-                    resp = json.loads(line)
-                    for k in range(options.n_generate):
-                        outputs[f"{model_name}_output_{k}"].append(sanitize(resp["solution"]))
-
         else:
-            assert os.path.exists(options.json_out_file), "Json out file does not exist."
-            if '/' in options.model_name:
-                model_name = options.model_name.split('/')[-1]
-            else:
-                model_name = options.model_name
-            outputs = defaultdict(list)
-            with open(options.json_out_file, 'r') as f:
-                k = 0
-                cur_task_id = 0
-                for line_idx, line in enumerate(f):
-                    resp = json.loads(line)
-                    task_id = resp["task_id"]
-                    if task_id != cur_task_id:
-                        k = 0
-                        cur_task_id = task_id
-                    try:
-                        solution = sanitize(resp["solution"])
-                    except Exception as e:
-                        print("Error: ", e)
-                        solution = resp["solution"]
-                    outputs[f"{model_name}_output_{k}"].append(solution)
-                    k += 1
+            model_name = options.model_name
+        outputs = defaultdict(list)
+        with open(options.json_out_file, 'r') as f:
+            k = 0
+            cur_task_id = 0
+            for line_idx, line in enumerate(f):
+                resp = json.loads(line)
+                task_id = resp["task_id"]
+                if task_id != cur_task_id:
+                    options.n_generate = k
+                    k = 0
+                    cur_task_id = task_id
+                try:
+                    solution = sanitize(resp["solution"])
+                except Exception as e:
+                    print("Error: ", e)
+                    solution = resp["solution"]
+                outputs[f"{model_name}_output_{k}"].append(solution)
+                k += 1
 
-        if outputs is not None:
-            output_df = pd.DataFrame(outputs)
-            if options.cot:
-                output_df = output_df.map(lambda x: extract_code_cot(x) if x is not None else x)
+    if outputs is not None:
+        output_df = pd.DataFrame(outputs)
+        if options.cot:
+            output_df = output_df.map(lambda x: extract_code_cot(x) if x is not None else x)
 
-            df = pd.merge(df, output_df, left_index=True, right_index=True)
+        df = pd.merge(df, output_df, left_index=True, right_index=True)
 
-        print(df.head())
-        
-        df = add_ranking_index(df, options.model_name.split('/')[-1], options.n_generate)
-        try:
-            repo_dir = os.path.dirname(os.path.dirname(options.data_path))
-            df['env_id'] = pd.read_csv(f'{repo_dir}/data/updated_libraries.csv')['env_id']
-        except Exception as e:
-            print("Error: ", e)
-            exit(1)
+    print(df.head())
+    
+    df = add_ranking_index(df, options.model_name.split('/')[-1], options.n_generate)
+    try:
+        repo_dir = os.path.dirname(os.path.dirname(options.data_path))
+        df['env_id'] = pd.read_csv(f'{repo_dir}/data/updated_libraries.csv')['env_id']
+    except Exception as e:
+        print("Error: ", e)
+        exit(1)
 
-        # check that outputs are not empty
-        for k in range(options.n_generate):
-            if any(df[f"{options.model_name.split('/')[-1]}_output_{k}"].isna()):
-                print(f"Empty outputs for {options.model_name.split('/')[-1]}_output_{k}")
-            # drop rows with empty outputs
-            df = df[~df[f"{options.model_name.split('/')[-1]}_output_{k}"].isna()]
-        if df.shape[0] == 0:
-            print("No outputs to evaluate. Exiting...")
-            exit(1)
-        else:
-            print("Non empty rows: ", df.shape[0])
-        df.reset_index(drop=True, inplace=True)
+    # check that outputs are not empty
+    for k in range(options.n_generate):
+        if any(df[f"{options.model_name.split('/')[-1]}_output_{k}"].isna()):
+            print(f"Empty outputs for {options.model_name.split('/')[-1]}_output_{k}")
+        # drop rows with empty outputs
+        df = df[~df[f"{options.model_name.split('/')[-1]}_output_{k}"].isna()]
+    if df.shape[0] == 0:
+        print("No outputs to evaluate. Exiting...")
+        exit(1)
+    else:
+        print("Non empty rows: ", df.shape[0])
+    df.reset_index(drop=True, inplace=True)
 
-        # no need to run model, just evaluate the model outputs
-        eval_save_file = save_file.split(".csv")[0] + "_eval.csv"
-        # check if exists (incomplete run)
-        if options.resume and os.path.exists(save_dir + '/' + eval_save_file):
-            df_updated = pd.read_csv(save_dir + '/' + eval_save_file)
-            print("Loaded partial results from: ", eval_save_file, f"Rows done: {df_updated.shape[0]}/{len(df)}")
-        else:
-            df_updated = None
+    # no need to run model, just evaluate the model outputs
+    eval_save_file = save_file.split(".csv")[0] + "_eval.csv"
+    # check if exists (incomplete run)
+    if options.resume and os.path.exists(save_dir + '/' + eval_save_file):
+        df_updated = pd.read_csv(save_dir + '/' + eval_save_file)
+        print("Loaded partial results from: ", eval_save_file, f"Rows done: {df_updated.shape[0]}/{len(df)}")
+    else:
+        df_updated = None
 
-        eval_df = evaluate_model(options, df, save_dir + '/' + eval_save_file, df_updated=df_updated, bs=options.batch_size)
-        eval_df.to_csv(save_dir + '/' + eval_save_file, index=False)
-        print("Saved results to: ", eval_save_file)
-        print(f"final_pass @ {options.k}: ", eval_df[f"{options.model_name.split('/')[-1]}_pass_at_{options.k}"].mean())
-        print(f"final_compile @ {options.k}: ", eval_df[f"{options.model_name.split('/')[-1]}_compile_at_{options.k}"].mean())
+    eval_df = evaluate_model(options, df, save_dir + '/' + eval_save_file, df_updated=df_updated, bs=options.batch_size)
+    eval_df.to_csv(save_dir + '/' + eval_save_file, index=False)
+    print("Saved results to: ", eval_save_file)
+    print(f"final_pass @ {options.k}: ", eval_df[f"{options.model_name.split('/')[-1]}_pass_at_{options.k}"].mean())
+    print(f"final_compile @ {options.k}: ", eval_df[f"{options.model_name.split('/')[-1]}_compile_at_{options.k}"].mean())
