@@ -62,20 +62,18 @@ python evaluate.py --evaluate-mode --json-out-file $json_outputs --output-path $
 
 - `--model-name`: Name of the model used.
 - `--json-out-file`: Path to the generated outputs (e.g., `generations/starcoder2-15b-instruct-v0.1_temperature0.0.jsonl`).
-- `--evaluate-mode`: Indicates that only evaluation metrics (e.g., pass\@k) will be run. Pre-generated outputs are required.
 - `--output-path`: Directory to save the evaluation results.
 - `--n-jobs`: Number of parallel evaluation jobs (`-1` uses all available CPUs).
 
 **Finishing the Example**:
 
 ```bash
-python evaluate.py --evaluate-mode --json-out-file generations/starcoder2-15b-instruct-v0.1_temperature0.8.jsonl --output-path results/starcoder2-15b-instruct-v0.1_temperature0.0.csv --model-name bigcode/starcoder2-15b-instruct-v0.1 --temperature 0.8
+python evaluate.py --json-out-file generations/starcoder2-15b-instruct-v0.1_temperature0.8.jsonl --output-path results/starcoder2-15b-instruct-v0.1_temperature0.0.csv --model-name bigcode/starcoder2-15b-instruct-v0.1 --temperature 0.8
 ```
 
 ### To-Do Items
 
 - Set default values for file paths to reduce manual entry.
-- Clarify if `evaluate.py` can run the full pipeline without `--evaluate-mode`.
 - Specify the number of CPUs used in generation.
 
 ### Supported Backends
