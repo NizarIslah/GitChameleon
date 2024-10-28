@@ -47,7 +47,7 @@ This command will create a `.jsonl` file with the generated outputs.
 **Complete Example**: Generating with `bigcode/starcoder2-15b-instruct-v0.1`, using `VLLM` as the backend on a GPU (with enough memory)  using 5 samples and a temperature of 0.8:
 
 ```bash
-python generate.py --n_samples 5 --temperature 0.8 --model bigcode/starcoder2-15b-instruct-v0.1 --save_path generations/Starcoder2-instruct-v1.0_temperature0.8.jsonl
+python generate.py --n_samples 5 --temperature 0.8 --model bigcode/starcoder2-15b-instruct-v0.1 --save_path generations/Starcoder2-instruct-v0.1_temperature0.8.jsonl
 ```
 
 #### Example: Running Evaluations
@@ -69,7 +69,7 @@ python evaluate.py --evaluate-mode --json-out-file $json_outputs --output-path $
 **Finishing the Example**:
 
 ```bash
-python evaluate.py --evaluate-mode --json-out-file generations/starcoder2-15b-instruct-v0.1_temperature0.8.jsonl --output-path results/starcoder2-15b-instruct-v0.1_temp0.0.csv --model-name bigcode/starcoder2-15b-instruct-v0.1 --temperature 0.8
+python evaluate.py --evaluate-mode --json-out-file generations/starcoder2-15b-instruct-v0.1_temperature0.8.jsonl --output-path results/starcoder2-15b-instruct-v0.1_temperature0.0.csv --model-name bigcode/starcoder2-15b-instruct-v0.1 --temperature 0.8
 ```
 
 ### To-Do Items

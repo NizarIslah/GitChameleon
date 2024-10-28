@@ -78,7 +78,9 @@ def parse_option():
     parser.add_argument("--instruct", default=False, action="store_true")
     parser.add_argument("--size", type=int, default=0)
     parser.add_argument("--token", type=str, default="")
-    parser.add_argument("--data-path", type=str, default="data/combined_dataset.csv")
+    parser.add_argument(
+        "--dataset-path", type=str, default="dataset/combined_dataset.csv"
+    )
     parser.add_argument("--base-path", type=str, default="")
     parser.add_argument("--enable-wandb", action="store_true", default=False)
     parser.add_argument("--wandb-project", type=str, default="GitChameleon")
@@ -697,14 +699,14 @@ if __name__ == "__main__":
     config.pop("wandb_project")
     config.pop("wandb_entity")
     # remove data and output path
-    config.pop("data_path")
+    config.pop("dataset_path")
     config.pop("output_path")
-    regen_str = ''
+    regen_str = ""
     instruct_str = "_new_instruct_no_ans" if options.instruct else ""
     run_name = (
         options.model_name.split("/")[-1]
         + "_"
-        + options.data_path.split("/")[-1].split(".")[0]
+        + options.dataset_path.split("/")[-1].split(".")[0]
         + "_top_p"
         + str(options.top_p)
         + instruct_str
@@ -723,7 +725,7 @@ if __name__ == "__main__":
         )
     print(config)
 
-    df = pd.read_csv(options.data_path, encoding="latin1")
+    df = pd.read_csv(options.dataset_path, encoding="latin1")
 
     if options.test:
         # take 10 random samples
@@ -770,6 +772,9 @@ if __name__ == "__main__":
                         )
 
         else:
+            import pdb
+
+            # pdb.set_trace()
             assert os.path.exists(
                 options.json_out_file
             ), "Json out file does not exist."
@@ -810,10 +815,8 @@ if __name__ == "__main__":
             df, options.model_name.split("/")[-1], options.n_generate
         )
         try:
-            repo_dir = os.path.dirname(os.path.dirname(options.data_path))
-            df["env_id"] = pd.read_csv(f"{repo_dir}/data/updated_libraries.csv")[
-                "env_id"
-            ]
+            repo_dir = os.path.dirname(os.path.dirname(options.dataset_path))
+            df["env_id"] = pd.read_csv(f"dataset/updated_libraries.csv")["env_id"]
         except Exception as e:
             print("Error: ", e)
             exit(1)
