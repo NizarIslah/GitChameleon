@@ -699,7 +699,6 @@ if __name__ == "__main__":
     # remove data and output path
     config.pop("data_path")
     config.pop("output_path")
-    regen_str = "_regen" if options.error_log_regenerate else ""
     instruct_str = "_new_instruct_no_ans" if options.instruct else ""
     run_name = (
         options.model_name.split("/")[-1]
