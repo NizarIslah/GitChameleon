@@ -1,5 +1,7 @@
 # GitChameleon: A Benchmark for Version-Conditioned Code Generation
 
+Benchmark associated with the paper "GitChameleon: Unmasking the Version-Switching Capabilities of Code Generation Models", which can be found here: {TBD}
+
 ### Downloading the Dataset
 
 The dataset used in our benchmark is available in CSV format at `data/combined_dataset.csv`.
@@ -73,7 +75,6 @@ python evaluate.py --json-out-file generations/starcoder2-15b-instruct-v0.1_temp
 
 ### To-Do Items
 
-- Set default values for file paths to reduce manual entry.
 - Specify the number of CPUs used in generation.
 
 ### Supported Backends
