@@ -15,7 +15,7 @@ def replace_torch_version(row):
 
 def create_virtual_environment(env_name, create_anyway=False):
     """Create and return the path of a virtual environment."""
-    env_path = f"eval_envs/{env_name}"
+    env_path = f"eval_venvs/{env_name}"
     if not os.path.exists(env_path):
         os.makedirs(env_path, exist_ok=True)
         subprocess.run(["python", "-m", "venv", env_path], check=True)
