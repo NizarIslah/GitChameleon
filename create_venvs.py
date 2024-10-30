@@ -15,7 +15,7 @@ def replace_torch_version(row):
 
 def create_virtual_environment(env_name, create_anyway=False):
     """Create and return the path of a virtual environment."""
-    env_path = f"{BASE_PATH}/venvs/{env_name}"
+    env_path = f"eval_envs/{env_name}"
     if not os.path.exists(env_path):
         os.makedirs(env_path, exist_ok=True)
         subprocess.run(["python", "-m", "venv", env_path], check=True)
@@ -84,7 +84,7 @@ def main():
     create_anyway = False
     # assert 'env_id' in df.columns, 'env_id column not found in the CSV file. Please run the script with the original CSV file.'
 
-    df = pd.read_csv("data/combined_dataset.csv")
+    df = pd.read_csv("dataset/combined_dataset.csv")
 
     # replace torch version
     df["version"] = df.apply(replace_torch_version, axis=1)
@@ -95,7 +95,7 @@ def main():
     print(f"Number of unique environments: {df['env_id'].nunique()}")
 
     # Save the updated CSV
-    df.to_csv("data/updated_libraries.csv", index=False)
+    df.to_csv("dataset/updated_libraries.csv", index=False)
     print("Updated CSV with virtual environment IDs saved.")
 
     # check that the python executable exists for each venv
