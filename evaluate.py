@@ -25,7 +25,7 @@ def parse_option():
     parser.add_argument('--size', type=int, default=0)
     parser.add_argument('--token', type=str, default='')
     parser.add_argument('--dataset-path', type=str, default="dataset/combined_dataset.csv")
-    parser.add_argument('--base-path', type=str, default="./")
+    parser.add_argument('--base-path', type=str, default="eval_venvs/")
     parser.add_argument('--enable-wandb', action='store_true', default=False)
     parser.add_argument('--wandb-project', type=str, default='GitChameleon')
     parser.add_argument('--wandb-entity', type=str, default='')
@@ -40,7 +40,6 @@ def parse_option():
     parser.add_argument('--max_tokens', type=int, default=256)
     parser.add_argument('--test', action='store_true', default=False)
     parser.add_argument('--scratch', type=str, default="./")
-    parser.add_argument('--disable-wandb', action='store_true', default=False)
     parser.add_argument('--output-path', type=str, default="results.csv")
     parser.add_argument('--cot', action='store_true', default=False)
     parser.add_argument('--cot-output-path', type=str, default="cot_generations.jsonl")
@@ -386,12 +385,12 @@ def make_py_file(
 
 
 def eval_sample_k(
-    base_path, model_names, row, n, k, idx, seed, temperature, options, regen=False
+    base_path, model_name, row, n, k, idx, seed, temperature, options, regen=False
 ):
     """
     Function to evaluate the model outputs at k
     base_path: str, path to the base directory.
-    model_names: list, name of the model(s)
+    model_name: name of the model
     row: row of the dataframe, example to evaluate
     n: int, number of generations from the model
     k: int, number of k to evaluate
@@ -407,34 +406,33 @@ def eval_sample_k(
         print(f"Error: venv not found, skipping sample {idx}...", e)
         return None, None, None, None, None
 
-    for model_name in model_names:
-        # concat k's + sample ranking heuristics
-        outputs_cols = [f"{model_name}_{regen_str}output_{i}" for i in range(n)] + [
-            f"{model_name}_{regen_str}output_{rank}"
-            for rank in get_ranks(model_name, row)
-        ]  # [k:] is ranking heuristics
-        model_outputs = extract_columns(row, outputs_cols)
+    # concat k's + sample ranking heuristics
+    outputs_cols = [f"{model_name}_{regen_str}output_{i}" for i in range(n)] + [
+        f"{model_name}_{regen_str}output_{rank}"
+        for rank in get_ranks(model_name, row)
+    ]  # [k:] is ranking heuristics
+    model_outputs = extract_columns(row, outputs_cols)
 
-        tmp_path = f"{options.scratch}/tmp_files/{model_name}/{seed}/{temperature}"
-        # if not os.path.exists(tmp_path):
-        os.makedirs(tmp_path, exist_ok=True)
-        py_files = [
-            make_py_file(
-                starting_code,
-                model_out,
-                test,
-                options.instruct,
-                py_file=os.path.join(
-                    tmp_path, f"temp_{idx}_{k}.py"
-                ),
-                verbose_mode=options.verbose_mode,
-            )
-            for k, model_out in enumerate(model_outputs)
-        ]
-
-        passes, compiles, parsed_codes, error_logs = zip(
-            *[run_script(py_exec, py_file) for py_file in py_files]
+    tmp_path = f"{options.scratch}/tmp_files/{model_name}/{seed}/{temperature}"
+    # if not os.path.exists(tmp_path):
+    os.makedirs(tmp_path, exist_ok=True)
+    py_files = [
+        make_py_file(
+            starting_code,
+            model_out,
+            test,
+            options.instruct,
+            py_file=os.path.join(
+                tmp_path, f"temp_{idx}_{k}.py"
+            ),
+            verbose_mode=options.verbose_mode,
         )
+        for k, model_out in enumerate(model_outputs)
+    ]
+
+    passes, compiles, parsed_codes, error_logs = zip(
+        *[run_script(py_exec, py_file) for py_file in py_files]
+    )
 
     return passes, compiles, parsed_codes, error_logs, outputs_cols
 
@@ -512,12 +510,12 @@ def make_result_df(results, options):
 
 
 def sample_eval_parallel(
-    base_path, model_names, idxs, df_with_outputs, n, k, n_jobs, options, regen=False
+    base_path, model_name, idxs, df_with_outputs, n, k, n_jobs, options, regen=False
 ):
     """
     Evaluate the model outputs in parallel for a batch of samples
     base_path: str, path to the base directory.
-    model_names: list, name of the model(s)
+    model_name: name of the model
     idxs: list, list of indices for the samples
     rows: list, list of rows for the samples
     n: int, number of generations from the model
@@ -528,7 +526,7 @@ def sample_eval_parallel(
     batch_results = Parallel(n_jobs=n_jobs, verbose=10)(
         delayed(eval_sample_k)(
             base_path,
-            model_names,
+            model_name,
             row,
             n,
             k,
@@ -558,7 +556,7 @@ def evaluate_model(
     df_with_outputs: pd.DataFrame, dataframe with the model outputs
     return: pd.DataFrame, dataframe with the evaluation results
     """
-    model_names = [model_name.split("/")[-1] for model_name in options.model_names]
+    model_name = options.model_name.split("/")[-1]
     base_path = options.base_path
     empty_count = 0
     # print(df_with_outputs.columns)
@@ -575,7 +573,7 @@ def evaluate_model(
         # evaluate the model outputs
         batch_df_results = sample_eval_parallel(
             base_path,
-            model_names,
+            model_name,
             idxs,
             df_with_outputs,
             options.n_generate,
@@ -592,7 +590,7 @@ def evaluate_model(
                 [df_updated, batch_df_results], axis=0, ignore_index=True
             )
 
-        if not options.disable_wandb:
+        if options.enable_wandb:
             wandb.log(
                 {
                     col: df_updated[col].mean()
@@ -610,7 +608,7 @@ def evaluate_model(
     # concat df_with_outputs and df_updated col axis
     df_with_outputs = pd.concat([df_with_outputs, df_updated], axis=1)
     df_with_outputs.to_csv(eval_path_csv, index=False)
-    if not options.disable_wandb:
+    if options.enable_wandb:
         wandb.log({"eval_df": wandb.Table(data=df_with_outputs)})
     print("Evaluation complete!")
     return df_with_outputs
@@ -657,7 +655,7 @@ if __name__ == "__main__":
     )
     if options.test:
         print("Running in test mode")
-    if not options.disable_wandb:
+    if options.enable_wandb:
         wandb.init(
             # set the wandb project where this run will be logged
             project=options.wandb_project,

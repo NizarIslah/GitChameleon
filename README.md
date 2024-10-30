@@ -70,7 +70,7 @@ python evaluate.py --json-out-file $json_outputs --output-path $out_dir --model-
 **Finishing the Example**:
 
 ```bash
-python evaluate.py --json-out-file generations/starcoder2-15b-instruct-v0.1_temperature0.8.jsonl --output-path results/starcoder2-15b-instruct-v0.1_temperature0.0.csv --model-name bigcode/starcoder2-15b-instruct-v0.1 --temperature 0.8
+python evaluate.py --json-out-file generations/Starcoder2-instruct-v0.1_temperature0.8.jsonl --output-path results/starcoder2-15b-instruct-v0.1_temperature0.8.csv --model-name bigcode/starcoder2-15b-instruct-v0.1 --temperature 0.8
 ```
 
 ### To-Do Items
