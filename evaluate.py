@@ -24,8 +24,8 @@ def parse_option():
     parser.add_argument('--instruct', default=False, action='store_true')
     parser.add_argument('--size', type=int, default=0)
     parser.add_argument('--token', type=str, default='')
-    parser.add_argument('--dataset-path', type=str, default="")
-    parser.add_argument('--base-path', type=str, default="")
+    parser.add_argument('--dataset-path', type=str, default="dataset/combined_dataset.csv")
+    parser.add_argument('--base-path', type=str, default="./")
     parser.add_argument('--enable-wandb', action='store_true', default=False)
     parser.add_argument('--wandb-project', type=str, default='GitChameleon')
     parser.add_argument('--wandb-entity', type=str, default='')
@@ -39,7 +39,7 @@ def parse_option():
     parser.add_argument('--top_k', type=int, default=50)
     parser.add_argument('--max_tokens', type=int, default=256)
     parser.add_argument('--test', action='store_true', default=False)
-    parser.add_argument('--scratch', type=str, default="")
+    parser.add_argument('--scratch', type=str, default="./")
     parser.add_argument('--disable-wandb', action='store_true', default=False)
     parser.add_argument('--output-path', type=str, default="results.csv")
     parser.add_argument('--cot', action='store_true', default=False)
@@ -559,7 +559,7 @@ def evaluate_model(
     return: pd.DataFrame, dataframe with the evaluation results
     """
     model_names = [model_name.split("/")[-1] for model_name in options.model_names]
-    base_path = options.scratch + "/venvs/"  # options.base_path
+    base_path = options.base_path
     empty_count = 0
     # print(df_with_outputs.columns)
 
