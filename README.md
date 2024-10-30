@@ -21,7 +21,7 @@ The dataset used in our benchmark is available in CSV format at `data/combined_d
 
 2. **Prepare Virtual Environments for Evaluation**:
 
-   - Run the following script to populate the `eval_envs/` directory with the necessary Python libraries:
+   - Run the following script to populate the `eval_venvs/` directory with the necessary Python libraries:
      ```
      python create_venvs.py
      ```
