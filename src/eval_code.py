@@ -561,7 +561,7 @@ def sample_eval_parallel(
     """
     start, end = list(idxs)[0], list(idxs)[-1] + 1
     rows = df_with_outputs.iloc[start:end].iterrows()
-    batch_results = Parallel(n_jobs=n_jobs, verbose=10)(
+    batch_results = Parallel(n_jobs=n_jobs, verbose=0)(
         delayed(eval_sample_k)(
             base_path,
             model_name,
