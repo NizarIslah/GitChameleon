@@ -68,7 +68,7 @@ def get_evaluate_args():
     parser.add_argument('--max_tokens', type=int, default=256)
     parser.add_argument('--test', action='store_true', default=False)
     parser.add_argument('--scratch', type=str, default="./")
-    parser.add_argument('--output-path', type=str, default="results.csv")
+    parser.add_argument('--output-path', type=str, default="results/starcoder2-15b-instruct-v0.1_temperature0.8.csv")
     parser.add_argument('--cot', action='store_true', default=False)
     parser.add_argument('--cot-output-path', type=str, default="cot_generations.jsonl")
     parser.add_argument('--resume', action='store_true', default=False)

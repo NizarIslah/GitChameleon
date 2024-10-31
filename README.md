@@ -18,10 +18,11 @@ The dataset used in our benchmark is available in CSV format at `data/combined_d
      ```
      pip install -r requirements.txt
      ```
+  - Note: vllm-cpu (experimental): The requirements.txt will install vllm with gpu spport. For vllm-cpu, please follow the instructions in the official documentation here (https://docs.vllm.ai/en/v0.6.1/getting_started/cpu-installation.html). This has not been tested end-to-end with this repository, so it may break. It is planned to be fully supported in the near future.
 
 2. **Prepare Virtual Environments for Evaluation**:
 
-   - Run the following script to populate the `eval_venvs/` directory with the necessary Python libraries:
+   - Run the following script to install the virtual environments with the necessary Python libraries:
      ```
      python create_venvs.py
      ```
@@ -70,8 +71,14 @@ python evaluate.py --json-out-file $json_outputs --output-path $out_dir --model-
 **Finishing the Example**:
 
 ```bash
-python evaluate.py --json-out-file generations/Starcoder2-instruct-v0.1_temperature0.8.jsonl --output-path results/starcoder2-15b-instruct-v0.1_temperature0.8.csv --model-name bigcode/starcoder2-15b-instruct-v0.1 --temperature 0.8
+python evaluate.py --json-out-file generations/Starcoder2-instruct-v0.1_temperature0.8.jsonl --model-name bigcode/starcoder2-15b-instruct-v0.1 --temperature 0.8
 ```
+
+**Full test**:
+```bash
+python tests/test_readme.sh
+```
+This will test the given README example to ensure that everything works as intended.
 
 ### To-Do Items
 

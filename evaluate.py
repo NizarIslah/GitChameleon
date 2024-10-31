@@ -58,7 +58,6 @@ if __name__ == "__main__":
         n = 10
         df = df.sample(n, random_state=options.seed)
     df.reset_index(drop=True, inplace=True)
-    print(df.head())
     if options.library != "":
         df = df[df["library"] == options.library]
 
@@ -108,11 +107,11 @@ if __name__ == "__main__":
     print("Saved results to: ", eval_save_file)
     print(
         f"final_pass @ {options.k}: ",
-        eval_df[f"{options.model_name.split('/')[-1]}_pass_at_{options.k}"].mean(),
+        eval_df[f"pass_at_{options.k}"].mean(),
     )
     print(
         f"final_compile @ {options.k}: ",
         eval_df[
-            f"{options.model_name.split('/')[-1]}_compile_at_{options.k}"
+            f"compile_at_{options.k}"
         ].mean(),
     )

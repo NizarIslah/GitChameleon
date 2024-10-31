@@ -24,7 +24,7 @@ def load_outputs_from_json(options):
             for line_idx, line in enumerate(f):
                 resp = json.loads(line)
                 for k in range(options.n_generate):
-                    outputs[f"{model_name}_output_{k}"].append(sanitize(resp["solution"]))
+                    outputs[f"output_{k}"].append(sanitize(resp["solution"]))
 
     else:
         assert os.path.exists(options.json_out_file), "Json out file does not exist."
@@ -53,7 +53,7 @@ def load_outputs_from_json(options):
                 except Exception as e:
                     print("Error: ", e)
                     solution = resp["solution"]
-                outputs[f"{model_name}_output_{k}"].append(solution)
+                outputs[f"output_{k}"].append(solution)
                 k += 1
     if outputs is not None:
         output_df = pd.DataFrame(outputs)
@@ -66,12 +66,12 @@ def load_outputs_from_json(options):
 def check_empty_outputs(options, df):
     # check that outputs are not empty
     for k in range(options.n_generate):
-        if any(df[f"{options.model_name.split('/')[-1]}_output_{k}"].isna()):
+        if any(df[f"output_{k}"].isna()):
             print(
-                f"Empty outputs for {options.model_name.split('/')[-1]}_output_{k}"
+                f"Empty outputs for output_{k}"
             )
         # drop rows with empty outputs
-        df = df[~df[f"{options.model_name.split('/')[-1]}_output_{k}"].isna()]
+        df = df[~df[f"output_{k}"].isna()]
     if df.shape[0] == 0:
         print("No outputs to evaluate. Exiting...")
         exit(1)
@@ -101,47 +101,47 @@ def get_ranks(model_name, row):
     returns the indices of the best mean_logp, sum_logp and a random index out of the k generated outputs
     """
     return [
-        row[f"{model_name}_best_mean_logp_index"],
-        row[f"{model_name}_best_sum_logp_index"],
-        row[f"{model_name}_random_index"],
+        row[f"best_mean_logp_index"],
+        row[f"best_sum_logp_index"],
+        row[f"random_index"],
     ]
 
 
 def add_ranking_index(df, model_name, n, regen=False):
     # Generate column names
     regen_str = "regen_" if regen else ""
-    outputs_cols = [f"{model_name}_{regen_str}output_{i}" for i in range(n)]
-    mean_logp_cols = [f"{model_name}_{regen_str}mean_logp_{i}" for i in range(n)]
-    sum_logp_cols = [f"{model_name}_{regen_str}sum_logp_{i}" for i in range(n)]
+    outputs_cols = [f"{regen_str}output_{i}" for i in range(n)]
+    mean_logp_cols = [f"{regen_str}mean_logp_{i}" for i in range(n)]
+    sum_logp_cols = [f"{regen_str}sum_logp_{i}" for i in range(n)]
 
     # Filter the DataFrame to include only the necessary columns
     try:
         df_filtered = df[outputs_cols + mean_logp_cols + sum_logp_cols]
     except Exception as e:
-        print("Not all columns found in the dataframe, skipping...", e)
-        df[f"{model_name}_best_mean_logp_index"] = np.random.randint(0, n, size=len(df))
-        df[f"{model_name}_best_sum_logp_index"] = np.random.randint(0, n, size=len(df))
-        df[f"{model_name}_random_index"] = np.random.randint(0, n, size=len(df))
+        # print("Not all columns found in the dataframe, skipping...", e)
+        df[f"best_mean_logp_index"] = np.random.randint(0, n, size=len(df))
+        df[f"best_sum_logp_index"] = np.random.randint(0, n, size=len(df))
+        df[f"random_index"] = np.random.randint(0, n, size=len(df))
         return df
 
     # Calculate the indices of the best mean_logp and sum_logp
-    df[f"{model_name}_best_mean_logp_index"] = (
+    df[f"best_mean_logp_index"] = (
         df_filtered[mean_logp_cols]
         .idxmax(axis=1)
         .apply(lambda x: int(x.split("_")[-1]))
     )
-    df[f"{model_name}_best_sum_logp_index"] = (
+    df[f"best_sum_logp_index"] = (
         df_filtered[sum_logp_cols].idxmax(axis=1).apply(lambda x: int(x.split("_")[-1]))
     )
     # make the values ints
-    df[f"{model_name}_best_mean_logp_index"] = df[
-        f"{model_name}_best_mean_logp_index"
+    df[f"best_mean_logp_index"] = df[
+        f"best_mean_logp_index"
     ].astype(int)
-    df[f"{model_name}_best_sum_logp_index"] = df[
-        f"{model_name}_best_sum_logp_index"
+    df[f"best_sum_logp_index"] = df[
+        f"best_sum_logp_index"
     ].astype(int)
     # Add a random output column
-    df[f"{model_name}_random_index"] = np.random.randint(0, n, size=len(df))
+    df[f"random_index"] = np.random.randint(0, n, size=len(df))
     return df
 
 
@@ -445,8 +445,8 @@ def eval_sample_k(
         return None, None, None, None, None
 
     # concat k's + sample ranking heuristics
-    outputs_cols = [f"{model_name}_{regen_str}output_{i}" for i in range(n)] + [
-        f"{model_name}_{regen_str}output_{rank}"
+    outputs_cols = [f"{regen_str}output_{i}" for i in range(n)] + [
+        f"{regen_str}output_{rank}"
         for rank in get_ranks(model_name, row)
     ]  # [k:] is ranking heuristics
     model_outputs = extract_columns(row, outputs_cols)
@@ -486,7 +486,7 @@ def make_result_df(results, options, regen=False):
     if passes is None:
         # make empty df with one row of nothing
         col_names = [
-            f"{model_name}_{regen_str}{key}"
+            f"{regen_str}{key}"
             for key in [
                 "best_mean_logp_pass",
                 "best_mean_logp_compile",
@@ -496,9 +496,9 @@ def make_result_df(results, options, regen=False):
                 "random_compile",
             ]
         ]
-        col_names += [f"{model_name}_{regen_str}pass_at_{k_}" for k_ in range(1, k + 1)]
+        col_names += [f"{regen_str}pass_at_{k_}" for k_ in range(1, k + 1)]
         col_names += [
-            f"{model_name}_{regen_str}compile_at_{k_}" for k_ in range(1, k + 1)
+            f"{regen_str}compile_at_{k_}" for k_ in range(1, k + 1)
         ]
         empty_df = pd.DataFrame({col: [None] for col in col_names})
         return empty_df
@@ -512,10 +512,10 @@ def make_result_df(results, options, regen=False):
         if i < k:
             results_dict[model_name].update(
                 {
-                    f"{model_name}_{regen_str}pass_at_{i+1}": corrected_pass_at_k(
+                    f"{regen_str}pass_at_{i+1}": corrected_pass_at_k(
                         n, c=pass_count, k=i + 1
                     ),
-                    f"{model_name}_{regen_str}compile_at_{i+1}": corrected_pass_at_k(
+                    f"{regen_str}compile_at_{i+1}": corrected_pass_at_k(
                         n, c=compile_count, k=i + 1
                     ),
                 }
@@ -524,23 +524,23 @@ def make_result_df(results, options, regen=False):
             {
                 f"{outputs_cols[i]}_pass": passes[i],
                 f"{outputs_cols[i]}_compile": compiles[i],
-                f"{model_name}_{regen_str}parsed_code_{i}": parsed_codes[i],
-                f"{model_name}_{regen_str}error_log_{i}": error_logs[i],
+                f"{regen_str}parsed_code_{i}": parsed_codes[i],
+                f"{regen_str}error_log_{i}": error_logs[i],
             }
         )
     # add sample ranking heuristics
     results_dict[model_name].update(
         {
-            f"{model_name}_{regen_str}best_mean_logp_pass": passes[n],
-            f"{model_name}_{regen_str}best_mean_logp_compile": compiles[n],
-            f"{model_name}_{regen_str}best_sum_logp_pass": passes[n + 1],
-            f"{model_name}_{regen_str}best_sum_logp_compile": compiles[n + 1],
-            f"{model_name}_{regen_str}random_pass": passes[n + 2],
-            f"{model_name}_{regen_str}random_compile": compiles[n + 2],
+            f"{regen_str}best_mean_logp_pass": passes[n],
+            f"{regen_str}best_mean_logp_compile": compiles[n],
+            f"{regen_str}best_sum_logp_pass": passes[n + 1],
+            f"{regen_str}best_sum_logp_compile": compiles[n + 1],
+            f"{regen_str}random_pass": passes[n + 2],
+            f"{regen_str}random_compile": compiles[n + 2],
         }
     )
     # add model_name prefix
-    # results_dict[model_name] = {f'{model_name}_{key}': value for key, value in results_dict[model_name].items()}
+    # results_dict[model_name] = {f'{key}': value for key, value in results_dict[model_name].items()}
     df_result = pd.concat(
         [pd.DataFrame(result, index=[0]) for result in results_dict.values()], axis=1
     )  # now we have for one sample, all models results in cols
@@ -646,6 +646,7 @@ def evaluate_model(
     # concat df_with_outputs and df_updated col axis
     df_with_outputs = pd.concat([df_with_outputs, df_updated], axis=1)
     df_with_outputs.to_csv(eval_path_csv, index=False)
+    df_with_outputs["model_name"] = model_name
     if options.enable_wandb:
         wandb.log({"eval_df": wandb.Table(data=df_with_outputs)})
     print("Evaluation complete!")
