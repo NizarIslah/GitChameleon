@@ -47,7 +47,7 @@ def parse_option():
     parser.add_argument("--library", type=str, default="")
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--error-log-evaluate", action="store_true", default=False)
-    parser.add_argument("--k", type=int, default=10)  # for pass @ k evaluation
+    parser.add_argument("--k", type=int, default=1)  # for pass @ k evaluation
     parser.add_argument(
         "--n-generate", type=int, default=20
     )  # number of generations to generate
@@ -623,15 +623,6 @@ if __name__ == "__main__":
         or "openai" in options.model_name.lower()
     ):
         options.instruct = True
-    if options.temperature == 0:
-        options.n_generate = 1
-        options.k = 1
-    elif options.temperature < 0.8:
-        options.n_generate = 5
-        options.k = 1
-    else:
-        options.n_generate = 20
-        options.k = 10
     # start a new wandb run to track this script
     config = deepcopy(vars(options))
     # remove token, model url, wandb project and entity from config
@@ -674,17 +665,9 @@ if __name__ == "__main__":
         df = df.sample(n, random_state=options.seed)
     df.reset_index(drop=True, inplace=True)
     print(df.head())
+    if options.library != "":
+        df = df[df["library"] == options.library]
 
-    save_file = (
-        options.model_name.split("/")[-1]
-        + "_n"
-        + str(options.n_generate)
-        + "_k"
-        + str(options.k)
-        + "_T="
-        + str(options.temperature)
-        + ".csv"
-    )
     save_dir = (
         options.output_path + "/" + options.model_name.split("/")[0]
         if "/" in options.model_name
@@ -693,9 +676,6 @@ if __name__ == "__main__":
     os.makedirs(save_dir, exist_ok=True)
     print("dir to save results:", save_dir)
 
-    if options.library != "":
-        df = df[df["library"] == options.library]
-        save_file = options.library + "_" + save_file
 
     outputs = None
     print("---Evaluation---")
@@ -724,6 +704,11 @@ if __name__ == "__main__":
                 task_id = resp["task_id"]
                 if task_id != cur_task_id:
                     options.n_generate = k
+                    try:
+                        assert options.k <= options.n_generate
+                    except Exception as e:
+                        print("value of --k should be <= to number of samples generated.")
+                        exit(1)
                     k = 0
                     cur_task_id = task_id
                 try:
@@ -769,7 +754,16 @@ if __name__ == "__main__":
         df.reset_index(drop=True, inplace=True)
 
         # no need to run model, just evaluate the model outputs
-        eval_save_file = save_file.split(".csv")[0] + "_eval.csv"
+        eval_save_file = (
+            options.model_name.split("/")[-1]
+            + "_n"
+            + str(options.n_generate)
+            + "_k"
+            + str(options.k)
+            + "_T="
+            + str(options.temperature)
+            + "_eval.csv"
+        )
         # check if exists (incomplete run)
         if options.resume and os.path.exists(save_dir + "/" + eval_save_file):
             df_updated = pd.read_csv(save_dir + "/" + eval_save_file)
