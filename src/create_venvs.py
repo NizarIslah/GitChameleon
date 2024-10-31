@@ -6,6 +6,7 @@ import sys
 from tqdm import tqdm
 from pathlib import Path
 
+
 def replace_torch_version(row):
     if row["library"] == "torch":
         if str(row["version"]) in ("1.9", "1.9.0", "1.1", "1.10", "1.10.0"):
@@ -122,9 +123,10 @@ def main(args):
 
 if __name__ == "__main__":
     import argparse
+
     # argument for env_path
     parser = argparse.ArgumentParser()
-    parser.add_argument("--base_path", type=str, default="../eval_venvs/")
+    parser.add_argument("--base_path", type=str, default="eval_venvs/")
     parser.add_argument("--create_anyway", action="store_true", default=False)
     args = parser.parse_args()
     main(args)
