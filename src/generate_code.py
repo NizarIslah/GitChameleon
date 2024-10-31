@@ -1,9 +1,9 @@
 import os
 import json
 import wandb
-from model import DecoderBase, make_model
-from utils import get_prompt, write_jsonl, load_dataset, get_prompt_doc
-from sanitize import sanitize
+from src.model import DecoderBase, make_model
+from src.utils import get_prompt, write_jsonl, load_dataset, get_prompt_doc
+from src.sanitize import sanitize
 from rich.progress import (
     BarColumn,
     MofNCompleteColumn,
