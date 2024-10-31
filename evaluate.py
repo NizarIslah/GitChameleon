@@ -707,8 +707,8 @@ if __name__ == "__main__":
                     try:
                         assert options.k <= options.n_generate
                     except Exception as e:
-                        print("value of --k should be <= to number of samples generated.")
-                        exit(1)
+                        print("value of --k should be <= to number of samples generated. Setting --k to be the same as --n_generate")
+                        options.k = options.n_generate
                     k = 0
                     cur_task_id = task_id
                 try:
