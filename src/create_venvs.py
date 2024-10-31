@@ -2,9 +2,9 @@ import pandas as pd
 import os
 import subprocess
 import hashlib
-from tqdm import tqdm
 import sys
-
+from tqdm import tqdm
+from pathlib import Path
 
 def replace_torch_version(row):
     if row["library"] == "torch":
@@ -13,27 +13,26 @@ def replace_torch_version(row):
     return row["version"]
 
 
-def create_virtual_environment(env_name, create_anyway=False):
+def create_virtual_environment(env_path, create_anyway=False):
     """Create and return the path of a virtual environment."""
-    env_path = f"eval_venvs/{env_name}"
     if not os.path.exists(env_path):
         os.makedirs(env_path, exist_ok=True)
         subprocess.run(["python", "-m", "venv", env_path], check=True)
-        print(f"Virtual environment created: {env_name}")
+        print(f"Virtual environment created: {env_path}")
     else:
-        print(f"Virtual environment already exists: {env_name}")
+        print(f"Virtual environment already exists: {env_path}")
         # remove it and create anywyay
         if create_anyway:
             subprocess.run(["rm", "-rf", env_path])
             os.makedirs(env_path, exist_ok=True)
             subprocess.run(["python", "-m", "venv", env_path], check=True)
-            print(f"Virtual environment created: {env_name}")
+            print(f"Virtual environment created: {env_path}")
     return env_path
 
 
 def install_packages(env_path, library, version, additional_dependencies):
     """Install packages using the Python executable in the virtual environment."""
-    python_executable = os.path.join(env_path, "bin", "python")  # For Unix-like OS
+    python_executable = Path(env_path, "bin", "python")  # For Unix-like OS
     # Construct the pip install command using the specific Python executable
     if str(additional_dependencies) in ("nan", "", "-", "io"):
         pip_install_cmd = [
@@ -78,11 +77,9 @@ def generate_env_id(row):
     ]  # Shorten the hash for readability
 
 
-def main():
-    # Load CSV
-    # df = pd.read_csv('updated_libraries.csv')
-    create_anyway = False
-    # assert 'env_id' in df.columns, 'env_id column not found in the CSV file. Please run the script with the original CSV file.'
+def main(args):
+    base_path = args.base_path
+    create_anyway = args.create_anyway
 
     df = pd.read_csv("dataset/combined_dataset.csv")
 
@@ -102,12 +99,12 @@ def main():
     failed_count = []
     for row_idx, row in df.drop_duplicates(subset=["env_id"]).iterrows():
         env_name = f"gcham_venv{row['env_id']}"
-        env_path = f"eval_venvs/{env_name}"
-        python_executable = os.path.join(env_path, "bin", "python")
+        env_path = Path(base_path, env_name)
+        python_executable = Path(env_path, "bin", "python")
         if not os.path.exists(python_executable):
             print(f"Python executable not found for {row_idx}")
             subprocess.run(["rm", "-rf", env_path])
-        create_virtual_environment(env_name, create_anyway=create_anyway)
+        create_virtual_environment(env_path, create_anyway=create_anyway)
         returncode = install_packages(
             env_path, row["library"], row["version"], row["additional_dependencies"]
         )
@@ -124,4 +121,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+    # argument for env_path
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--base_path", type=str, default="../eval_venvs/")
+    parser.add_argument("--create_anyway", action="store_true", default=False)
+    args = parser.parse_args()
+    main(args)
