@@ -16,7 +16,7 @@ The dataset used in our benchmark is available in CSV format at `data/combined_d
      ```
    - Install the required packages:
      ```
-     pip install -r requirements.txt
+     pip install vllm -r requirements.txt
      ```
   - Note: vllm-cpu (experimental): The requirements.txt will install vllm with gpu spport. For vllm-cpu, please follow the instructions in the official documentation here (https://docs.vllm.ai/en/v0.6.1/getting_started/cpu-installation.html). This has not been tested end-to-end with this repository, so it may break. It is planned to be fully supported in the near future.
 

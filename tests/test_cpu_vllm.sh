@@ -15,7 +15,14 @@ pip install -v -r requirements-cpu.txt --extra-index-url https://download.pytorc
 VLLM_TARGET_DEVICE=cpu python setup.py install
 # test the readme example now
 # python src/create_venvs.py # uncomment if first time running
-cd ../GitChameleon
+target_dir="GitChameleon"
+while [[ "$PWD" != "/" ]]; do
+    if [[ -d "../$target_dir" ]]; then
+        cd "../$target_dir"
+        break
+    fi
+    cd ..
+done
 pip install -r requirements.txt
 python generate.py --n_samples 5 --temperature 0.8 --model bigcode/starcoder2-15b-instruct-v0.1 --save_path generations/Starcoder2-instruct-v0.1_temperature0.8.jsonl
 python evaluate.py --json-out-file generations/Starcoder2-instruct-v0.1_temperature0.8.jsonl --output-path results/starcoder2-15b-instruct-v0.1_temperature0.8.csv --model-name bigcode/starcoder2-15b-instruct-v0.1 --temperature 0.8
