@@ -76,7 +76,7 @@ python evaluate.py --json-out-file generations/Starcoder2-instruct-v0.1_temperat
 
 **Full test**:
 ```bash
-python tests/test_readme.sh
+bash tests/test_readme.sh
 ```
 This will test the given README example to ensure that everything works as intended.
 
