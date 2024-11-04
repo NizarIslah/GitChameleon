@@ -5,7 +5,7 @@ client = OpenAI(
 )
 
 completion = client.chat.completions.create(
-  model="NousResearch/Meta-Llama-3-8B-Instruct",
+  model="bigcode/starcoder2-15b-instruct-v0.1",
   messages=[
     {"role": "user", "content": "Hello!"}
   ]

@@ -6,6 +6,7 @@ from warnings import warn
 import openai
 
 import os
+from tqdm import tqdm
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -34,7 +35,6 @@ def extra_eos_for_direct_completion(dataset) -> List[str]:
 
 
 def make_chat_prompt(prompt: str, tokenizer: AutoTokenizer, direct_completion: bool, cot: bool) -> str:
-    # directly return prompt if it does not have a tokenizer.chat_template
     if tokenizer.chat_template is None or direct_completion:
         return prompt
     response = f"""\
@@ -353,51 +353,6 @@ def extra_eos_for_direct_completion(dataset) -> List[str]:
 _MAGIC_SPLITTER_ = "-[[]]-this-is-really-our-highest-priority-[[]]-"
 
 
-def make_raw_chat_prompt(
-    task_prompt: str,
-    subset: str,
-    split: str, 
-    instruction_prefix: str,
-    response_prefix: str,
-    tokenizer: AutoTokenizer,
-    direct_completion: bool = False,
-) -> str:
-    # directly return prompt if it does not have a tokenizer.chat_template
-    if tokenizer:
-        if tokenizer.chat_template is None or direct_completion:
-            return task_prompt
-
-    assert instruction_prefix is not None, "Instruction prefix is required!"
-    assert response_prefix is not None, "Response prefix is required!"
-    
-    if split == "complete":
-        task_prompt = f"""\
-{instruction_prefix}
-```
-{task_prompt.strip()}
-```
-"""
-    else:
-        task_prompt = f"""\
-{instruction_prefix}
-{task_prompt.strip()}
-"""
-    response = f"""\
-{response_prefix}
-```python
-{_MAGIC_SPLITTER_}
-```
-"""
-    if tokenizer:
-        task_prompt = tokenizer.apply_chat_template(
-            [
-                {"role": "user", "content": task_prompt},
-                {"role": "assistant", "content": response},
-            ],
-            tokenize=False,
-        ).split(_MAGIC_SPLITTER_)[0]
-    return task_prompt
-
 import signal
 import time
 
@@ -424,7 +379,7 @@ def make_request(
     return client.chat.completions.create(
         model=model,
         messages=[
-            {"role": "system", "content": system_msg},
+            # {"role": "system", "content": system_msg},
             {"role": "user", "content": message},
         ],
         max_tokens=max_tokens,
@@ -472,6 +427,7 @@ class OpenAIChatDecoder(DecoderBase):
         self.client = openai.OpenAI(
             api_key=os.getenv("OPENAI_API_KEY", "none"), base_url=base_url
         )
+        print(f"Using OpenAI API key: {self.client.api_key}")
 
     def codegen(
         self, prompts: List[str], do_sample: bool = True, num_samples: int = 200
@@ -481,14 +437,7 @@ class OpenAIChatDecoder(DecoderBase):
         all_outputs = []
         for prompt in tqdm(prompts):
             outputs = []
-            message = make_raw_chat_prompt(
-                task_prompt=prompt,
-                subset=self.subset,
-                split=self.split,
-                instruction_prefix=self.instruction_prefix,
-                response_prefix=self.response_prefix,
-                tokenizer=None,
-            )
+            message = prompt
             ret = make_auto_request(
                 self.client,
                 message=message,
