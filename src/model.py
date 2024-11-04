@@ -3,6 +3,7 @@ import os
 from abc import ABC, abstractmethod
 from typing import List
 from warnings import warn
+import openai
 
 import os
 
@@ -329,6 +330,180 @@ class AnthropicMessageDecoder(AnthropicDecoder):
 
             all_outputs.append(outputs)
         return outputs
+from typing import List
+from transformers import AutoTokenizer
+
+EOS = [
+    "<|endoftext|>",
+    "<|endofmask|>",
+    "</s>",
+    "\nif __name__",
+    "\ndef main(",
+    "\nprint(",
+]
+
+
+def extra_eos_for_direct_completion(dataset) -> List[str]:
+    if dataset.lower() == "bigcodebench":
+        return ["\ndef ", "\nclass ", "\nimport ", "\nfrom ", "\nassert "]
+    raise ValueError(f"Unknown dataset: {dataset}")
+
+
+# some random words which serves as the splitter
+_MAGIC_SPLITTER_ = "-[[]]-this-is-really-our-highest-priority-[[]]-"
+
+
+def make_raw_chat_prompt(
+    task_prompt: str,
+    subset: str,
+    split: str, 
+    instruction_prefix: str,
+    response_prefix: str,
+    tokenizer: AutoTokenizer,
+    direct_completion: bool = False,
+) -> str:
+    # directly return prompt if it does not have a tokenizer.chat_template
+    if tokenizer:
+        if tokenizer.chat_template is None or direct_completion:
+            return task_prompt
+
+    assert instruction_prefix is not None, "Instruction prefix is required!"
+    assert response_prefix is not None, "Response prefix is required!"
+    
+    if split == "complete":
+        task_prompt = f"""\
+{instruction_prefix}
+```
+{task_prompt.strip()}
+```
+"""
+    else:
+        task_prompt = f"""\
+{instruction_prefix}
+{task_prompt.strip()}
+"""
+    response = f"""\
+{response_prefix}
+```python
+{_MAGIC_SPLITTER_}
+```
+"""
+    if tokenizer:
+        task_prompt = tokenizer.apply_chat_template(
+            [
+                {"role": "user", "content": task_prompt},
+                {"role": "assistant", "content": response},
+            ],
+            tokenize=False,
+        ).split(_MAGIC_SPLITTER_)[0]
+    return task_prompt
+
+import signal
+import time
+
+import openai
+from openai.types.chat import ChatCompletion
+
+
+def make_request(
+    client: openai.Client,
+    message: str,
+    model: str,
+    max_tokens: int = 512,
+    temperature: float = 1,
+    n: int = 1,
+    **kwargs
+) -> ChatCompletion:
+    system_msg = "You are a helpful assistant good at coding."
+    if (
+        kwargs.get("response_format", None)
+        and kwargs["response_format"]["type"] == "json_object"
+    ):
+        system_msg = "You are a helpful assistant designed to output JSON."
+
+    return client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": system_msg},
+            {"role": "user", "content": message},
+        ],
+        max_tokens=max_tokens,
+        temperature=temperature,
+        n=n,
+        **kwargs
+    )
+
+
+def handler(signum, frame):
+    # swallow signum and frame
+    raise Exception("end of time")
+
+
+def make_auto_request(*args, **kwargs) -> ChatCompletion:
+    ret = None
+    while ret is None:
+        try:
+            signal.signal(signal.SIGALRM, handler)
+            signal.alarm(100)
+            ret = make_request(*args, **kwargs)
+            signal.alarm(0)
+        except openai.RateLimitError:
+            print("Rate limit exceeded. Waiting...")
+            signal.alarm(0)
+            time.sleep(5)
+        except openai.APIConnectionError:
+            print("API connection error. Waiting...")
+            signal.alarm(0)
+            time.sleep(5)
+        except openai.APIError as e:
+            print(e)
+            signal.alarm(0)
+        except Exception as e:
+            print("Unknown error. Waiting...")
+            print(e)
+            signal.alarm(0)
+            time.sleep(1)
+    return ret
+
+
+class OpenAIChatDecoder(DecoderBase):
+    def __init__(self, name: str, base_url=None, **kwargs) -> None:
+        super().__init__(name, **kwargs)
+        self.client = openai.OpenAI(
+            api_key=os.getenv("OPENAI_API_KEY", "none"), base_url=base_url
+        )
+
+    def codegen(
+        self, prompts: List[str], do_sample: bool = True, num_samples: int = 200
+    ) -> List[str]:
+        if do_sample:
+            assert self.temperature > 0, "Temperature must be positive for sampling"
+        all_outputs = []
+        for prompt in tqdm(prompts):
+            outputs = []
+            message = make_raw_chat_prompt(
+                task_prompt=prompt,
+                subset=self.subset,
+                split=self.split,
+                instruction_prefix=self.instruction_prefix,
+                response_prefix=self.response_prefix,
+                tokenizer=None,
+            )
+            ret = make_auto_request(
+                self.client,
+                message=message,
+                model=self.name,
+                max_tokens=self.max_new_tokens,
+                temperature=self.temperature,
+                n=num_samples,
+            )
+            for item in ret.choices:
+                outputs.append(item.message.content)
+            all_outputs.append(outputs)
+        return all_outputs
+
+    def is_direct_completion(self) -> bool:
+        return False
 
 def make_model(
     model: str,
@@ -377,4 +552,11 @@ def make_model(
             name=model,
             temperature=temperature,
             cot=cot,
+        )
+    elif backend == "openai":
+        return OpenAIChatDecoder(
+            name=model,
+            temperature=temperature,
+            cot=cot,
+            base_url=base_url,
         )

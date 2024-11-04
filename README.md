@@ -53,6 +53,15 @@ This command will create a `.jsonl` file with the generated outputs.
 python generate.py --n_samples 5 --temperature 0.8 --model bigcode/starcoder2-15b-instruct-v0.1 --save_path generations/Starcoder2-instruct-v0.1_temperature0.8.jsonl
 ```
 
+#### Example: OpenAI-compatible serving
+
+To generate code generations with an OpenAI-compatible server, run the following command replacing with your model and token.
+```
+vllm serve NousResearch/Meta-Llama-3-8B-Instruct --dtype auto --api-key token-abc123
+```
+To call the server, you can use the official OpenAI Python client library, or any other HTTP client (see https://docs.vllm.ai/en/v0.6.1/serving/openai_compatible_server.html).
+
+
 #### Example: Running Evaluations
 
 For standard evaluation:
@@ -89,6 +98,7 @@ This will test the given README example to ensure that everything works as inten
 Currently supported backend:
 
 - `vllm`
+- `openai` (needs testing)
 
 Planned support:
 
