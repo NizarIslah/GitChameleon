@@ -59,7 +59,7 @@ To generate code generations with an OpenAI-compatible server, run the following
 ```
 vllm serve NousResearch/Meta-Llama-3-8B-Instruct --dtype auto --api-key token-abc123
 ```
-To call the server, you can use the official OpenAI Python client library, or any other HTTP client (see https://docs.vllm.ai/en/v0.6.1/serving/openai_compatible_server.html).
+To call the server, you can use the official OpenAI Python client library, or any other HTTP client (see https://docs.vllm.ai/en/v0.6.1/serving/openai_compatible_server.html and https://docs.vllm.ai/en/v0.6.1/serving/distributed_serving.html for multi-GPU serving).
 
 
 #### Example: Running Evaluations
@@ -89,6 +89,11 @@ bash tests/test_readme.sh
 ```
 This will test the given README example to ensure that everything works as intended.
 
+To test url serving:
+```bash
+bash tests/test_url.sh
+```
+
 ### To-Do Items
 
 - Specify the number of CPUs used in generation.
@@ -98,7 +103,7 @@ This will test the given README example to ensure that everything works as inten
 Currently supported backend:
 
 - `vllm`
-- `openai` (needs testing)
+- `url-serving (openai-compatible)`
 
 Planned support:
 
