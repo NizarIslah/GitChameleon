@@ -9,7 +9,6 @@ joblib
 sentencepiece
 jinja2
 mock
-vllm
 argparse
 tempdir
 wget

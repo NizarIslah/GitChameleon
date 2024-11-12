@@ -36,10 +36,10 @@ def get_generate_args():
         default="vllm",
         type=str,
         choices=["vllm", "hf", "openai", "mistral", "anthropic", "google"],
-    )  # TODO: are these even implemented?
+    )
     parser.add_argument(
         "--base_url", default=None, type=str
-    )  # TODO: is this even implemented?
+    ) 
     parser.add_argument("--tp", default=1, type=int)
     parser.add_argument("--trust_remote_code", action="store_true")
     parser.add_argument("--tokenizer_legacy", action="store_true")
