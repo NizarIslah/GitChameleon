@@ -2,6 +2,8 @@
 
 Benchmark associated with the paper "GitChameleon: Unmasking the Version-Switching Capabilities of Code Generation Models", which can be found here: https://arxiv.org/abs/2411.05830
 
+We thank Terry Zhuo and the BigCodeBench project (https://github.com/bigcode-project/bigcodebench) for providing a starting point for our codebase.
+
 ### Downloading the Dataset
 
 The dataset used in our benchmark is available in CSV format at `data/combined_dataset.csv`.
