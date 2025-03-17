@@ -17,7 +17,7 @@ def get_generate_args():
     parser.add_argument("--disable-wandb", action="store_true", default=False)
     parser.add_argument("--model", required=True, type=str)
     parser.add_argument(
-        "--dataset_path", default="dataset/combined_dataset.csv", type=str
+        "--dataset_path", default="dataset/samples_collab.jsonl", type=str
     )
     parser.add_argument("--save_path", default=None, type=str)
     parser.add_argument("--cot", action="store_true")
@@ -26,7 +26,7 @@ def get_generate_args():
     parser.add_argument("--temperature", default=0.0, type=float)
     parser.add_argument("--greedy", action="store_true")
     parser.add_argument("--strip_newlines", action="store_true")
-    parser.add_argument("--datatype_jsonl", action="store_true")
+    parser.add_argument("--datatype_jsonl", action="store_false", default=True)
     parser.add_argument("--feedback", action="store_true")
     parser.add_argument("--oracle", action="store_true")
     parser.add_argument("--resume", action="store_true")
@@ -53,7 +53,10 @@ def get_evaluate_args():
     parser.add_argument('--model-name', type=str, default="")
     parser.add_argument('--instruct', default=False, action='store_true')
     parser.add_argument('--size', type=int, default=0)
-    parser.add_argument('--dataset-path', type=str, default="dataset/combined_dataset.csv")
+    parser.add_argument('--dataset-path', type=str, default="/home/mila/n/nizar.islah/GitChameleon/dataset/samples_reordered.csv")
+    parser.add_argument('--dataset-env-path', type=str, default="/home/mila/n/nizar.islah/GitChameleon/dataset/env_ids_reordered.csv")
+    parser.add_argument('--id_start', type=int, default=0)
+    parser.add_argument('--id_end', type=int, default=-1)
     parser.add_argument('--base-path', type=str, default="eval_venvs/")
     parser.add_argument('--enable-wandb', action='store_true', default=False)
     parser.add_argument('--wandb-project', type=str, default='GitChameleon_new')

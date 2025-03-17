@@ -14,6 +14,7 @@ from copy import deepcopy
 from transformers import AutoTokenizer
 from collections import defaultdict
 from src.sanitize import sanitize
+import pdb
 
 def load_outputs_from_json(options):
     if options.cot:
@@ -48,6 +49,7 @@ def load_outputs_from_json(options):
                 task_key, task_id = get_task(resp)
                 if task_key == 'task_id':
                     if task_id != cur_task_id:
+                        # pdb.set_trace()
                         options.n_generate = k
                         try:
                             assert options.k <= options.n_generate
@@ -73,7 +75,7 @@ def load_outputs_from_json(options):
                 else:
                     raise ValueError("task_id not found in json output.")
                 outputs[f"output_{k}"].append(solution)
-                if task_id == 'task_id':
+                if task_key == 'task_id':
                     k += 1
 
     if outputs is not None:
@@ -103,19 +105,40 @@ def check_empty_outputs(options, df):
     return df
 
 def prepare_eval_df(options, df, output_df):
+    id_end = len(output_df) if options.id_end == -1 else options.id_end
+    # df = df.iloc[options.id_start:id_end]
+    # if options.test:
+    #     print("Running in test mode")
+    #     # take 10 random samples
+    #     n = 10
+    #     df = df.sample(n, random_state=options.seed)
+    # df.reset_index(drop=True, inplace=True)
+    output_df = output_df.iloc[options.id_start:id_end]
+    output_df.reset_index(drop=True, inplace=True)
+    if options.library != "":
+        df = df[df["library"] == options.library]
+        output_df = output_df[df["library"] == options.library]
+
     df = pd.merge(df, output_df, left_index=True, right_index=True)
+
     df = add_ranking_index(
         df, options.model_name.split("/")[-1], options.n_generate
     )
     # check empty outputs
     df = check_empty_outputs(options, df)
     try:
-        repo_dir = os.path.dirname(os.path.dirname(options.dataset_path))
-        df["env_id"] = pd.read_csv(f"dataset/updated_libraries.csv")["env_id"]
+        # repo_dir = os.path.dirname(os.path.dirname(options.dataset_path))
+        # df_env = pd.read_csv(f"{repo_dir}/updated_libraries.csv")
+        df_env = pd.read_csv(options.dataset_env_path)
+        # id_end = len(df_env) if options.id_end == -1 else options.id_end
+        # df_env = df_env.iloc[options.id_start:id_end]
+        # df_env.reset_index(drop=True, inplace=True)
+        df["env_id"] = df_env["env_id"]
     except Exception as e:
         print("Error: ", e)
         exit(1)
-
+    # print(df.head())
+    # exit(0)
     return df
 
 def get_ranks(model_name, row):
@@ -278,13 +301,14 @@ def concat_testcase(
     add_back_starter=True,
     verbose_mode=False,
 ):
-    try:
+    # TODO: check if no parsing is needed
+    # try:
         # regex filter out starting_code from output exact string matching
         # if instruct:  for base as well
-        model_output = remove_patterns(starting_code, model_output)
-    except Exception as e:
-        print("Error: ", e)
-        print(type(model_output))
+        # model_output = remove_patterns(starting_code, model_output)
+    # except Exception as e:
+    #     print("Error: ", e)
+    #     print(type(model_output))
     if verbose_mode:
         print("This is model code to run before assert: ", model_output)
         print("------------------------------------")

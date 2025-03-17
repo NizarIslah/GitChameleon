@@ -36,12 +36,14 @@ def codegen(
 
         if not args.datatype_jsonl:
             dataset = load_dataset(dataset_path)
+            prompt_key = "prompt"
         else:
             # datatype_jsonl data
             with open(dataset_path, "r") as f:
                 dataset = [json.loads(line) for line in f]
-                dataset = [(d["task_id"], d) for d in dataset]
-
+                dataset = [(d.get("task_id", id), d) for id, d in enumerate(dataset)]
+                prompt_key = "prompt" if "prompt" in dataset[0][1] else "content"
+                assert prompt_key in dataset[0][1], f"Prompt key not found in {dataset[0]}"
         # create save_path if it doesn't exist, e.g., a/b.jsonl
         dirname = os.path.dirname(save_path)
         if not os.path.exists(dirname) and dirname != "":
@@ -81,7 +83,7 @@ def codegen(
             nsamples = n_samples - n_existing
 
             if args.datatype_jsonl:
-                prompt = task["prompt"]
+                prompt = task[prompt_key]
             elif args.oracle:
                 prompt = get_prompt_doc(task, not model.is_direct_completion())
             else:

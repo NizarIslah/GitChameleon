@@ -52,15 +52,6 @@ if __name__ == "__main__":
 
     df = pd.read_csv(options.dataset_path, encoding="latin1")
 
-    if options.test:
-        print("Running in test mode")
-        # take 10 random samples
-        n = 10
-        df = df.sample(n, random_state=options.seed)
-    df.reset_index(drop=True, inplace=True)
-    if options.library != "":
-        df = df[df["library"] == options.library]
-
     save_dir = (
         options.output_path + "/" + options.model_name.split("/")[0]
         if "/" in options.model_name
