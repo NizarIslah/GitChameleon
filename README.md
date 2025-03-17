@@ -24,7 +24,7 @@ The dataset used in our benchmark is available in CSV format at `data/combined_d
 
    - Run the following script to install the virtual environments with the necessary Python libraries:
      ```
-     python create_venvs.py
+     python src/create_venvs.py
      ```
 
    This step sets up the specific library versions required for evaluation using code execution criteria.

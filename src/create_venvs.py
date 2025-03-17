@@ -7,14 +7,19 @@ from tqdm import tqdm
 from pathlib import Path
 
 
-def replace_torch_version(row):
+def replace_lib_version(row):
+    """Replace specific versions of library with a compatible
+    version for the evaluation environment."""
     if row["library"] == "torch":
         if str(row["version"]) in ("1.9", "1.9.0", "1.1", "1.10", "1.10.0"):
             return "1.11.0"
+    if row["library"] == "scipy":
+        if str(row["version"]) in ("1.10.2"):
+            return "1.10.1"
     return row["version"]
 
 
-def create_virtual_environment(env_path, create_anyway=False):
+def create_virtual_environment(env_path, create_anyway=False, library_to_check=None):
     """Create and return the path of a virtual environment."""
     if not os.path.exists(env_path):
         os.makedirs(env_path, exist_ok=True)
@@ -28,6 +33,23 @@ def create_virtual_environment(env_path, create_anyway=False):
             os.makedirs(env_path, exist_ok=True)
             subprocess.run(["python", "-m", "venv", env_path], check=True)
             print(f"Virtual environment created: {env_path}")
+    
+    if library_to_check:
+        # Determine the correct path to the Python executable in the venv
+        python_exec = os.path.join(env_path, "bin", "python")
+        
+        # Use pip show to check for the library.
+        result = subprocess.run(
+            [python_exec, "-m", "pip", "show", library_to_check],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+        
+        if result.returncode == 0:
+            print(f"Library '{library_to_check}' is installed in the virtual environment.")
+        else:
+            print(f"Library '{library_to_check}' is NOT installed in the virtual environment.")
+    
     return env_path
 
 
@@ -82,10 +104,10 @@ def main(args):
     base_path = args.base_path
     create_anyway = args.create_anyway
 
-    df = pd.read_csv("dataset/combined_dataset.csv")
+    df = pd.read_csv(args.dataset)
 
     # replace torch version
-    df["version"] = df.apply(replace_torch_version, axis=1)
+    df["version"] = df.apply(replace_lib_version, axis=1)
     # Generate unique environment IDs
     df["env_id"] = df.apply(generate_env_id, axis=1)
 
@@ -105,7 +127,7 @@ def main(args):
         if not os.path.exists(python_executable):
             print(f"Python executable not found for {row_idx}")
             subprocess.run(["rm", "-rf", env_path])
-        create_virtual_environment(env_path, create_anyway=create_anyway)
+        create_virtual_environment(env_path, create_anyway=create_anyway, library_to_check=row["library"])
         returncode = install_packages(
             env_path, row["library"], row["version"], row["additional_dependencies"]
         )
@@ -126,6 +148,7 @@ if __name__ == "__main__":
 
     # argument for env_path
     parser = argparse.ArgumentParser()
+    parser.add_argument("--dataset", type=str, default="dataset/all_samples.csv")
     parser.add_argument("--base_path", type=str, default="eval_venvs/")
     parser.add_argument("--create_anyway", action="store_true", default=False)
     args = parser.parse_args()

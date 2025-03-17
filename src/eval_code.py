@@ -33,34 +33,56 @@ def load_outputs_from_json(options):
         else:
             model_name = options.model_name
         outputs = defaultdict(list)
+        possible_keys = ["task_id", "seed"]
+        def get_task(resp):
+            for key in possible_keys:
+                if key in list(resp.keys()):
+                    return key, resp[key]
+            return None
         with open(options.json_out_file, 'r') as f:
             k = 0
             cur_task_id = 0
             for line_idx, line in enumerate(f):
                 resp = json.loads(line)
-                task_id = resp["task_id"]
-                if task_id != cur_task_id:
-                    options.n_generate = k
+                # task_id in json format
+                task_key, task_id = get_task(resp)
+                if task_key == 'task_id':
+                    if task_id != cur_task_id:
+                        options.n_generate = k
+                        try:
+                            assert options.k <= options.n_generate
+                        except Exception as e:
+                            print("value of --k should be <= to number of samples generated.")
+                            exit(1)
+                        k = 0
+                        cur_task_id = task_id
                     try:
-                        assert options.k <= options.n_generate
+                        solution = sanitize(resp["solution"])
                     except Exception as e:
-                        print("value of --k should be <= to number of samples generated.")
-                        exit(1)
-                    k = 0
-                    cur_task_id = task_id
-                try:
-                    solution = sanitize(resp["solution"])
-                except Exception as e:
-                    print("Error: ", e)
-                    solution = resp["solution"]
+                        print("Error: ", e)
+                        solution = resp["solution"]
+                elif task_key == 'seed':   # gemini format: "output", "seed"
+                    k = task_id
+                    if k > 1000:
+                        k = 0 # hardcoded
+                    try:
+                        solution = sanitize(resp["output"])
+                    except Exception as e:
+                        print("Error: ", e)
+                        solution = resp["output"]
+                else:
+                    raise ValueError("task_id not found in json output.")
                 outputs[f"output_{k}"].append(solution)
-                k += 1
+                if task_id == 'task_id':
+                    k += 1
+
     if outputs is not None:
         output_df = pd.DataFrame(outputs)
         if options.cot:
             output_df = output_df.map(lambda x: extract_code_cot(x) if x is not None else x)
     else:
         output_df = None
+    print(output_df.head()['output_0'])
     return output_df
 
 def check_empty_outputs(options, df):
@@ -304,10 +326,14 @@ def run_script(python_executable, py_file="temp.py"):
         # Run the Python script within the virtual environment
         command = [python_executable, py_file]
         try:
-            result = subprocess.run(command, capture_output=True, text=True, timeout=30)
+            result = subprocess.run(command, capture_output=True, text=True, timeout=60)
             exit_code = result.returncode
             error_log = result.stderr
             # print("error_log: ", error_log)
+            # if "ModuleNotFoundError" in error_log:
+            #     print("ModuleNotFoundError")
+            # else:
+            #     print("No ModuleNotFoundError")
         except subprocess.TimeoutExpired as e:
             print(e)
             exit_code = 1
