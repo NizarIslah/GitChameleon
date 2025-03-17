@@ -2,6 +2,8 @@
 
 Benchmark associated with the paper ["GitChameleon: Unmasking the Version-Switching Capabilities of Code Generation Models"](https://arxiv.org/abs/2411.05830)
 
+We thank Terry Zhuo and the BigCodeBench project (https://github.com/bigcode-project/bigcodebench) for providing a starting point for our codebase.
+
 ### Downloading the Dataset
 
 The dataset used in our benchmark is available in CSV format at `data/combined_dataset.csv`.
@@ -16,7 +18,7 @@ The dataset used in our benchmark is available in CSV format at `data/combined_d
      ```
    - Install the required packages:
      ```
-     pip install -r requirements.txt
+     pip install vllm -r requirements.txt
      ```
   - Note: vllm-cpu (experimental): The requirements.txt will install vllm with gpu spport. For vllm-cpu, please follow the instructions in the [official documentation](https://docs.vllm.ai/en/v0.6.1/getting_started/cpu-installation.html). This has not been tested end-to-end with this repository, so it may break. It is planned to be fully supported in the near future.
 
@@ -53,6 +55,15 @@ This command will create a `.jsonl` file with the generated outputs.
 python generate.py --n_samples 5 --temperature 0.8 --model bigcode/starcoder2-15b-instruct-v0.1 --save_path generations/Starcoder2-instruct-v0.1_temperature0.8.jsonl
 ```
 
+#### Example: OpenAI-compatible serving
+
+To generate code generations with an OpenAI-compatible server, run the following command replacing with your model and token.
+```
+vllm serve NousResearch/Meta-Llama-3-8B-Instruct --dtype auto --api-key token-abc123
+```
+To call the server, you can use the official OpenAI Python client library, or any other HTTP client (see https://docs.vllm.ai/en/v0.6.1/serving/openai_compatible_server.html and https://docs.vllm.ai/en/v0.6.1/serving/distributed_serving.html for multi-GPU serving).
+
+
 #### Example: Running Evaluations
 
 For standard evaluation:
@@ -80,6 +91,11 @@ bash tests/test_readme.sh
 ```
 This will test the given README example to ensure that everything works as intended.
 
+To test url serving:
+```bash
+bash tests/test_url.sh
+```
+
 ### To-Do Items
 
 - Specify the number of CPUs used in generation.
@@ -89,6 +105,7 @@ This will test the given README example to ensure that everything works as inten
 Currently supported backend:
 
 - `vllm`
+- `url-serving (openai-compatible)`
 
 Planned support:
 
