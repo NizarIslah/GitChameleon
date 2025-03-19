@@ -1,4 +1,4 @@
-,library,version,name_of_class_or_func,type_of_change,problem,starting_code,solution,test,additional_dependencies,release_date,python_version,count as ,env_id
+Unnamed: 0,library,version,name_of_class_or_func,type_of_change,problem,starting_code,solution,test,additional_dependencies,release_date,python_version,count as ,env_id
 0,torch,1.9.0,log_ndtr,"
 other library
 ","Calculate the logarithm of the cumulative distribution function of the standard normal distribution using available functions. If not available in PyTorch, use another library.","import torch\ninput_tensor = torch.linspace(-10, 10, steps=20)\n# put answer in variable called output\n",import numpy as np\nfrom scipy.stats import norm\noutput = torch.from_numpy(norm.logcdf(input_tensor.numpy())),"input_tensor = torch.linspace(-10, 10, steps=20)\nexpected_result = torch.from_numpy(norm.logcdf(input_tensor.numpy()))\nassert torch.allclose(output, expected_result, rtol=1e-3, atol=1e-3)",scipy==1.7.3 numpy==1.21.6,,,,
@@ -1069,12 +1069,6 @@ pattern_id_to_remove = ""pattern1""
 ruler",.remove_by_id(pattern_id_to_remove),"assert len(ruler.patterns) == 1
 remaining_pattern_ids = [pattern[""id""] for pattern in ruler.patterns]
 assert pattern_id_to_remove not in remaining_pattern_ids",numpy==1.26.4,2023-01,,,
-110,nltk,3.7,fromstring,New feature or additional dependency based change,Parse a string representation of a tree into an NLTK Tree object.,"from nltk import Tree
-
-s = ""(S (NP (DT The) (NN cat)) (VP (VBZ sits) (PP (IN on) (NP (DT the) (NN mat)))))""
-
-parsed_tree = Tree",".fromstring(s, remove_empty_top_bracketing=True)","assert isinstance(parsed_tree, Tree)
-assert parsed_tree.label() == 'S'",,2022-02,,,
 111,nltk,3.7,align_words,New feature or additional dependency based change,Align words in a hypothesis and reference sentence using the METEOR algorithm.,"import nltk
 from nltk.stem import PorterStemmer
 from nltk.corpus import wordnet
