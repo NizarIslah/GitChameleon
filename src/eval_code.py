@@ -28,7 +28,7 @@ def load_outputs_from_json(options):
                     outputs[f"output_{k}"].append(sanitize(resp["solution"]))
 
     else:
-        assert os.path.exists(options.json_out_file), "Json out file does not exist."
+        assert os.path.exists(options.json_out_file), f"Json file {options.json_out_file} does not exist."
         if '/' in options.model_name:
             model_name = options.model_name.split('/')[-1]
         else:
@@ -44,9 +44,13 @@ def load_outputs_from_json(options):
             k = 0
             cur_task_id = 0
             for line_idx, line in enumerate(f):
-                resp = json.loads(line)
-                # task_id in json format
-                task_key, task_id = get_task(resp)
+                try:
+                    resp = json.loads(line)
+                    task_key, task_id = get_task(resp)
+                except Exception as e:
+                    print("Error: ", e)
+                    exit(1)
+
                 if task_key == 'task_id':
                     if task_id != cur_task_id:
                         # pdb.set_trace()
@@ -64,9 +68,7 @@ def load_outputs_from_json(options):
                         print("Error: ", e)
                         solution = resp["solution"]
                 elif task_key == 'seed':   # gemini format: "output", "seed"
-                    k = task_id
-                    if k > 1000:
-                        k = 0 # hardcoded
+                    k = task_id % options.n_generate
                     try:
                         solution = sanitize(resp["output"])
                     except Exception as e:
@@ -79,12 +81,15 @@ def load_outputs_from_json(options):
                     k += 1
 
     if outputs is not None:
+        # pdb.set_trace()
         output_df = pd.DataFrame(outputs)
         if options.cot:
             output_df = output_df.map(lambda x: extract_code_cot(x) if x is not None else x)
     else:
         output_df = None
-    print(output_df.head()['output_0'])
+    
+    # pdb.set_trace()
+    assert 'output_0' in output_df.columns, "output_0 not found in output_df."
     return output_df
 
 def check_empty_outputs(options, df):
@@ -119,13 +124,17 @@ def prepare_eval_df(options, df, output_df):
         df = df[df["library"] == options.library]
         output_df = output_df[df["library"] == options.library]
 
+    print(len(df), len(output_df))
+    if len(output_df) > len(df):
+        output_df = output_df.drop(110) # # drop row 110 from output df TODO: only for gemini
+        output_df.reset_index(drop=True, inplace=True)
+    assert len(df) == len(output_df), "Length of input and output dataframes do not match."
     df = pd.merge(df, output_df, left_index=True, right_index=True)
 
     df = add_ranking_index(
         df, options.model_name.split("/")[-1], options.n_generate
     )
     # check empty outputs
-    df = check_empty_outputs(options, df)
     try:
         # repo_dir = os.path.dirname(os.path.dirname(options.dataset_path))
         # df_env = pd.read_csv(f"{repo_dir}/updated_libraries.csv")
@@ -133,12 +142,16 @@ def prepare_eval_df(options, df, output_df):
         # id_end = len(df_env) if options.id_end == -1 else options.id_end
         # df_env = df_env.iloc[options.id_start:id_end]
         # df_env.reset_index(drop=True, inplace=True)
+        assert len(df) == len(df_env), "Length of input and env dataframes do not match."
         df["env_id"] = df_env["env_id"]
     except Exception as e:
         print("Error: ", e)
         exit(1)
     # print(df.head())
     # exit(0)
+    df = check_empty_outputs(options, df)
+    print(df.iloc[114])
+    print(df.iloc[115])
     return df
 
 def get_ranks(model_name, row):

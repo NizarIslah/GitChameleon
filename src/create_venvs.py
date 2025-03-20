@@ -57,6 +57,13 @@ def install_packages(env_path, library, version, additional_dependencies):
     """Install packages using the Python executable in the virtual environment."""
     python_executable = Path(env_path, "bin", "python")  # For Unix-like OS
     # Construct the pip install command using the specific Python executable
+    if library == 'librosa':
+        if "pip" in version:
+            version = "0.8.0"
+            additional_dependencies.replace("joblib==0.12", "joblib")
+        if "July 21" in additional_dependencies:
+            additional_dependencies = "numba==0.46 llvmlite==0.30 joblib numpy==1.16.0 audioread==2.1.5 scipy==1.1.0 resampy==0.2.2 soundfile"
+        additional_dependencies += " six decorator cffi" # hardcoded for librosa
     if str(additional_dependencies) in ("nan", "", "-", "io"):
         pip_install_cmd = [
             python_executable,
@@ -127,14 +134,15 @@ def main(args):
         if not os.path.exists(python_executable):
             print(f"Python executable not found for {row_idx}")
             subprocess.run(["rm", "-rf", env_path])
-        create_virtual_environment(env_path, create_anyway=create_anyway, library_to_check=row["library"])
-        returncode = install_packages(
-            env_path, row["library"], row["version"], row["additional_dependencies"]
-        )
-        if returncode != 0:
-            failed_count.append(row_idx)
-        else:
-            print(f"Python executable created for {row_idx}")
+        if row["library"] == "librosa":
+            create_virtual_environment(env_path, create_anyway=create_anyway, library_to_check=row["library"])
+            returncode = install_packages(
+                env_path, row["library"], row["version"], row["additional_dependencies"]
+            )
+            if returncode != 0:
+                failed_count.append(row_idx)
+            else:
+                print(f"All good for {row_idx}")
 
     print(f"Failed: {len(failed_count)}")
     for idx in failed_count:
@@ -148,8 +156,8 @@ if __name__ == "__main__":
 
     # argument for env_path
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset", type=str, default="dataset/all_samples.csv")
-    parser.add_argument("--base_path", type=str, default="eval_venvs/")
+    parser.add_argument("--dataset", type=str, default="dataset/all_samples_reordered.csv")
+    parser.add_argument("--base_path", type=str, default="/network/scratch/n/nizar.islah/eval_venvs/")
     parser.add_argument("--create_anyway", action="store_true", default=False)
     args = parser.parse_args()
     main(args)

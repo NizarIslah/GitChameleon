@@ -2,7 +2,7 @@ import os
 import json
 import wandb
 from src.model import DecoderBase, make_model
-from src.utils import get_prompt, write_jsonl, load_dataset, get_prompt_doc
+from src.utils import get_prompt, write_jsonl, load_dataset, get_prompt_doc, get_prompt_feedback
 from src.sanitize import sanitize
 from rich.progress import (
     BarColumn,
@@ -86,6 +86,8 @@ def codegen(
                 prompt = task[prompt_key]
             elif args.oracle:
                 prompt = get_prompt_doc(task, not model.is_direct_completion())
+            elif args.feedback:
+                prompt = get_prompt_feedback(task)
             else:
                 prompt = get_prompt(task, not model.is_direct_completion(), cot)
             if strip_newlines:

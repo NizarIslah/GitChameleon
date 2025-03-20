@@ -3,8 +3,8 @@ import json
 import os
 from os import PathLike
 from typing import Dict, Iterable
-
 import pandas as pd
+from tqdm import tqdm
 
 
 def write_jsonl(
@@ -33,21 +33,41 @@ def write_jsonl(
                 fp.write((json.dumps(x) + "\n").encode("utf-8"))
 
 
-def stream_jsonl(filename: str) -> Iterable[Dict]:
+import gzip
+import json
+from typing import Iterable, Dict
+
+def stream_jsonl(filename: str, seed: int) -> Iterable[Dict]:
     """
-    Parses each jsonl line and yields it as a dictionary
+    Parses each JSONL line from the given file and yields it as a dictionary.
+    If a line is empty (only whitespace), yields a dictionary with {"output": "", "seed": seed}.
+    
+    Parameters:
+      filename (str): The path to the JSONL file (can be gzip compressed if ends with '.gz').
+      seed (int): The seed value to include if an empty line is encountered.
+    
+    Returns:
+      Iterable[Dict]: An iterable of dictionaries parsed from the file.
     """
     if filename.endswith(".gz"):
         with open(filename, "rb") as gzfp:
             with gzip.open(gzfp, "rt") as fp:
                 for line in fp:
-                    if any(not x.isspace() for x in line):
+                    stripped_line = line.strip()
+                    if stripped_line == "":
+                        yield {"output": "", "seed": seed}
+                    else:
                         yield json.loads(line)
     else:
         with open(filename, "r") as fp:
             for line in fp:
-                if any(not x.isspace() for x in line):
+                stripped_line = line.strip()
+                if json.loads(stripped_line) == "":
+                    print("empty line")
+                    yield {"output": "", "seed": seed}
+                else:
                     yield json.loads(line)
+
 
 
 def write_directory(directory: PathLike, data: Iterable[Dict]):
@@ -130,6 +150,85 @@ Please start with the following markdown code block:
 """.format(example["starting_code"].replace('\\n', '\n'))
     return prompt
 
+
+def generate_prompt(model_name, example, df_idx, sample_idx):
+    base_model_name = model_name.split('/')[-1]
+    parsed_code = example[f'parsed_code_{sample_idx}']
+    error_log = example[f'error_log_{sample_idx}']
+    # task_id is index of the example
+    task_id = df_idx
+    # print(type(parsed_code), type(error_log))
+    if type(error_log) == float:
+        print(error_log)
+        error_log = ""
+    if type(parsed_code) == float:
+        parsed_code = ""
+    prompt = get_prompt_feedback(example, parsed_code, error_log)
+    prompt = {"task_id": task_id, "sample_id": sample_idx,"prompt": prompt}
+    return prompt
+
+def generate_prompt_with_error_log(model_name, n_generate, eval_df, indices):
+    prompts = []
+    df_indices = [i//n_generate for i in indices]
+    sample_indices = [i%n_generate for i in indices]
+    for df_idx, sample_idx in zip(df_indices, sample_indices):
+        example = eval_df.iloc[df_idx]
+        prompt = generate_prompt(model_name, example, df_idx, sample_idx)
+        prompts.append(prompt)
+    return prompts
+
+def save_feedback_prompts_jsonl(model_name, n_generate, eval_df_path, jsonl_save_path):
+    """
+    Regenerates error log prompts based on evaluation data.
+
+    This function:
+      - Loads evaluation data from either a WandB table file or a CSV.
+      - Filters the evaluation DataFrame based on the model name.
+      - Sets up the tokenizer (unless prompt_saving is enabled).
+      - Processes the evaluation data in batches to generate error log prompts.
+      - If prompt_saving is enabled, saves the prompts to a JSONL file and exits;
+        otherwise, returns the generated prompts.
+
+    Parameters:
+        options: An object with attributes including:
+            - error_log_regenerate (bool)
+            - wandb_table_file (str)
+            - model_name (str)
+            - seed (any)
+            - temperature (any)
+            - prompt_saving (bool)
+            - batch_size (int)
+            - n_generate (int)
+            - model_url (str)
+            - token (str)
+        save_dir (str): Directory where the evaluation CSV is located.
+        eval_save_file (str): Filename for the evaluation CSV (used if wandb_table_file is empty).
+
+    Returns:
+        If prompt_saving is False, returns a list of generated prompts.
+    """
+    eval_df = pd.read_csv(eval_df_path)
+    print(eval_df.head())
+
+    bs = 16
+    n_samples = len(eval_df)
+    total_gen = n_samples * n_generate
+    print("n_samples * n_generate:", total_gen, "n_mb:", total_gen // bs + 1)
+    all_prompts = []
+    # Process evaluation data in batches.
+    for i in tqdm(range(0, total_gen, bs)):
+        stop = min(total_gen, i + bs)
+        prompts = generate_prompt_with_error_log(model_name, n_generate, eval_df, range(i, stop))
+        all_prompts.extend(prompts)
+
+    with open(jsonl_save_path, 'w') as f:
+        for prompt in all_prompts:
+            f.write(json.dumps(prompt) + '\n')
+    print(f"Saved error log prompts to {jsonl_save_path}")
+
+    return all_prompts
+
+
 def get_prompt_doc(example, instruct=False):
     if instruct:
         prompt_template = PROMPT_TEMPLATE
@@ -192,7 +291,50 @@ def move_rows_to_position(df, idx1, idx2, idx3):
     return df_new
 
 # # Example usage:
-# if __name__ == "__main__":
+if __name__ == "__main__":
+    model_name = "codegemma-7b-it"
+    n_generate = 1
+    temp = 0
+    seed = 0
+    eval_df_path = "/home/mila/n/nizar.islah/GitChameleon/results/codegemma-7b-it/codegemma-7b-it_n1_k1_T=0.0_seed0_eval.csv"
+    jsonl_save_path = f"/home/mila/n/nizar.islah/GitChameleon/results/codegemma-7b-it/codegemma-7b-it_n{n_generate}_k1_T={temp}_feedback_prompts_{seed}.jsonl"
+    save_feedback_prompts_jsonl(model_name, n_generate, eval_df_path, jsonl_save_path)
+
+    #############
+
+    import csv
+    # # File paths
+    # input_csv = "dataset/all_samples_reordered.csv"
+    # output_jsonl = "dataset/all_samples_reordered.jsonl"
+
+    # # Read CSV and write JSONL
+    # with open(input_csv, newline='', encoding='utf-8') as csvfile, open(output_jsonl, 'w', encoding='utf-8') as jsonlfile:
+    #     reader = csv.DictReader(csvfile)
+    #     for i,row in enumerate(reader):
+    #         if i==110:
+    #             continue
+    #         prompt = get_prompt(row, instruct=True, cot=False)
+    #         json_obj = {"role": "user", "content": prompt}
+    #         jsonlfile.write(json.dumps(json_obj) + "\n")
+
+
+    # temp=0.3
+    # seeds = 25
+    # file_template = f'/home/mila/n/nizar.islah/GitChameleon/gemini-2.0-flash/temp_{temp}/samples_all_reformatted.jsonl_{temp}_'
+    # n_generate = seeds//5
+    # for seed in range(0, seeds, n_generate): #0,5,10,15,20
+    #     out_jsonl_path = f'/home/mila/n/nizar.islah/GitChameleon/gemini-2.0-flash/temp_{temp}/seed_samples_all_reformatted.jsonl_{temp}_{seed // n_generate}.jsonl'
+    #     print(out_jsonl_path)
+    #     data = []
+    #     for i in range(n_generate):
+    #         file_path = file_template+'{}.jsonl'.format(seed+i)
+    #         assert os.path.isfile(file_path)
+    #         data.extend(stream_jsonl(file_path, seed // n_generate))
+    #     for i,d in enumerate(data):
+    #         if not type(d) == dict:
+    #             print(i, d, type(d))
+    #     write_jsonl(out_jsonl_path, data)
+
 #     # Read the CSV file into a DataFrame
 #     df = pd.read_csv("/home/mila/n/nizar.islah/GitChameleon/dataset/updated_libraries.csv")
     

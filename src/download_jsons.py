@@ -14,10 +14,10 @@ def extract_json_from_wandb(filter_key, model_name, seed, temp, n_generate, cot=
 
     # Define the project and entity (username or team name)
     entity = "cl4code"  # Replace with your entity
-    project = "GitChameleon"  # Replace with your project name
+    project = "GitChameleon_new"  # Replace with your project name
 
     # Define the date after which to filter runs (use the format YYYY-MM-DD)
-    filter_date = '2024-10-07'  # Example date
+    filter_date = '2025-03-15'  # Example date
 
     # Convert the filter_date to datetime for comparison
     filter_date_time = datetime.strptime(filter_date, '%Y-%m-%d')
@@ -34,7 +34,8 @@ def extract_json_from_wandb(filter_key, model_name, seed, temp, n_generate, cot=
                     "config.bs": 200,
                     "config.temperature": temp,
                     "config.backend": "vllm",
-                    "config.cot": cot
+                    "config.cot": cot,
+                    "config.prefetched": True,
                 },
                 "regenerate":
                 {
@@ -166,38 +167,38 @@ if __name__ == "__main__":
 
 
     model_names=[
-        "DeepSeek-Coder-V2-Lite-Instruct",
-        "Qwen2.5-0.5B-Instruct",
-        "Yi-Coder-9B-Chat",
-        "Yi-Coder-1.5B-Chat",
-        "CodeLlama-7b-Instruct-hf",
-        "CodeLlama-13b-Instruct-hf",
-        "CodeLlama-34b-Instruct-hf",
-        "Llama-3.1-8B-Instruct",
-        "Llama-3.1-70B-Instruct",
-        "Qwen2-7B-Instruct",
-        "Qwen2.5-Coder-1.5B-Instruct",
-        "Qwen2.5-Coder-7B-Instruct",
-        "Llama-3.2-1B-Instruct",
-        "Llama-3.2-3B-Instruct",
-        "Codestral-22B-v0.1",
-        "Yi-1.5-6B-Chat",
-        "Yi-1.5-9B-Chat",
-        "Yi-1.5-34B-Chat"
+        # "DeepSeek-Coder-V2-Lite-Instruct",
+        # "Qwen2.5-0.5B-Instruct",
+        # "Yi-Coder-9B-Chat",
+        # "Yi-Coder-1.5B-Chat",
+        # "CodeLlama-7b-Instruct-hf",
+        # "CodeLlama-13b-Instruct-hf",
+        # "CodeLlama-34b-Instruct-hf",
+        # "Llama-3.1-8B-Instruct",
+        # "Llama-3.1-70B-Instruct",
+        # "Qwen2-7B-Instruct",
+        # "Qwen2.5-Coder-1.5B-Instruct",
+        # "Qwen2.5-Coder-7B-Instruct",
+        # "Llama-3.2-1B-Instruct",
+        # "Llama-3.2-3B-Instruct",
+        # "Codestral-22B-v0.1",
+        # "Yi-1.5-6B-Chat",
+        # "Yi-1.5-9B-Chat",
+        # "Yi-1.5-34B-Chat"
         "codegemma-7b-it",
-        "stable-code-instruct-3b",
-        "starcoder2-15b-instruct-v0.1",
-        "Qwen2-72B-Instruct",
-        "granite-3b-code-instruct-2k",
-        "granite-3b-code-instruct-128k",
-        "granite-8b-code-instruct-4k",
-        "granite-8b-code-instruct-128k",
-        "granite-20b-code-instruct-8k",
-        "granite-34b-code-instruct-8k",
-        "Phi-3.5-mini-instruct",
-        "Phi-3.5-MoE-instruct",
-        "CodeQwen1.5-7B-Chat",
-        "Nxcode-CQ-7B-orpo"
+        # "stable-code-instruct-3b",
+        # "starcoder2-15b-instruct-v0.1",
+        # "Qwen2-72B-Instruct",
+        # "granite-3b-code-instruct-2k",
+        # "granite-3b-code-instruct-128k",
+        # "granite-8b-code-instruct-4k",
+        # "granite-8b-code-instruct-128k",
+        # "granite-20b-code-instruct-8k",
+        # "granite-34b-code-instruct-8k",
+        # "Phi-3.5-mini-instruct",
+        # "Phi-3.5-MoE-instruct",
+        # "CodeQwen1.5-7B-Chat",
+        # "Nxcode-CQ-7B-orpo"
     ]
     # model_names = ['granite-8b-code-instruct-4k', 'Qwen2.5-Coder-1.5B-Instruct', 'CodeLlama-34b-Instruct-hf', 
     # 'Llama-3.1-70B-Instruct', 'stable-code-instruct-3b', 'Qwen2.5-Coder-7B-Instruct', 'Qwen2-7B-Instruct', 
@@ -205,7 +206,7 @@ if __name__ == "__main__":
     # 'granite-20b-code-instruct-8k', 'starcoder2-15b-instruct-v0.1', 'Llama-3.2-3B-Instruct', 
     # 'granite-3b-code-instruct-128k', 'Llama-3.2-1B-Instruct', 'CodeQwen1.5-7B-Chat', 'Phi-3.5-mini-instruct', 
     # 'Phi-3.5-MoE-instruct', 'granite-8b-code-instruct-128k', 'Qwen2-72B-Instruct']
-    cot = True
+    cot = False
     filter_key = "generate"
     if filter_key == "regenerate":
         seeds = range(5)

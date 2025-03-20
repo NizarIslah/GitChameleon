@@ -74,6 +74,8 @@ if __name__ == "__main__":
         + str(options.k)
         + "_T="
         + str(options.temperature)
+        + "_seed"
+        + str(options.seed)
         + "_eval.csv"
     )
 
