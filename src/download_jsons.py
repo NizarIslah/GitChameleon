@@ -126,6 +126,22 @@ def concatenate_jsonl_files(input_dir, model_name, temperature, output_file):
 
     print(f"Concatenated {len(concatenated_data)} records into {output_file}")
 
+def extract_every_n_lines_with_offset(input_path, output_path, n, offset):
+    """
+    Extracts every n-th line from the input JSONL file starting at the given offset,
+    and writes those lines to the output JSONL file.
+    
+    Parameters:
+    input_path (str): Path to the input JSONL file.
+    output_path (str): Path to the output JSONL file.
+    n (int): Step size (every n-th line will be taken).
+    offset (int): The starting line index offset (zero-indexed).
+    """
+    with open(input_path, 'r') as infile, open(output_path, 'w') as outfile:
+        for i, line in enumerate(infile):
+            if i >= offset and (i - offset) % n == 0:
+                outfile.write(line)
+
 
 if __name__ == "__main__":
     # json_path="/home/mila/n/nizar.islah/GitChameleon/hf_tmp/CodeLlama-34b-Instruct-hf_outputs_0_0.8_100.jsonl"
@@ -171,21 +187,21 @@ if __name__ == "__main__":
         # "Qwen2.5-0.5B-Instruct",
         # "Yi-Coder-9B-Chat",
         # "Yi-Coder-1.5B-Chat",
-        # "CodeLlama-7b-Instruct-hf",
-        # "CodeLlama-13b-Instruct-hf",
-        # "CodeLlama-34b-Instruct-hf",
+        "CodeLlama-7b-Instruct-hf",
+        "CodeLlama-13b-Instruct-hf",
+        "CodeLlama-34b-Instruct-hf",
         # "Llama-3.1-8B-Instruct",
         # "Llama-3.1-70B-Instruct",
-        # "Qwen2-7B-Instruct",
+        "Qwen2-7B-Instruct",
         # "Qwen2.5-Coder-1.5B-Instruct",
         # "Qwen2.5-Coder-7B-Instruct",
         # "Llama-3.2-1B-Instruct",
-        # "Llama-3.2-3B-Instruct",
-        # "Codestral-22B-v0.1",
+        "Llama-3.2-3B-Instruct",
+        "Codestral-22B-v0.1",
         # "Yi-1.5-6B-Chat",
         # "Yi-1.5-9B-Chat",
         # "Yi-1.5-34B-Chat"
-        "codegemma-7b-it",
+        # "codegemma-7b-it",
         # "stable-code-instruct-3b",
         # "starcoder2-15b-instruct-v0.1",
         # "Qwen2-72B-Instruct",
@@ -197,7 +213,7 @@ if __name__ == "__main__":
         # "granite-34b-code-instruct-8k",
         # "Phi-3.5-mini-instruct",
         # "Phi-3.5-MoE-instruct",
-        # "CodeQwen1.5-7B-Chat",
+        "CodeQwen1.5-7B-Chat",
         # "Nxcode-CQ-7B-orpo"
     ]
     # model_names = ['granite-8b-code-instruct-4k', 'Qwen2.5-Coder-1.5B-Instruct', 'CodeLlama-34b-Instruct-hf', 
@@ -215,7 +231,7 @@ if __name__ == "__main__":
     
     for seed in seeds:
         for model in tqdm(model_names):
-            for cfg in [(seed, 0.0, 1)]: #, (seed, 0.3, 25), (seed, 0.8, 100)]:  # seed, temp, n_sample (seed, 0.3, 25), 
+            for cfg in [(seed, 0.0, 1)]: #, (seed, 0.3, 25)]: #, (seed, 0.8, 100)]:  # seed, temp, n_sample (seed, 0.3, 25), 
                 try:
                     json_file = extract_json_from_wandb(filter_key, model, cfg[0], cfg[1], cfg[2], cot=cot)
                 except:
@@ -243,7 +259,21 @@ if __name__ == "__main__":
                 import shutil
                 shutil.move(json_file.name, new_name)
                 print(f"Renamed file to {new_name}")
-        print("Done")
+
+            # for i in range(5):
+            #     input_file = new_name
+            #     output_file = new_name.replace(".jsonl", f"_{i}.jsonl")
+            #     n = 5
+            #     offset = i
+            #     extract_every_n_lines_with_offset(input_file, output_file, n, offset)
+            #     print("Done")
+
+
+    import sys
+
+
+
+
         # break
     # # # testing extract json from wandb
     # # json_file = extract_json_from_wandb(filter_key, "/fast/dmisra/hf_tmp/CodeLlama-7b-instruct-hf", 0, 0.3, 25, cot=False)

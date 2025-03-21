@@ -159,7 +159,6 @@ def generate_prompt(model_name, example, df_idx, sample_idx):
     task_id = df_idx
     # print(type(parsed_code), type(error_log))
     if type(error_log) == float:
-        print(error_log)
         error_log = ""
     if type(parsed_code) == float:
         parsed_code = ""
@@ -292,13 +291,28 @@ def move_rows_to_position(df, idx1, idx2, idx3):
 
 # # Example usage:
 if __name__ == "__main__":
-    model_name = "codegemma-7b-it"
-    n_generate = 1
-    temp = 0
-    seed = 0
-    eval_df_path = "/home/mila/n/nizar.islah/GitChameleon/results/codegemma-7b-it/codegemma-7b-it_n1_k1_T=0.0_seed0_eval.csv"
-    jsonl_save_path = f"/home/mila/n/nizar.islah/GitChameleon/results/codegemma-7b-it/codegemma-7b-it_n{n_generate}_k1_T={temp}_feedback_prompts_{seed}.jsonl"
-    save_feedback_prompts_jsonl(model_name, n_generate, eval_df_path, jsonl_save_path)
+    model_names = [
+        "gemini15",
+        "gemini-2.0-flash",
+        "codegemma-7b-it",
+        "gpt4o",
+        "gpt4o_2",
+        "gpt_mini",
+        "Qwen2-7B-Instruct",
+        "Llama-3.2-3B-Instruct",
+        "CodeLlama-7b-Instruct-hf",
+        "CodeLlama-13b-Instruct-hf",
+        "CodeLlama-34b-Instruct-hf",
+        "CodeQwen1.5-7B-Chat",
+        "Codestral-22B-v0.1"
+    ]
+    for model_name in model_names:
+        n_generate = 1
+        temp = 0.0
+        seed = 0
+        eval_df_path = f"/home/mila/n/nizar.islah/GitChameleon/results/{model_name}/{model_name}_n{n_generate}_k1_T={temp}_seed{seed}_eval.csv"
+        jsonl_save_path = f"/home/mila/n/nizar.islah/GitChameleon/results/feedback_prompts/{model_name}_n{n_generate}_k1_T={temp}_feedback_prompts.jsonl"
+        save_feedback_prompts_jsonl(model_name, n_generate, eval_df_path, jsonl_save_path)
 
     #############
 
@@ -317,23 +331,28 @@ if __name__ == "__main__":
     #         json_obj = {"role": "user", "content": prompt}
     #         jsonlfile.write(json.dumps(json_obj) + "\n")
 
-
+    # import pickle
     # temp=0.3
     # seeds = 25
-    # file_template = f'/home/mila/n/nizar.islah/GitChameleon/gemini-2.0-flash/temp_{temp}/samples_all_reformatted.jsonl_{temp}_'
+    # file_template = '/home/mila/n/nizar.islah/nizar.islah/GitChameleon/results/gpt_mini_03/responses_{}.pkl'
     # n_generate = seeds//5
     # for seed in range(0, seeds, n_generate): #0,5,10,15,20
-    #     out_jsonl_path = f'/home/mila/n/nizar.islah/GitChameleon/gemini-2.0-flash/temp_{temp}/seed_samples_all_reformatted.jsonl_{temp}_{seed // n_generate}.jsonl'
+    #     out_jsonl_path = f'/home/mila/n/nizar.islah/nizar.islah/GitChameleon/results/gpt_mini_03/responses_{temp}_{seed // n_generate}.jsonl'
     #     print(out_jsonl_path)
     #     data = []
     #     for i in range(n_generate):
-    #         file_path = file_template+'{}.jsonl'.format(seed+i)
+    #         file_path = file_template.format(seed+i)
     #         assert os.path.isfile(file_path)
-    #         data.extend(stream_jsonl(file_path, seed // n_generate))
+    #         if 'pkl' in file_path:
+    #             data.extend([{'output': x, 'seed': seed+i} for x in pickle.load(open(file_path, 'rb'))])
+    #         else: # jsonl
+    #             data.extend(stream_jsonl(file_path, seed // n_generate))
     #     for i,d in enumerate(data):
     #         if not type(d) == dict:
     #             print(i, d, type(d))
     #     write_jsonl(out_jsonl_path, data)
+
+
 
 #     # Read the CSV file into a DataFrame
 #     df = pd.read_csv("/home/mila/n/nizar.islah/GitChameleon/dataset/updated_libraries.csv")

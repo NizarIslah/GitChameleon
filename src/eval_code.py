@@ -21,14 +21,22 @@ def load_outputs_from_json(options):
         # greedy, 1 file, "solution"
         model_name = options.model_name.split('/')[-1]
         outputs = defaultdict(list)
-        with open(options.cot_output_path, 'r') as f:
+        with open(options.json_out_file, 'r') as f:
             for line_idx, line in enumerate(f):
                 resp = json.loads(line)
                 for k in range(options.n_generate):
-                    outputs[f"output_{k}"].append(sanitize(resp["solution"]))
+                    outputs[f"output_{k}"].append(sanitize(resp["output"]))
 
     else:
         assert os.path.exists(options.json_out_file), f"Json file {options.json_out_file} does not exist."
+
+        if ".pkl" in options.json_out_file:
+            import pickle
+            # handle gpt pickle file. assume greedy
+            outputs = pickle.load(open(options.json_out_file, "rb"))
+            output_df = pd.DataFrame({'output_0': [sanitize(o) for o in outputs]})
+            return output_df
+
         if '/' in options.model_name:
             model_name = options.model_name.split('/')[-1]
         else:
