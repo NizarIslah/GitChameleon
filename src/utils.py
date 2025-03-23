@@ -289,55 +289,156 @@ def move_rows_to_position(df, idx1, idx2, idx3):
     
     return df_new
 
+PROMPT_TEMPLATE="""\
+1. Required Library:
+<library>
+{}=={} with python {}
+</library>
+
+2. Coding Problem:
+<coding_problem>
+{}
+</coding_problem>
+
+3. Starter Code:
+<starter_code>
+{}
+</starter_code>
+```
+
+After writing your solution, please review it to ensure all requirements are met and the code is correct and efficient."""
+    
 # # Example usage:
 if __name__ == "__main__":
-    model_names = [
-        "gemini15",
-        "gemini-2.0-flash",
-        "codegemma-7b-it",
-        "gpt4o",
-        "gpt4o_2",
-        "gpt_mini",
-        "Qwen2-7B-Instruct",
-        "Llama-3.2-3B-Instruct",
-        "CodeLlama-7b-Instruct-hf",
-        "CodeLlama-13b-Instruct-hf",
-        "CodeLlama-34b-Instruct-hf",
-        "CodeQwen1.5-7B-Chat",
-        "Codestral-22B-v0.1"
-    ]
-    for model_name in model_names:
-        n_generate = 1
-        temp = 0.0
-        seed = 0
-        eval_df_path = f"/home/mila/n/nizar.islah/GitChameleon/results/{model_name}/{model_name}_n{n_generate}_k1_T={temp}_seed{seed}_eval.csv"
-        jsonl_save_path = f"/home/mila/n/nizar.islah/GitChameleon/results/feedback_prompts/{model_name}_n{n_generate}_k1_T={temp}_feedback_prompts.jsonl"
-        save_feedback_prompts_jsonl(model_name, n_generate, eval_df_path, jsonl_save_path)
+    import pandas as pd
+    import json
 
-    #############
+    samples = []
+    with open("/home/mila/n/nizar.islah/scratch/GitChameleon/GitChameleon/dataset/all_samples_final_merged.jsonl", 'r') as f:
+        idx=0
+        for line in f:
+            sample = json.loads(line)
+            lib = sample['library']
+            version = sample['version']
+            problem = sample['problem']
+            starter_code = sample['starting_code']
+            if idx < 293:
+                python_version = "3.10"
+            else:
+                python_version = "3.7"
+            idx+=1
+            prompt = PROMPT_TEMPLATE.format(lib,version,python_version,problem,starter_code)
+            samples.append({"role": "user", "content": prompt})
+    # write to a jsonl
+    with open("dataset/all_samples_final_new.jsonl", 'w') as f:
+        for sample in samples:
+            f.write(json.dumps(sample) + '\n')
+    print("all samples written to jsonl")
+
+    # samples = pd.read_csv("dataset/all_samples_final.csv")
+    # idxs = (50, 150, 220)
+    # prompts=[]
+    # for idx in idxs:
+    #     sample = samples.iloc[idx]
+    #     lib = sample['library']
+    #     version = sample['version']
+    #     problem = sample['problem']
+    #     starter_code = sample['starting_code']
+    #     prompt = PROMPT_TEMPLATE.format(lib,version,problem,starter_code,lib,version,lib,version)
+    #     prompts.append({"role": "user", "content": prompt})
+    # # write to a jsonl
+    # with open("dataset/test_new_prompts.jsonl", 'w') as f:
+    #     for prompt in prompts:
+    #         f.write(json.dumps(prompt) + '\n')
+
+
+    # # combine csvs
+    # import csv
+    # input_csvs = [
+    #     "src/gitchameleon samples to verify - Brice (1).csv",
+    #     "src/gitchameleon samples to verify - zihan (1).csv",
+    #     "src/gitchameleon samples to verify - Muawiz (2).csv",
+    # ]
+    # output_csv = "dataset/samples_collab_final.csv"
+    # # they may have different columns
+    # combined = []
+    # columns = set()
+    # for input_csv in input_csvs:
+    #     with open(input_csv, newline='', encoding='utf-8') as csvfile:
+    #         reader = csv.DictReader(csvfile)
+    #         for row in reader:
+    #             combined.append(row)
+    #             columns.update(row.keys())
+    # columns = list(columns)
+    # with open(output_csv, 'w', newline='', encoding='utf-8') as csvfile:
+    #     writer = csv.DictWriter(csvfile, fieldnames=columns)
+    #     writer.writeheader()
+    #     for row in combined:
+    #         writer.writerow(row)
+
+
+    # df2=pd.read_csv(output_csv)
+    # df1=pd.read_csv("/home/mila/n/nizar.islah/GitChameleon/dataset/combined_dataset.csv")
+    # # merge with different columns some same.
+    # all_columns = set(df1.columns).union(set(df2.columns))
+    # df1 = df1.reindex(columns=all_columns)
+    # df2 = df2.reindex(columns=all_columns)
+    # df = pd.concat([df1, df2], ignore_index=True)
+    # df=df.drop([110])
+    # df=df.reset_index(drop=True)
+    # df.to_csv("dataset/all_samples_final.csv", index=False)
+
 
     import csv
+    ## feedback prompt saving ##
+    # model_names = [
+    #     "gemini15",
+    #     "gemini-2.0-flash",
+    #     "codegemma-7b-it",
+    #     "gpt4o",
+    #     "gpt4o_2",
+    #     "gpt_mini",
+    #     "Qwen2-7B-Instruct",
+    #     "Llama-3.2-3B-Instruct",
+    #     "CodeLlama-7b-Instruct-hf",
+    #     "CodeLlama-13b-Instruct-hf",
+    #     "CodeLlama-34b-Instruct-hf",
+    #     "CodeQwen1.5-7B-Chat",
+    #     "Codestral-22B-v0.1"
+    # ]
+    # for model_name in model_names:
+    #     n_generate = 1
+    #     temp = 0.0
+    #     seed = 0
+    #     eval_df_path = f"/home/mila/n/nizar.islah/GitChameleon/results/{model_name}/{model_name}_n{n_generate}_k1_T={temp}_seed{seed}_eval.csv"
+    #     jsonl_save_path = f"/home/mila/n/nizar.islah/GitChameleon/results/feedback_prompts/{model_name}_n{n_generate}_k1_T={temp}_feedback_prompts.jsonl"
+    #     save_feedback_prompts_jsonl(model_name, n_generate, eval_df_path, jsonl_save_path)
+
+    #####  csv to jsonl saving #######0#
+
+    # import csv
     # # File paths
-    # input_csv = "dataset/all_samples_reordered.csv"
-    # output_jsonl = "dataset/all_samples_reordered.jsonl"
+    # input_csv = "dataset/all_samples_final.csv"
+    # output_jsonl = "dataset/all_samples_final.jsonl"
 
     # # Read CSV and write JSONL
     # with open(input_csv, newline='', encoding='utf-8') as csvfile, open(output_jsonl, 'w', encoding='utf-8') as jsonlfile:
     #     reader = csv.DictReader(csvfile)
     #     for i,row in enumerate(reader):
-    #         if i==110:
-    #             continue
+    #         # if i==110:
+    #         #     continue
     #         prompt = get_prompt(row, instruct=True, cot=False)
     #         json_obj = {"role": "user", "content": prompt}
     #         jsonlfile.write(json.dumps(json_obj) + "\n")
 
+    ### gpt formatting to jsonl ###
     # import pickle
-    # temp=0.3
-    # seeds = 25
-    # file_template = '/home/mila/n/nizar.islah/nizar.islah/GitChameleon/results/gpt_mini_03/responses_{}.pkl'
+    # temp=0.8
+    # seeds = 100
+    # file_template = '/home/mila/n/nizar.islah/nizar.islah/GitChameleon/results/gpt_42_08/responses_{}.pkl'
     # n_generate = seeds//5
-    # for seed in range(0, seeds, n_generate): #0,5,10,15,20
-    #     out_jsonl_path = f'/home/mila/n/nizar.islah/nizar.islah/GitChameleon/results/gpt_mini_03/responses_{temp}_{seed // n_generate}.jsonl'
+    # for seed in range(0, seeds, n_generate):
+    #     out_jsonl_path = f'/home/mila/n/nizar.islah/nizar.islah/GitChameleon/results/gpt_42_08/responses_{temp}_{seed // n_generate}.jsonl'
     #     print(out_jsonl_path)
     #     data = []
     #     for i in range(n_generate):

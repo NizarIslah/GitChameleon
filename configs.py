@@ -12,16 +12,16 @@ def save_config(config_path, config):
 
 def get_generate_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--wandb-project", type=str, default="GitChameleon")
+    parser.add_argument("--wandb-project", type=str, default="GitChameleon_new")
     parser.add_argument("--wandb-entity", type=str, default="cl4code")
     parser.add_argument("--disable-wandb", action="store_true", default=False)
     parser.add_argument("--model", required=True, type=str)
     parser.add_argument(
-        "--dataset_path", default="dataset/samples_collab.jsonl", type=str
+        "--dataset_path", default="dataset/all_samples_final_merged_system.jsonl", type=str
     )
     parser.add_argument("--save_path", default=None, type=str)
     parser.add_argument("--cot", action="store_true")
-    parser.add_argument("--bs", default=1, type=int)
+    parser.add_argument("--bs", default=200, type=int)
     parser.add_argument("--n_samples", default=1, type=int)
     parser.add_argument("--temperature", default=0.0, type=float)
     parser.add_argument("--greedy", action="store_true")
@@ -68,7 +68,7 @@ def get_evaluate_args():
     parser.add_argument('--debug-mode', action='store_true', default=False)
     parser.add_argument('--top_p', type=float, default=0.8)
     parser.add_argument('--top_k', type=int, default=50)
-    parser.add_argument('--max_tokens', type=int, default=256)
+    parser.add_argument('--max_tokens', type=int, default=6000)
     parser.add_argument('--test', action='store_true', default=False)
     parser.add_argument('--scratch', type=str, default="./")
     parser.add_argument('--output-path', type=str, default="results/starcoder2-15b-instruct-v0.1_temperature0.8.csv")

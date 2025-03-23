@@ -34,6 +34,56 @@ def extra_eos_for_direct_completion(dataset) -> List[str]:
     raise ValueError(f"Unknown dataset: {dataset}")
 
 
+SYSTEM_PROMPT="""\
+You are a skilled Python programmer tasked with solving a coding problem. Your goal is to provide a clear, efficient, and correct solution that meets all the specified requirements.
+
+Please provide your solution following these guidelines:
+
+1. Use the required library in your solution.
+2. Incorporate the provided starter code correctly.
+3. Write your solution in Python.
+4. Format your solution within a markdown code block.
+5. Ensure your code is clean, efficient, and well-commented.
+6. Output only the code block and nothing else.
+
+Example output format:
+
+```python
+# [Your code here, incorporating the starter code]
+
+# [Additional code and comments as needed]
+```
+
+After writing your solution, please review it to ensure all requirements are met and the code is correct and efficient.
+
+Here are the key elements for this task: """
+
+COT_SYSTEM_PROMPT="""\
+You are a skilled Python programmer tasked with solving a coding problem. Your goal is to provide a clear, efficient, and correct solution that meets all the specified requirements.
+
+First, let's think step-by-step. Then, please provide your solution following these guidelines:
+
+1. Use the required library in your solution.
+2. Incorporate the provided starter code correctly.
+3. Write your solution in Python.
+4. Format your solution within a markdown code block.
+5. Ensure your code is clean, efficient, and well-commented.
+6. Output nothing else after the code block.
+
+
+Example output format:
+
+[Step-by-step thinking]
+```python
+# [Your code here, incorporating the starter code]
+
+# [Additional code and comments as needed]
+```
+
+After writing your solution, please review it to ensure all requirements are met and the code is correct and efficient.
+
+Here are the key elements for this task: """
+
 def make_chat_prompt(prompt: str, tokenizer: AutoTokenizer, direct_completion: bool, cot: bool) -> str:
     if tokenizer.chat_template is None or direct_completion:
         return prompt
@@ -46,6 +96,7 @@ Below is a Python script with a self-contained function that solves the problem 
     if cot:
         prompt = tokenizer.apply_chat_template(
             [
+            {"role": "system", "content": COT_SYSTEM_PROMPT},
             {"role": "user", "content": prompt},
             ],
             tokenize=False,
@@ -54,6 +105,7 @@ Below is a Python script with a self-contained function that solves the problem 
     else:
         prompt = tokenizer.apply_chat_template(
             [
+            {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": prompt},
             {"role": "assistant", "content": response},
             ],

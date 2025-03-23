@@ -28,8 +28,16 @@ def load_outputs_from_json(options):
                     outputs[f"output_{k}"].append(sanitize(resp["output"]))
 
     else:
-        assert os.path.exists(options.json_out_file), f"Json file {options.json_out_file} does not exist."
+        # TODO uncomment
+        # assert os.path.exists(options.json_out_file), f"Json file {options.json_out_file} does not exist."
+        
+        # # testing new promp TODO remove 
+        # if "test" in options.json_out_file:
+        #     outputs = ["```python\n# Solution using gradio==3.20.0\n\nimport gradio as gr\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\ndef gradio_plot(): \n    # Create a bar plot using the provided data\n    data = pd.DataFrame({\n        'a': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],\n        'b': [28, 55, 43, 91, 81, 53, 19, 87, 52]\n    })\n    \n    plt.figure(figsize=(10, 6))\n    plt.bar(data['a'], data['b'], color='skyblue')\n    plt.title('Interactive Bar Plot')\n    plt.xlabel('Categories')\n    plt.ylabel('Values')\n    plt.xticks(rotation=45)\n    \n    # Save the plot to a file\n    plt.tight_layout()\n    plt.savefig('bar_plot.png')\n    plt.close()\n    \n    # Return the path to the saved plot\n    return 'bar_plot.png'\n\n# Create the Gradio interface\niface = gr.Interface(fn=gradio_plot, inputs=[], outputs=gr.Image())\n\n# Launch the interface\niface.launch()\n```", "```python\n# Solution using scipy\n\nfrom scipy.ndimage import percentile_filter\nimport numpy as np \n\n# Given batched images\nA = np.array([[[7.81411439e-01, 1.12331105e-02, 9.39679607e-01, 6.42515536e-01,\n         6.95548884e-01],\n        [4.58001321e-01, 7.90049557e-01, 7.41113873e-01, 9.85894466e-03,\n         4.53976568e-01],\n        [2.24634401e-01, 4.26973301e-01, 8.91014236e-01, 8.23895514e-01,\n         9.31046059e-01],\n        [4.45855698e-02, 2.58723740e-02, 3.84879860e-01, 5.52190839e-01,\n         8.30264909e-02],\n        [9.15445530e-01, 8.36618255e-02, 4.39455188e-01, 1.53462390e-01,\n         7.26436401e-01]],\n\n       [[7.28031138e-01, 3.75117422e-01, 5.42310487e-01, 5.63557751e-01,\n         2.57909701e-04],\n        [7.50931873e-01, 6.15538706e-01, 9.05514875e-01, 8.48424138e-01,\n         3.10902901e-01],\n        [1.72613108e-01, 7.06317645e-01, 8.89355115e-01, 8.90701413e-02,\n         9.28579120e-01],\n        [9.80044173e-01, 1.67306937e-01, 1.69314197e-01, 5.09876755e-01,\n         7.74652232e-01],\n        [5.31016205e-01, 6.71446481e-01, 8.29882594e-02, 1.70589945e-01,\n         3.23593050e-01]],\n\n       [[8.38046468e-01, 7.96708042e-03, 9.28662972e-01, 6.75111182e-01,\n         3.33247539e-02],\n        [9.99455965e-01, 9.41123427e-01, 1.06977786e-01, 1.73786082e-01,\n         5.95914076e-01],\n        [5.46093501e-01, 4.99303483e-01, 4.60402210e-01, 4.75650259e-02,\n         4.58097639e-01],\n        [5.15319589e-01, 2.31310779e-01, 1.93670305e-01, 9.76320068e-01,\n         8.78819966e-01],\n        [1.09356481e-01, 2.16028113e-01, 1.67111833e-01, 9.65726787e-01,\n         6.75017369e-01]]])\n\n# Parameters for the percentile filter\npercentile = 90\nsize = 3\n\n# Apply the percentile filter to the batched images\noutput = percentile_filter(A, percentile, size=size, mode='reflect')\n\n# Output the result\nprint(output)\n```", '```python\n# Solution using sympy\n\nimport sympy\n\ndef custom_npartitions(n):\n    """\n    Compute the number of partitions of a given integer n.\n    \n    Parameters:\n    n (int): The integer for which to compute the number of partitions.\n    \n    Returns:\n    int: The number of partitions of n.\n    """\n    # Using sympy\'s partition function to compute the number of partitions\n    return sympy.partition(n)\n\n# Example usage\n# print(custom_npartitions(5))  # Output: 7\n```']
+        #     output_df = pd.DataFrame({'output_0': [sanitize(o) for o in outputs]})
+        #     return output_df
 
+        # gpt greedy
         if ".pkl" in options.json_out_file:
             import pickle
             # handle gpt pickle file. assume greedy
@@ -75,7 +83,7 @@ def load_outputs_from_json(options):
                     except Exception as e:
                         print("Error: ", e)
                         solution = resp["solution"]
-                elif task_key == 'seed':   # gemini format: "output", "seed"
+                elif task_key == 'seed':   # gemini or gpt non greedy format: "output", "seed"
                     k = task_id % options.n_generate
                     try:
                         solution = sanitize(resp["output"])
@@ -118,8 +126,13 @@ def check_empty_outputs(options, df):
     return df
 
 def prepare_eval_df(options, df, output_df):
+
+    # only for test TODO remove
+    # idxs = [50, 150, 220]
+    # df = df.iloc[idxs].reset_index(drop=True)
+    
     id_end = len(output_df) if options.id_end == -1 else options.id_end
-    # df = df.iloc[options.id_start:id_end]
+    df = df.iloc[options.id_start:id_end]
     # if options.test:
     #     print("Running in test mode")
     #     # take 10 random samples
@@ -134,7 +147,7 @@ def prepare_eval_df(options, df, output_df):
 
     print(len(df), len(output_df))
     if len(output_df) > len(df):
-        output_df = output_df.drop(110) # # drop row 110 from output df TODO: only for gemini
+        output_df = output_df.drop(110) # # drop row 110 from output df, only for gemini gpt
         output_df.reset_index(drop=True, inplace=True)
     assert len(df) == len(output_df), "Length of input and output dataframes do not match."
     df = pd.merge(df, output_df, left_index=True, right_index=True)
@@ -147,6 +160,7 @@ def prepare_eval_df(options, df, output_df):
         # repo_dir = os.path.dirname(os.path.dirname(options.dataset_path))
         # df_env = pd.read_csv(f"{repo_dir}/updated_libraries.csv")
         df_env = pd.read_csv(options.dataset_env_path)
+
         # id_end = len(df_env) if options.id_end == -1 else options.id_end
         # df_env = df_env.iloc[options.id_start:id_end]
         # df_env.reset_index(drop=True, inplace=True)
@@ -158,8 +172,9 @@ def prepare_eval_df(options, df, output_df):
     # print(df.head())
     # exit(0)
     df = check_empty_outputs(options, df)
-    print(df.iloc[114])
-    print(df.iloc[115])
+    # print(df.iloc[114])
+    # print(df.iloc[115])
+
     return df
 
 def get_ranks(model_name, row):

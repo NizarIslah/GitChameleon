@@ -49,10 +49,10 @@ python generate.py --n_samples $n_samples --temperature $temperature --model $mo
 
 This command will create a `.jsonl` file with the generated outputs.
 
-**Complete Example**: Generating with `bigcode/starcoder2-15b-instruct-v0.1`, using `VLLM` as the backend on a GPU (with enough memory)  using 5 samples and a temperature of 0.8:
+**Complete Example**: Generating with `meta-llama/Llama-3.2-1B-Instruct`, using `VLLM` as the backend on a GPU (with enough memory)  using 1 sample and a temperature of 0 (greedy):
 
 ```bash
-python generate.py --n_samples 5 --temperature 0.8 --model bigcode/starcoder2-15b-instruct-v0.1 --save_path generations/Starcoder2-instruct-v0.1_temperature0.8.jsonl
+python generate.py --n_samples 1 --temperature 0 --greedy --model meta-llama/Llama-3.2-1B-Instruct --save_path generations/Llama-3.2-1B-Instruct_T=0.jsonl
 ```
 
 #### Example: OpenAI-compatible serving
@@ -82,7 +82,7 @@ python evaluate.py --json-out-file $json_outputs --output-path $out_dir --model-
 **Finishing the Example**:
 
 ```bash
-python evaluate.py --json-out-file generations/Starcoder2-instruct-v0.1_temperature0.8.jsonl --model-name bigcode/starcoder2-15b-instruct-v0.1 --temperature 0.8
+python evaluate.py --json-out-file generations/Llama-3.2-1B-Instruct_T=0.3.jsonl --model-name meta-llama/Llama-3.2-1B-Instruct --temperature 0.8
 ```
 
 **Full test**:

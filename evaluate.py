@@ -50,7 +50,12 @@ if __name__ == "__main__":
             name=run_name,
         )
 
-    df = pd.read_csv(options.dataset_path, encoding="latin1")
+    if options.dataset_path.endswith(".jsonl"):
+        # if jsonl
+        df = pd.read_json(options.dataset_path, lines=True)
+    else:
+        # if csv
+        df = pd.read_csv(options.dataset_path, encoding="latin1")
 
     save_dir = (
         options.output_path + "/" + options.model_name.split("/")[0]
