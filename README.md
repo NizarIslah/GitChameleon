@@ -112,3 +112,8 @@ Planned support:
 - `hf`, `openai`, `mistral`, `anthropic`, `google`
 
 
+# Docker
+To build the Docker image, run `make docker-build`. 
+
+To open an interactive shell in a Docker container with a specific Python version, run `make docker-run PYTHON_VERSION={desired version}`. 
+The following Python versions are configured to work: 3.7, 3.9, 3.10.
