@@ -117,3 +117,9 @@ To build the Docker image, run `make docker-build`.
 
 To open an interactive shell in a Docker container with a specific Python version, run `make docker-run PYTHON_VERSION={desired version}`. 
 The following Python versions are configured to work: 3.7, 3.9, 3.10. The local working dir is mounted into the container in the dir `/app/repo`.
+
+# Converting CSV to JSONL
+To convert a list of CSV file to JSONL format, use the script `csv2jsonl.py`. Example usage:
+```
+python csv2jsonl.py file1.csv file2.csv -o merged.jsonl
+```
