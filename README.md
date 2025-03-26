@@ -82,7 +82,7 @@ python evaluate.py --json-out-file $json_outputs --output-path $out_dir --model-
 **Finishing the Example**:
 
 ```bash
-python evaluate.py --json-out-file generations/Llama-3.2-1B-Instruct_T=0.3.jsonl --model-name meta-llama/Llama-3.2-1B-Instruct --temperature 0.8
+python evaluate.py --json-out-file generations/Llama-3.2-1B-Instruct_T=0.jsonl --model-name meta-llama/Llama-3.2-1B-Instruct --temperature 0.0
 ```
 
 **Full test**:
