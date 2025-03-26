@@ -76,11 +76,7 @@ def main(input_path: Path, output_path: Path):
 
     for line in inputs:
         python_version =line["python_version"]
-
-        if line["library"] in ["sympy", "plotly"]:
-            python_version = "3.9"
-            print("Changing python version for " + line["library"] + " to " + python_version)
-            
+       
         line["messages"] = [
             {"role": "system", "content": SYS_PROMPT},
             {
