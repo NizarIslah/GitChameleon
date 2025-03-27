@@ -14,6 +14,10 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     libbz2-dev \
     liblzma-dev \
+    libffi-dev \ 
+    libsqlite3-dev \
+    gfortran \           
+    libopenblas-dev \ 
     xz-utils && rm -rf /var/lib/apt/lists/*
 
 ENV PYENV_ROOT="/root/.pyenv"
