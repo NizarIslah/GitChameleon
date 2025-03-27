@@ -63,7 +63,9 @@ def install_packages(env_path, library, version, additional_dependencies):
             additional_dependencies.replace("joblib==0.12", "joblib")
         if "July 21" in additional_dependencies:
             additional_dependencies = "numba==0.46 llvmlite==0.30 joblib numpy==1.16.0 audioread==2.1.5 scipy==1.1.0 resampy==0.2.2 soundfile"
+        print("Adding dependencies six decorator cffi")
         additional_dependencies += " six decorator cffi" # hardcoded for librosa
+    additional_dependencies = additional_dependencies.replace("pip==24.1", "pip==24.0")
     if str(additional_dependencies) in ("nan", "", "-", "io"):
         pip_install_cmd = [
             python_executable,
@@ -83,6 +85,19 @@ def install_packages(env_path, library, version, additional_dependencies):
             "--quiet",
         ] + additional_dependencies.split()
 
+    # upgrade pip first
+    pip_upgrade_cmd = [
+        python_executable,
+        "-m",
+        "pip",
+        "install",
+        "--upgrade",
+        "pip",
+        "--quiet",
+    ]
+    result = subprocess.run(
+        pip_upgrade_cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     # Run the installation command
     print(f"Installing packages in {env_path}...")
     result = subprocess.run(
@@ -134,8 +149,18 @@ def main(args):
         if not os.path.exists(python_executable):
             print(f"Python executable not found for {row_idx}")
             subprocess.run(["rm", "-rf", env_path])
-        if row["library"] == "librosa":
+
             create_virtual_environment(env_path, create_anyway=create_anyway, library_to_check=row["library"])
+            returncode = install_packages(
+                env_path, row["library"], row["version"], row["additional_dependencies"]
+            )
+            if returncode != 0:
+                failed_count.append(row_idx)
+            else:
+                print(f"All good for {row_idx}")
+        else:
+            # check install packages anyway
+            if row["library"] == "librosa":
             returncode = install_packages(
                 env_path, row["library"], row["version"], row["additional_dependencies"]
             )
@@ -156,7 +181,7 @@ if __name__ == "__main__":
 
     # argument for env_path
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset", type=str, default="dataset/all_samples_reordered.csv")
+    parser.add_argument("--dataset", type=str, default="dataset/all_samples_final.csv")
     parser.add_argument("--base_path", type=str, default="/network/scratch/n/nizar.islah/eval_venvs/")
     parser.add_argument("--create_anyway", action="store_true", default=False)
     args = parser.parse_args()

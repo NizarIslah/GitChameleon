@@ -70,7 +70,7 @@ if __name__ == "__main__":
     df = prepare_eval_df(options, df, output_df)
     print(df.head())
     print("---Evaluation---")
-
+    cot_str="" if not options.cot else "_cot"
     eval_save_file = (
         options.model_name.split("/")[-1]
         + "_n"
@@ -81,6 +81,7 @@ if __name__ == "__main__":
         + str(options.temperature)
         + "_seed"
         + str(options.seed)
+        + cot_str
         + "_eval.csv"
     )
 
