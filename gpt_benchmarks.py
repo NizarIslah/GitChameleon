@@ -26,6 +26,9 @@ parser.add_argument('--feedback', type=bool, default=False, help='Whether to inc
 parser.add_argument('--cot', type=bool, default=False, help='Whether to include chain of thought')
 args = parser.parse_args()
 
+# Set the random seed for reproducibility
+random.seed(args.seed)
+
 # check if the temp is 0 when feedback is true and set to 0
 if args.feedback and args.temperature != 0:
     print("Temperature set to 0 when feedback is true")
@@ -38,9 +41,6 @@ if args.cot and args.max_tokens != 6000:
 elif not args.cot and args.max_tokens != 4800:
     print("Max tokens set to 4800 for baseline")
     args.max_tokens = 4800
-
-# Set the random seed for reproducibility
-random.seed(args.seed)
 
 # Load the data from the JSONL file
 with open(args.input_data) as f:
