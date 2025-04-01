@@ -309,10 +309,38 @@ PROMPT_TEMPLATE="""\
 After writing your solution, please review it to ensure all requirements are met and the code is correct and efficient."""
     
 # # Example usage:
+def concatenate_jsonl_files(input_dir, model_name, temperature, output_file):
+    # List to hold concatenated data
+    concatenated_data = []
+
+    # Loop through files in the input directory
+    for filename in os.listdir(input_dir):
+        # print(f"Checking file: {filename}")
+        # Check if the filename contains the model name and a seed number
+        if model_name in filename and str(temperature) in filename and filename.endswith(".jsonl"):
+            # Open and read each matching jsonl file
+            file_path = os.path.join(input_dir, filename)
+            print(f"Processing file: {file_path}")
+
+            with open(file_path, 'r') as jsonl_file:
+                for line in jsonl_file:
+                    # Each line in a jsonl file is a separate JSON object
+                    json_object = json.loads(line)
+                    concatenated_data.append(json_object)
+
+    # Write concatenated data to the output file
+    with open(output_file, 'w') as output_jsonl_file:
+        for item in concatenated_data:
+            output_jsonl_file.write(json.dumps(item) + '\n')
+
+    print(f"Concatenated {len(concatenated_data)} records into {output_file}")
 if __name__ == "__main__":
     import pandas as pd
     import json
 
+    # concatenate_jsonl_files()
+
+    # update python version
     samples = []
     with open("/home/mila/n/nizar.islah/scratch/GitChameleon/GitChameleon/dataset/all_samples_final_merged.jsonl", 'r') as f:
         idx=0
@@ -322,15 +350,15 @@ if __name__ == "__main__":
             version = sample['version']
             problem = sample['problem']
             starter_code = sample['starting_code']
-            if idx < 293:
-                python_version = "3.10"
-            else:
-                python_version = "3.7"
+            python_version = sample['python_version']
+            if lib in ("plotly", "sympy"):
+                python_version = "3.9"
+            sample['python_version'] = python_version
             idx+=1
-            prompt = PROMPT_TEMPLATE.format(lib,version,python_version,problem,starter_code)
-            samples.append({"role": "user", "content": prompt})
+            # prompt = PROMPT_TEMPLATE.format(lib,version,python_version,problem,starter_code)
+            # samples.append({"role": "user", "content": prompt})
     # write to a jsonl
-    with open("dataset/all_samples_final_new.jsonl", 'w') as f:
+    with open("dataset/final_set.jsonl", 'w') as f:
         for sample in samples:
             f.write(json.dumps(sample) + '\n')
     print("all samples written to jsonl")
