@@ -5,6 +5,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PATH="/root/.local/bin:$PATH" \
     PYTHONPATH="/app"
 
+ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -17,7 +18,10 @@ RUN apt-get update && apt-get install -y \
     libffi-dev \ 
     libsqlite3-dev \
     gfortran \           
-    libopenblas-dev \ 
+    libopenblas-dev \
+    libspatialindex-dev\
+    ffmpeg\
+    libsndfile1-dev\
     xz-utils && rm -rf /var/lib/apt/lists/*
 
 ENV PYENV_ROOT="/root/.pyenv"
