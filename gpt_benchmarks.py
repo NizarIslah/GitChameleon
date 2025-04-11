@@ -17,7 +17,7 @@ parser.add_argument('--input_data', type=str, required=True, default='dataset.js
 parser.add_argument('--output_data', type=str, required=True, default='output/', help='Path to output data')
 parser.add_argument('--top_p', type=float, default=0.95, help='Top-p sampling parameter')
 parser.add_argument('--temperature', type=float, default=0.8, help='Temperature parameter')
-parser.add_argument('--max_tokens', type=int, default=4800, help='Maximum tokens for the model. (4800 for baseline, 6000 for CoT)')
+parser.add_argument('--max_tokens', type=int, default=4096, help='Maximum tokens for the model. (4800 for baseline, 6000 for CoT)')
 parser.add_argument('--api_key', type=str, required=True, help='OpenAI API key')
 parser.add_argument('--azure_endpoint', type=str, required=True, help='Azure endpoint')
 parser.add_argument('--azure_api_version', type=str, default='2024-05-01-preview', help='Azure API version')
@@ -34,13 +34,10 @@ if args.feedback and args.temperature != 0:
     print("Temperature set to 0 when feedback is true")
     args.temperature = 0
 
-# check max tokens to be 6000 for cot otherwise 4800
-if args.cot and args.max_tokens != 6000:
-    print("Max tokens set to 6000 for cot")
-    args.max_tokens = 6000
-elif not args.cot and args.max_tokens != 4800:
-    print("Max tokens set to 4800 for baseline")
-    args.max_tokens = 4800
+# Adjust max tokens based on cot and model
+args.max_tokens = 6000 if args.cot else 4096
+if args.model == 'gpt-4o':
+    args.max_tokens = 4096
 
 # Load the data from the JSONL file
 with open(args.input_data) as f:
