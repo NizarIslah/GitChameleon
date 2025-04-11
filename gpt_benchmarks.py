@@ -121,3 +121,4 @@ for run in random.sample(range(1, 1000), num_samples):
     output_file = Path(args.output_data) / f"responses_{args.temperature}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{run}.pkl"
     with output_file.open('wb') as f:
         pickle.dump(r_final, f)
+    print(f'Seed_{run} done')
