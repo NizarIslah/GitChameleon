@@ -17,7 +17,7 @@ parser.add_argument('--input_data', type=str, required=True, default='dataset.js
 parser.add_argument('--output_data', type=str, required=True, default='output/', help='Path to output data')
 parser.add_argument('--top_p', type=float, default=0.95, help='Top-p sampling parameter')
 parser.add_argument('--temperature', type=float, default=0.8, help='Temperature parameter')
-parser.add_argument('--max_tokens', type=int, default=4096, help='Maximum tokens for the model. (4800 for baseline, 6000 for CoT)')
+parser.add_argument('--max_tokens', type=int, default=4096, help='Maximum tokens for the model. (4096 for baseline, 6000 for CoT)')
 parser.add_argument('--api_key', type=str, required=True, help='OpenAI API key')
 parser.add_argument('--azure_endpoint', type=str, required=True, help='Azure endpoint')
 parser.add_argument('--azure_api_version', type=str, default='2024-05-01-preview', help='Azure API version')
