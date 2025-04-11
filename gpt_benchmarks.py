@@ -10,6 +10,7 @@ from joblib import Parallel, delayed
 
 import argparse
 from pathlib import Path
+from tqdm import tqdm
 parser = argparse.ArgumentParser(description='Arguments for GPT benchmarking')
 parser.add_argument('--seed', type=int, default=42, help='Random seed for reproducibility')
 parser.add_argument('--model', type=str, default='gpt-4o', help='Models available: gpt-4o-mini, gpt-4o, o1, o3-mini, o1-mini')
@@ -87,7 +88,7 @@ num_samples = 1 if args.temperature == 0 or args.feedback or args.model in ['o1'
 # Ensure output directory exists
 Path(args.output_data).mkdir(parents=True, exist_ok=True)
 
-for run in random.sample(range(1, 1000), num_samples):
+for run in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing runs"):
     responses = Parallel(n_jobs=-1, prefer="threads")(
         delayed(get_completion_with_retry)(prompt, run, args) for prompt in prompts
     )
@@ -101,8 +102,8 @@ for run in random.sample(range(1, 1000), num_samples):
         content = response.choices[0].message.content
         if args.logprobs and args.model in ['gpt-4o', 'gpt-4o-mini']:
             log_probs = [
-            logprob for logprob in (response.choices[0].logprobs.get('content', []) or [])
-            if hasattr(logprob, 'logprob')
+                logprob for logprob in (response.choices[0].logprobs.get('content', []) or [])
+                if hasattr(logprob, 'logprob')
             ]
             log_prob_mean = statistics.mean(log_probs) if log_probs else None
             log_prob_sum = sum(log_probs) if log_probs else None
@@ -121,4 +122,3 @@ for run in random.sample(range(1, 1000), num_samples):
     output_file = Path(args.output_data) / f"responses_{args.temperature}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{run}.pkl"
     with output_file.open('wb') as f:
         pickle.dump(r_final, f)
-    print(f'Seed_{run} done')
