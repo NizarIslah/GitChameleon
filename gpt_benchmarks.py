@@ -12,9 +12,9 @@ import argparse
 from pathlib import Path
 parser = argparse.ArgumentParser(description='Arguments for GPT benchmarking')
 parser.add_argument('--seed', type=int, default=42, help='Random seed for reproducibility')
-parser.add_argument('--model', type=str, default='gpt-4o-2', help='Models available: gpt-4o-mini, gpt-4o, gpt-4o-2')
+parser.add_argument('--model', type=str, default='gpt-4o', help='Models available: gpt-4o-mini, gpt-4o, o1, o3-mini, o1-mini')
 parser.add_argument('--input_data', type=str, required=True, default='dataset.jsonl', help='Path to input data')
-parser.add_argument('--output_data', type=str, default='output/', help='Path to output data')
+parser.add_argument('--output_data', type=str, required=True, default='output/', help='Path to output data')
 parser.add_argument('--top_p', type=float, default=0.95, help='Top-p sampling parameter')
 parser.add_argument('--temperature', type=float, default=0.8, help='Temperature parameter')
 parser.add_argument('--max_tokens', type=int, default=4800, help='Maximum tokens for the model. (4800 for baseline, 6000 for CoT)')
@@ -55,17 +55,26 @@ client = AzureOpenAI(
 # Function to call OpenAI's chat completion with retry logic, including seed and temperature
 def get_completion_with_retry(prompt, seed, args, max_retries=5, delay=10):
     retries = 0
+    if args.model == 'o1-mini':
+        prompt = [{'role': 'user', 'content': prompt[0]['content']+prompt[1]['content']}]
     while retries < max_retries:
         try:
-            response = client.chat.completions.create(
-                model=args.model, 
-                messages=prompt,
-                seed=seed,
-                max_tokens=args.max_tokens,
-                top_p=args.top_p,
-                temperature=args.temperature,
-                logprobs=args.logprobs
-            )
+            if args.model in ['o1', 'o1-mini', 'o3-mini']:
+                response = client.chat.completions.create(
+                    model=args.model, 
+                    messages=prompt,
+                    seed=seed
+                )
+            else:
+                response = client.chat.completions.create(
+                    model=args.model, 
+                    messages=prompt,
+                    seed=seed,
+                    max_tokens=args.max_tokens,
+                    top_p=args.top_p,
+                    temperature=args.temperature,
+                    logprobs=args.logprobs
+                )
             return response
         except openai.RateLimitError as e:
             retries += 1
@@ -93,7 +102,7 @@ for run in random.sample(range(1, 1000), num_samples):
             continue
 
         content = response.choices[0].message.content
-        if args.logprobs:
+        if args.logprobs and args.model in ['gpt-4o', 'gpt-4o-mini']:
             log_probs = [
             logprob for logprob in (response.choices[0].logprobs.get('content', []) or [])
             if hasattr(logprob, 'logprob')
