@@ -88,9 +88,9 @@ num_samples = 1 if args.temperature == 0 or args.feedback or args.model in ['o1'
 # Ensure output directory exists
 Path(args.output_data).mkdir(parents=True, exist_ok=True)
 
-for run in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing runs"):
+for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing seeds"):
     responses = Parallel(n_jobs=-1, prefer="threads")(
-        delayed(get_completion_with_retry)(prompt, run, args) for prompt in prompts
+        delayed(get_completion_with_retry)(prompt, seed, args) for prompt in prompts
     )
 
     r_final = []
@@ -119,6 +119,6 @@ for run in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing run
         })
 
     # Save the responses to a file
-    output_file = Path(args.output_data) / f"responses_{args.temperature}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{run}.pkl"
+    output_file = Path(args.output_data) / f"responses_{args.temperature}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{seed}.pkl"
     with output_file.open('wb') as f:
         pickle.dump(r_final, f)
