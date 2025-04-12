@@ -62,7 +62,7 @@ def install_packages(env_path, library, version, additional_dependencies):
     for dep in dependencies:
         if dep.startswith("pip="):
             pip_version = dep.split("=")[1]
-        else:
+        elif dep.strip() and dep != "-":  # Filter out invalid entries
             other_dependencies.append(dep)
 
     # Upgrade pip to the specified version or the latest version
@@ -104,7 +104,7 @@ def install_packages(env_path, library, version, additional_dependencies):
     )
     if result.returncode != 0:
         print(f"Failed to install packages in {env_path}: {result.stderr}")
-        subprocess.run(["rm", "-rf", env_path])
+        subprocess.run(["rm", "-rf", env_path])  # Clean up the environment if installation fails
     else:
         print(f"Packages installed successfully in {env_path}")
     return result.returncode
