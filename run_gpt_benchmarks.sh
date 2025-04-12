@@ -12,7 +12,7 @@ else
 fi
 
 # Default arguments
-MODEL="gpt-4o-2"
+MODEL="gpt-4o"
 API_KEY="your_api_key_here"  # Replace with your actual API key
 API_ENDPOINT="your_api_endpoint" # Replace with your actual API endpoint
 INPUT_DATA=""
