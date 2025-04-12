@@ -123,3 +123,24 @@ To convert a list of CSV file to JSONL format, use the script `csv2jsonl.py`. Ex
 ```
 python csv2jsonl.py file1.csv file2.csv -o merged.jsonl
 ```
+
+
+
+# Run the env creation in the docker image
+
+```
+make docker-build
+make docker-run
+```
+then you can run the eval env creation
+```
+cd repo 
+pyenv shell 3.10.14
+python -m venv eval_main_venv
+source eval_main_venv/bin/activate
+pip install vllm -r requirements.txt
+
+# create the virtual env
+python create_venvs.py --dataset dataset/absolute_final_dataset.jsonl --base_path eval_venvs --create_anyway
+```
+

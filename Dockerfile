@@ -15,27 +15,35 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     libbz2-dev \
     liblzma-dev \
-    libffi-dev \ 
+    libffi-dev \
     libsqlite3-dev \
-    gfortran \           
+    gfortran \
     libopenblas-dev \
-    libspatialindex-dev\
-    ffmpeg\
-    libsndfile1-dev\
+    libspatialindex-dev \
+    ffmpeg \
+    libsndfile1-dev \
     xz-utils && rm -rf /var/lib/apt/lists/*
 
 ENV PYENV_ROOT="/root/.pyenv"
-ENV PATH="$PYENV_ROOT/bin:$PATH"
+ENV PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
+
 RUN curl -fsSL https://pyenv.run | bash
 
-# Add pyenv initialization to the shell environment
-RUN echo 'eval "$(pyenv init --path)"' >> /root/.profile
-RUN echo 'eval "$(pyenv init -)"' >> /root/.bashrc
+# Ensure that pyenv is initialized on every new shell.
+RUN echo 'export PYENV_ROOT="/root/.pyenv"' >> /root/.bashrc && \
+    echo 'export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"' >> /root/.bashrc && \
+    echo 'eval "$(pyenv init --path)"' >> /root/.bashrc && \
+    echo 'eval "$(pyenv init -)"' >> /root/.bashrc
 
-RUN /bin/bash -c "source /root/.profile && pyenv install 3.9.19"
-RUN /bin/bash -c "source /root/.profile && pyenv install 3.10.14"
-RUN /bin/bash -c "source /root/.profile && pyenv install 3.7.17"
+# Install the desired Python versions, rehash to update pyenv shims, and set the global versions.
+RUN pyenv install 3.9.19 && \
+    pyenv install 3.10.14 && \
+    pyenv install 3.7.17 && \
+    pyenv rehash && \
+    pyenv global 3.9.19 3.10.14 3.7.17
 
+# Set the working directory
 WORKDIR /app
 
+# Use bash as the entrypoint.
 ENTRYPOINT ["/bin/bash"]

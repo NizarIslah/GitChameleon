@@ -5,46 +5,42 @@ import hashlib
 import sys
 from tqdm import tqdm
 from pathlib import Path
+import json
 
+# Mapping of Python versions to pyenv-installed versions
+python_versions = {
+    "3.7": "3.7.17",
+    "3.9": "3.9.19",
+    "3.10": "3.10.14"
+}
 
-def replace_lib_version(row):
-    """Replace specific versions of library with a compatible
-    version for the evaluation environment."""
-    if row["library"] == "torch":
-        if str(row["version"]) in ("1.9", "1.9.0", "1.1", "1.10", "1.10.0"):
-            return "1.11.0"
-    if row["library"] == "scipy":
-        if str(row["version"]) in ("1.10.2"):
-            return "1.10.1"
-    return row["version"]
-
-
-def create_virtual_environment(env_path, create_anyway=False, library_to_check=None):
+# Function to create a virtual environment
+def create_virtual_environment(env_path, python_version, create_anyway=False, library_to_check=None):
     """Create and return the path of a virtual environment."""
+    python_executable = f"/root/.pyenv/versions/{python_version}/bin/python"
+    if not os.path.exists(python_executable):
+        print(f"Python version {python_version} not found. Skipping {env_path}.")
+        return
+    
     if not os.path.exists(env_path):
         os.makedirs(env_path, exist_ok=True)
-        subprocess.run(["python", "-m", "venv", env_path], check=True)
+        subprocess.run([python_executable, "-m", "venv", env_path], check=True)
         print(f"Virtual environment created: {env_path}")
     else:
         print(f"Virtual environment already exists: {env_path}")
-        # remove it and create anywyay
         if create_anyway:
             subprocess.run(["rm", "-rf", env_path])
             os.makedirs(env_path, exist_ok=True)
-            subprocess.run(["python", "-m", "venv", env_path], check=True)
-            print(f"Virtual environment created: {env_path}")
+            subprocess.run([python_executable, "-m", "venv", env_path], check=True)
+            print(f"Virtual environment recreated: {env_path}")
     
     if library_to_check:
-        # Determine the correct path to the Python executable in the venv
         python_exec = os.path.join(env_path, "bin", "python")
-        
-        # Use pip show to check for the library.
         result = subprocess.run(
             [python_exec, "-m", "pip", "show", library_to_check],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
-        
         if result.returncode == 0:
             print(f"Library '{library_to_check}' is installed in the virtual environment.")
         else:
@@ -55,59 +51,59 @@ def create_virtual_environment(env_path, create_anyway=False, library_to_check=N
 
 def install_packages(env_path, library, version, additional_dependencies):
     """Install packages using the Python executable in the virtual environment."""
-    python_executable = Path(env_path, "bin", "python")  # For Unix-like OS
-    # Construct the pip install command using the specific Python executable
-    if library == 'librosa':
-        if "pip" in version:
-            version = "0.8.0"
-            additional_dependencies.replace("joblib==0.12", "joblib")
-        if "July 21" in additional_dependencies:
-            additional_dependencies = "numba==0.46 llvmlite==0.30 joblib numpy==1.16.0 audioread==2.1.5 scipy==1.1.0 resampy==0.2.2 soundfile"
-        print("Adding dependencies six decorator cffi")
-        additional_dependencies += " six decorator cffi" # hardcoded for librosa
-    additional_dependencies = additional_dependencies.replace("pip==24.1", "pip==24.0")
-    if str(additional_dependencies) in ("nan", "", "-", "io"):
-        pip_install_cmd = [
+    python_executable = Path(env_path, "bin", "python")
+    
+    # Parse additional dependencies
+    dependencies = additional_dependencies.split() if additional_dependencies else []
+    pip_version = None
+    other_dependencies = []
+
+    # Separate pip version if specified
+    for dep in dependencies:
+        if dep.startswith("pip="):
+            pip_version = dep.split("=")[1]
+        else:
+            other_dependencies.append(dep)
+
+    # Upgrade pip to the specified version or the latest version
+    if pip_version:
+        pip_upgrade_cmd = [
             python_executable,
             "-m",
             "pip",
             "install",
-            f"{library}=={version}",
+            f"pip=={pip_version}",
             "--quiet",
         ]
     else:
-        pip_install_cmd = [
+        pip_upgrade_cmd = [
             python_executable,
             "-m",
             "pip",
             "install",
-            f"{library}=={version}",
+            "--upgrade",
+            "pip",
             "--quiet",
-        ] + additional_dependencies.split()
+        ]
+    subprocess.run(pip_upgrade_cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    print(f"Pip upgraded in {env_path} to version {pip_version if pip_version else 'latest'}.")
 
-    # upgrade pip first
-    pip_upgrade_cmd = [
+    # Install the main library and other dependencies
+    pip_install_cmd = [
         python_executable,
         "-m",
         "pip",
         "install",
-        "--upgrade",
-        "pip",
+        f"{library}=={version}",
         "--quiet",
-    ]
-    result = subprocess.run(
-        pip_upgrade_cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    # Run the installation command
+    ] + other_dependencies
+
     print(f"Installing packages in {env_path}...")
     result = subprocess.run(
         pip_install_cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
     if result.returncode != 0:
-        print(
-            f"Failed to install packages in {env_path}: {result.stderr}, tearing down the environment..."
-        )
-        # remove the virtual environment
+        print(f"Failed to install packages in {env_path}: {result.stderr}")
         subprocess.run(["rm", "-rf", env_path])
     else:
         print(f"Packages installed successfully in {env_path}")
@@ -117,72 +113,58 @@ def install_packages(env_path, library, version, additional_dependencies):
 def generate_env_id(row):
     """Generate a unique ID based on library, version, and dependencies."""
     unique_str = f"{row['library']}-{row['version']}-{row['additional_dependencies']}"
-    return hashlib.sha256(unique_str.encode()).hexdigest()[
-        :8
-    ]  # Shorten the hash for readability
+    return hashlib.sha256(unique_str.encode()).hexdigest()[:8]
 
 
 def main(args):
+    jsonl_file = args.dataset
     base_path = args.base_path
     create_anyway = args.create_anyway
+    # Ensure the base path exists
+    os.makedirs(base_path, exist_ok=True)
 
-    df = pd.read_csv(args.dataset)
-
-    # replace torch version
-    df["version"] = df.apply(replace_lib_version, axis=1)
-    # Generate unique environment IDs
-    df["env_id"] = df.apply(generate_env_id, axis=1)
-
-    # print num unique envs
-    print(f"Number of unique environments: {df['env_id'].nunique()}")
-
-    # Save the updated CSV
-    df.to_csv("dataset/updated_libraries.csv", index=False)
-    print("Updated CSV with virtual environment IDs saved.")
-
-    # check that the python executable exists for each venv
     failed_count = []
-    for row_idx, row in df.drop_duplicates(subset=["env_id"]).iterrows():
-        env_name = f"gcham_venv{row['env_id']}"
-        env_path = Path(base_path, env_name)
-        python_executable = Path(env_path, "bin", "python")
-        if not os.path.exists(python_executable):
-            print(f"Python executable not found for {row_idx}")
-            subprocess.run(["rm", "-rf", env_path])
 
-            create_virtual_environment(env_path, create_anyway=create_anyway, library_to_check=row["library"])
-            returncode = install_packages(
-                env_path, row["library"], row["version"], row["additional_dependencies"]
-            )
-            if returncode != 0:
-                failed_count.append(row_idx)
-            else:
-                print(f"All good for {row_idx}")
-        else:
-            # check install packages anyway
-            if row["library"] == "librosa":
-            returncode = install_packages(
-                env_path, row["library"], row["version"], row["additional_dependencies"]
-            )
-            if returncode != 0:
-                failed_count.append(row_idx)
-            else:
-                print(f"All good for {row_idx}")
+    # Read the JSONL file
+    with open(jsonl_file, "r") as file:
+        for line in file:
+            sample = json.loads(line)
+            python_version = sample.get("python_version")
+            example_id = sample.get("example_id")
+            library = sample.get("library")
+            version = sample.get("version")
+            additional_dependencies = sample.get("additional_dependencies", "")
 
+            if python_version and example_id:
+                pyenv_version = python_versions.get(python_version)
+                if not pyenv_version:
+                    print(f"Unsupported Python version {python_version} for example {example_id}.")
+                    continue
+
+                env_name = f"gcham_venv_{example_id}"
+                env_path = Path(base_path, env_name)
+
+                python_executable = Path(env_path, "bin", "python")
+                if not os.path.exists(python_executable):
+                    print(f"Python executable not found for {example_id}. Creating environment...")
+                    create_virtual_environment(env_path, pyenv_version, create_anyway=create_anyway, library_to_check=library)
+                    returncode = install_packages(env_path, library, version, additional_dependencies)
+                    if returncode != 0:
+                        failed_count.append(example_id)
+                else:
+                    print(f"Environment already exists for {example_id}.")
+    
     print(f"Failed: {len(failed_count)}")
-    for idx in failed_count:
-        print(
-            f"idx {idx} \t Library: {df.loc[idx, 'library']}, Version: {df.loc[idx, 'version']}, Additional Dependencies: {df.loc[idx, 'additional_dependencies']}"
-        )
+    for example_id in failed_count:
+        print(f"Failed to create environment for example ID: {example_id}")
 
 
 if __name__ == "__main__":
     import argparse
 
-    # argument for env_path
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset", type=str, default="dataset/all_samples_final.csv")
-    parser.add_argument("--base_path", type=str, default="/network/scratch/n/nizar.islah/eval_venvs/")
-    parser.add_argument("--create_anyway", action="store_true", default=False)
+    parser.add_argument("--dataset", type=str, required=True, help="Path to the JSONL dataset file.")
+    parser.add_argument("--base_path", type=str, default="eval_venvs", help="Base path for virtual environments.")
+    parser.add_argument("--create_anyway", action="store_true", default=False, help="Recreate environments if they already exist.")
     args = parser.parse_args()
     main(args)
