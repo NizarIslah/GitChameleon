@@ -4,6 +4,17 @@ import os
 import subprocess
 from tqdm import tqdm
 import argparse
+
+
+python_versions = {
+    "3.7": "/root/.pyenv/versions/3.7.17/bin/python",
+    "3.9": "/root/.pyenv/versions/3.9.19/bin/python",
+    "3.10": "/root/.pyenv/versions/3.10.14/bin/python"
+}
+
+def get_python_path(python_version):
+    return python_versions.get(python_version)
+
 def main():
     """
     For each line in the provided JSONL file (where each line is a JSON object),
@@ -36,7 +47,8 @@ def main():
         solution   = record.get("solution", "-")
         test       = record.get("test", "-")
         dep        = record.get("additional_dependencies", "")
-
+        python_version        = record.get("python_version", "3.10")
+        python_executable = get_python_path(python_version)
         # Replace literal "\n" with actual newlines in potentially multiline fields
         # (This helps pass multiline code to the shell script correctly)
         code = code.replace("\\n", os.linesep)
@@ -50,12 +62,10 @@ def main():
             func_name, # $3
             change,    # $4
             problem,   # $5
-            code,      # $6
-            solution,  # $7 (expected_output)
-            test,      # $8
-            dep        # $9
+            code + solution+ os.linesep+ test,# $6
+            dep,       # $7
+            python_executable, # $8
         ]
-
         # 4) Call verify_dataset.sh with these arguments
         result = subprocess.run(
             ["bash", "verify_dataset.sh", *args],
