@@ -13,8 +13,13 @@ from joblib import Parallel, delayed
 from copy import deepcopy
 from transformers import AutoTokenizer
 from collections import defaultdict
-from src.sanitize import sanitize
 import pdb
+
+import re
+
+def extract_first_python_code_block(text):
+    match = re.search(r"```python(.*?)```", text, re.DOTALL)
+    return match.group(1) if match else None
 
 def load_outputs_from_json(options):
     if options.cot:
@@ -25,7 +30,7 @@ def load_outputs_from_json(options):
             for line_idx, line in enumerate(f):
                 resp = json.loads(line)
                 for k in range(options.n_generate):
-                    outputs[f"output_{k}"].append(sanitize(resp["output"]))
+                    outputs[f"output_{k}"].append(extract_first_python_code_block(resp["output"]))
 
     else:
         assert os.path.exists(options.json_out_file), f"Json file {options.json_out_file} does not exist."
@@ -35,7 +40,8 @@ def load_outputs_from_json(options):
             import pickle
             # handle gpt pickle file. assume greedy
             outputs = pickle.load(open(options.json_out_file, "rb"))
-            output_df = pd.DataFrame({'output_0': [sanitize(o) for o in outputs]})
+            output_df = pd.DataFrame({'output_0': [extract_first_python_code_block(o) for o in outputs]})
+            print(output_df)
             return output_df
 
         if '/' in options.model_name:
@@ -72,14 +78,14 @@ def load_outputs_from_json(options):
                         k = 0
                         cur_task_id = task_id
                     try:
-                        solution = sanitize(resp["solution"])
+                        solution = extract_first_python_code_block(resp["solution"])
                     except Exception as e:
                         print("Error: ", e)
                         solution = resp["solution"]
                 elif task_key == 'seed':   # gemini or gpt non greedy format: "output", "seed"
                     k = task_id % options.n_generate
                     try:
-                        solution = sanitize(resp["output"])
+                        solution = extract_first_python_code_block(resp["output"])
                     except Exception as e:
                         print("Error: ", e)
                         solution = resp["output"]
@@ -119,19 +125,8 @@ def check_empty_outputs(options, df):
     return df
 
 def prepare_eval_df(options, df, output_df):
-
-    # only for test TODO remove
-    # idxs = [50, 150, 220]
-    # df = df.iloc[idxs].reset_index(drop=True)
-    
     id_end = len(output_df) if options.id_end == -1 else options.id_end
     df = df.iloc[options.id_start:id_end]
-    # if options.test:
-    #     print("Running in test mode")
-    #     # take 10 random samples
-    #     n = 10
-    #     df = df.sample(n, random_state=options.seed)
-    # df.reset_index(drop=True, inplace=True)
     output_df = output_df.iloc[options.id_start:id_end]
     output_df.reset_index(drop=True, inplace=True)
     if options.library != "":
@@ -139,35 +134,13 @@ def prepare_eval_df(options, df, output_df):
         output_df = output_df[df["library"] == options.library]
 
     print(len(df), len(output_df))
-    if len(output_df) > len(df):
-        output_df = output_df.drop(110) # # drop row 110 from output df, only for gemini gpt
-        output_df.reset_index(drop=True, inplace=True)
     assert len(df) == len(output_df), "Length of input and output dataframes do not match."
     df = pd.merge(df, output_df, left_index=True, right_index=True)
 
     df = add_ranking_index(
         df, options.model_name.split("/")[-1], options.n_generate
     )
-    # check empty outputs
-    try:
-        # repo_dir = os.path.dirname(os.path.dirname(options.dataset_path))
-        # df_env = pd.read_csv(f"{repo_dir}/updated_libraries.csv")
-        df_env = pd.read_csv(options.dataset_env_path)
-
-        # id_end = len(df_env) if options.id_end == -1 else options.id_end
-        # df_env = df_env.iloc[options.id_start:id_end]
-        # df_env.reset_index(drop=True, inplace=True)
-        assert len(df) == len(df_env), "Length of input and env dataframes do not match."
-        df["env_id"] = df_env["env_id"]
-    except Exception as e:
-        print("Error: ", e)
-        exit(1)
-    # print(df.head())
-    # exit(0)
     df = check_empty_outputs(options, df)
-    # print(df.iloc[114])
-    # print(df.iloc[115])
-
     return df
 
 def get_ranks(model_name, row):
@@ -254,72 +227,10 @@ def get_python_executable(base_path, venv_name):
     venv_name: str, name of the virtual environment.
     return: str, path to the Python executable in the virtual environment.
     """
-    venv_path = os.path.join(base_path, "gcham_venv" + venv_name)
+    venv_path = os.path.join(base_path, venv_name)
     bin_path = os.path.join(venv_path, "bin")
     python_executable = os.path.join(bin_path, "python")
     return python_executable
-
-
-def remove_patterns(starting_code, model_output):
-    """
-    Function to remove patterns from a text
-    text: str, text to remove patterns from
-    patterns: list of str, patterns to remove
-    return: str, text with patterns removed
-    """
-    pattern = r"(?m)^.*assert.*$\n?"
-    # Use re.sub() to remove the 'assert' line
-    cleaned_code = re.sub(pattern, "", model_output)
-    # gradio cleaning - remove lines with .launch and parentheses
-    pattern = r"(?m)^\s*.*\.launch\([^\n]*\).*\s*$"
-    cleaned_code = re.sub(pattern, "", cleaned_code)
-    # remove lines with test_launch
-    # pattern = r'(?m)^\s*.*\.test_launch\([^\n]*\).*\s*$'
-    # cleaned_code = re.sub(pattern, '', cleaned_code)
-    # matplotlib - remove .show and parentheses
-    pattern = r"(?m)^\s*.*\.show\([^\n]*\).*\s*$"
-    cleaned_code = re.sub(pattern, "", cleaned_code)
-    # remove assistant may be on the first line
-    pattern = r"(?m)^.*assistant.*$\n?"
-    pattern2 = r"(?m)^.*Assistant.*$\n?"
-    cleaned_code = re.sub(pattern, "", cleaned_code)
-    cleaned_code = re.sub(pattern2, "", cleaned_code)
-    # "2"
-    pattern = r"(?m)^.*2.*$\n?"
-    cleaned_code = re.sub(pattern, "", cleaned_code)
-    # <|placeholder6|> in the code
-    pattern = r"(?m)^.*<\|placeholder\d+\|>.*$\n?"
-    cleaned_code = re.sub(pattern, "", cleaned_code)
-    # [inst] and [starter_code] lower or capitalized
-    pattern = r"(?m)^.*\[inst\].*$\n?"
-    pattern2 = r"(?m)^.*\[starter_code\].*$\n?"
-    cleaned_code = re.sub(pattern, "", cleaned_code)
-    cleaned_code = re.sub(pattern2, "", cleaned_code)
-    # [ PYTHON ] and [/ PYTHON]
-    pattern = r"(?m)^.*\[ PYTHON \].*$\n?"
-    pattern2 = r"(?m)^.*\[/ PYTHON\].*$\n?"
-    cleaned_code = re.sub(pattern, "", cleaned_code)
-    cleaned_code = re.sub(pattern2, "", cleaned_code)
-    # remove answer may be on the first line
-    pattern = r"(?m)^.*answer.*$\n?"
-    cleaned_code = re.sub(pattern, "", cleaned_code)
-    # remove main block
-    cleaned_code = remove_main_block(cleaned_code)
-
-    model_output = cleaned_code
-    return model_output
-
-
-def remove_main_block(script: str) -> str:
-    # Find the start of the if __name__ == '__main__': block
-    main_start = script.find("if __name__ ==")
-
-    # If the block is found, return the script up to that point
-    if main_start != -1:
-        return script[:main_start]
-
-    # If the block isn't found, return the script unchanged
-    return script
 
 
 def concat_testcase(
@@ -330,14 +241,6 @@ def concat_testcase(
     add_back_starter=True,
     verbose_mode=False,
 ):
-    # TODO: check if no parsing is needed
-    # try:
-        # regex filter out starting_code from output exact string matching
-        # if instruct:  for base as well
-        # model_output = remove_patterns(starting_code, model_output)
-    # except Exception as e:
-    #     print("Error: ", e)
-    #     print(type(model_output))
     if verbose_mode:
         print("This is model code to run before assert: ", model_output)
         print("------------------------------------")
@@ -397,6 +300,7 @@ def run_script(python_executable, py_file="temp.py"):
         os.remove(py_file)
     except Exception as e:
         print(e)
+    print("error: ", error_log)
     return 1 - exit_code, 1 - compile_code, parsed_code, error_log  # 1 = pass, 0 = fail
 
 
@@ -489,9 +393,11 @@ def make_py_file(
         model_out,
         test,
         instruct,
-        add_back_starter=False,
+        add_back_starter=True,
         verbose_mode=verbose_mode,
     )
+    # print("Here was the generated code:")
+    # print(code_wo_starter)
 
     """
     code: str, Python code to run.
@@ -513,7 +419,7 @@ def eval_sample_k(
     k: int, number of k to evaluate
     return: results_dict, containing eval results for each model and for each of the k then sample ranking heuristics (sum_logp, mean_logp, random)
     """
-    starting_code, test, venv_name = row["starting_code"], row["test"], row["env_id"]
+    starting_code, test, venv_name = row["starting_code"], row["test"], f'gcham_venv_{row["example_id"]}' # row["env_id"]
     py_exec = get_python_executable(base_path, venv_name)
     regen_str = "regen_" if regen else ""
     try:
