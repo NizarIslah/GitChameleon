@@ -3,6 +3,14 @@ import json
 import argparse
 import pandas as pd
 import sys
+"""
+Currently supported
+-best of both: adding starter code + model output + test, or just model output + test
+
+TODO:
+- parser for reasoning models
+"""
+
 import numpy as np
 import py_compile
 import re
@@ -63,7 +71,6 @@ def load_outputs_from_json(options):
                     resp = json.loads(line)
                     task_key, task_id = get_task(resp)
                 except Exception as e:
-                    print("Error: ", e)
                     exit(1)
 
                 if task_key == 'task_id':
@@ -80,14 +87,12 @@ def load_outputs_from_json(options):
                     try:
                         solution = extract_first_python_code_block(resp["solution"])
                     except Exception as e:
-                        print("Error: ", e)
                         solution = resp["solution"]
                 elif task_key == 'seed':   # gemini or gpt non greedy format: "output", "seed"
                     k = task_id % options.n_generate
                     try:
                         solution = extract_first_python_code_block(resp["output"])
                     except Exception as e:
-                        print("Error: ", e)
                         solution = resp["output"]
                 else:
                     raise ValueError("task_id not found in json output.")
@@ -251,7 +256,6 @@ def concat_testcase(
     try:
         final_code = str(model_output) + "\n" + str(test)
     except Exception as e:
-        print("Error: ", e)
         print("model_output: ", model_output)
         final_code = test
     return final_code
@@ -300,7 +304,6 @@ def run_script(python_executable, py_file="temp.py"):
         os.remove(py_file)
     except Exception as e:
         print(e)
-    print("error: ", error_log)
     return 1 - exit_code, 1 - compile_code, parsed_code, error_log  # 1 = pass, 0 = fail
 
 
@@ -382,7 +385,7 @@ def write_py_file(code, py_file):
 
 
 def make_py_file(
-    starting_code, model_out, test, instruct, py_file="temp.py", verbose_mode=False
+    starting_code, model_out, test, instruct, py_file="temp.py", add_starter=True, verbose_mode=False
 ):
     if model_out is None or pd.isna(model_out) or model_out == "":
         return None
@@ -393,7 +396,7 @@ def make_py_file(
         model_out,
         test,
         instruct,
-        add_back_starter=True,
+        add_back_starter=add_starter,
         verbose_mode=verbose_mode,
     )
     # print("Here was the generated code:")
@@ -448,6 +451,7 @@ def eval_sample_k(
             py_file=os.path.join(
                 tmp_path, f"temp_{idx}_{k}.py"
             ),
+            add_starter=True,
             verbose_mode=options.verbose_mode,
         )
         for k, model_out in enumerate(model_outputs)
@@ -456,6 +460,49 @@ def eval_sample_k(
     passes, compiles, parsed_codes, error_logs = zip(
         *[run_script(py_exec, py_file) for py_file in py_files]
     )
+
+    # second round w/out starter code
+    py_files_wo_starter = [
+        make_py_file(
+            starting_code,
+            model_out,
+            test,
+            options.instruct,
+            py_file=os.path.join(
+                tmp_path, f"temp_{idx}_{k}_wo_starter.py"
+            ),
+            add_starter=False,
+            verbose_mode=options.verbose_mode,
+        )
+        for k, model_out in enumerate(model_outputs)
+    ]
+    passes_wo_starter, compiles_wo_starter, parsed_codes_wo_starter, error_logs_wo_starter = zip(
+        *[run_script(py_exec, py_file) for py_file in py_files_wo_starter]
+    )
+    # take the best of both. get the indices first
+    best_indices = [
+        np.argmax(
+            np.array([passes[i], passes_wo_starter[i]])
+        )
+        for i in range(len(passes))
+    ]
+    # now take the best of both
+    passes = [
+        passes[i] if best_indices[i] == 0 else passes_wo_starter[i]
+        for i in range(len(passes))
+    ]
+    compiles = [
+        compiles[i] if best_indices[i] == 0 else compiles_wo_starter[i]
+        for i in range(len(compiles))
+    ]
+    parsed_codes = [
+        parsed_codes[i] if best_indices[i] == 0 else parsed_codes_wo_starter[i]
+        for i in range(len(parsed_codes))
+    ]
+    error_logs = [
+        error_logs[i] if best_indices[i] == 0 else error_logs_wo_starter[i]
+        for i in range(len(error_logs))
+    ]
 
     return passes, compiles, parsed_codes, error_logs, outputs_cols
 

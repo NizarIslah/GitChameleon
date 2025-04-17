@@ -21,7 +21,7 @@ python evaluate.py --json-out-file $6 \
                 --k $4 \
                 --base-path $SCRATCH/eval_venvs \
                 --id_start 0 \
-                --dataset-path dataset/fix_dataset.jsonl \
+                --dataset_path dataset/fix_dataset.jsonl \
                 --scratch $SCRATCH \
                 --enable-wandb \
                 $cot_flag
