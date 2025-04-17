@@ -63,6 +63,7 @@ def get_evaluate_args():
     parser.add_argument('--wandb-entity', type=str, default='cl4code')
     parser.add_argument('--json-out-file', type=str, default='')
     parser.add_argument('--seed', type=int, default=42)
+    parser.add_argument('--eval-strategy', type=str, choices=['python_concat', 'pytest'], default='python_concat')
     parser.add_argument('--temperature', type=float, default=0.3)
     parser.add_argument('--verbose-mode', action='store_true', default=False)
     parser.add_argument('--debug-mode', action='store_true', default=False)

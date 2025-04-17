@@ -409,6 +409,158 @@ def make_py_file(
     write_py_file(code_wo_starter, py_file_wo_starter)
     return py_file_wo_starter
 
+ def eval_strategy(strategy: str):
+    """
+    Function to evaluate the model outputs at k
+    strategy: str, evaluation strategy to use
+    """
+    if strategy == "python_concat":
+        return eval_sample_k
+    elif strategy == "pytest":
+        return pytest_eval_sample_k
+    else:
+        raise ValueError(f"Unknown strategy: {strategy}")
+
+def run_pytest(pytest_exec, py_file, test_file):
+    """
+    Function to run pytest on a given file
+    pytest_exec: str, path to the pytest executable
+    py_file: str, path to the python file to test
+    test_file: str, path to the test file
+    return: result of the test, 1 if pass, 0 if fail
+    """
+    # concat the py_file into the test_file
+    with open(test_file, "a") as file:
+        with open(py_file, "r") as py_file:
+            code = py_file.read()
+            file.write(code)
+    command = [pytest_exec, test_file]
+    try:
+        result = subprocess.run(command, capture_output=True, text=True)
+        exit_code = result.returncode
+        error_log = result.stderr
+        # print("error_log: ", error_log)
+        # if "ModuleNotFoundError" in error_log:
+        #     print("ModuleNotFoundError")
+        # else:
+        #     print("No ModuleNotFoundError")
+    except subprocess.TimeoutExpired as e:
+        print(e)
+        exit_code = 1
+        error_log = "TimeoutError"
+    return 1 - exit_code, 1 - exit_code, "", error_log
+
+def pytest_eval_sample_k(
+    base_path, model_name, row, n, k, idx, seed, temperature, options, regen=False
+):
+    """
+    Function to evaluate the model outputs at k using pytest
+    base_path: str, path to the base directory.
+    model_name: name of the model
+    row: row of the dataframe, example to evaluate
+    n: int, number of generations from the model
+    k: int, number of k to evaluate
+    return: results_dict, containing eval results for each model and for each of the k then sample ranking heuristics (sum_logp, mean_logp, random)
+    """
+    pytest_exec = os.path.join(base_path, "venv/bin/pytest")
+    if not os.path.exists(pytest_exec):
+        print(f"Error: pytest executable not found, skipping sample {idx}...")
+        return None, None, None, None, None
+    # pytest tests will be in a separate folder and file. make the structure
+    test_dir = os.path.join(
+        base_path, "tests", model_name, str(seed), str(temperature)
+    )
+    # extract the columns with test_ in the name
+    test_cols = [col for col in row.index if "test_" in col]
+    # extract the test codes
+    test_codes = extract_columns(row, test_cols)
+
+    assert len(test_codes) > 0, "No test keys found in the row."
+    for test_key, test_code in enumerate(test_codes):
+        test_file = os.path.join(
+            test_dir, f"{test_key}_{idx}.py"
+        )
+        os.makedirs(os.path.dirname(test_file), exist_ok=True)
+        # write the test file
+        with open(test_file, "w") as file:
+            file.write(test_code)
+
+    # concat k's + sample ranking heuristics
+    outputs_cols = [f"{regen_str}output_{i}" for i in range(n)] + [
+        f"{regen_str}output_{rank}"
+        for rank in get_ranks(model_name, row)
+    ]  # [k:] is ranking heuristics
+    model_outputs = extract_columns(row, outputs_cols)
+    # make the py files for each model output
+    py_files = [
+        make_py_file(
+            starting_code,
+            model_out,
+            test,
+            options.instruct,
+            py_file=os.path.join(
+                test_dir, f"temp_{idx}_{k}.py"
+            ),
+            add_starter=True,
+            verbose_mode=options.verbose_mode,
+        )
+        for k, model_out in enumerate(model_outputs)
+    ]
+    # run the tests
+    passes, compiles, parsed_codes, error_logs = zip(
+        *[
+            run_pytest(pytest_exec, py_file, test_file)
+            for py_file, test_file in zip(py_files, test_files)
+        ]
+    )
+    # second round w/out starter code
+    py_files_wo_starter = [
+        make_py_file(
+            starting_code,
+            model_out,
+            test,
+            options.instruct,
+            py_file=os.path.join(
+                test_dir, f"temp_{idx}_{k}_wo_starter.py"
+            ),
+            add_starter=False,
+            verbose_mode=options.verbose_mode,
+        )
+        for k, model_out in enumerate(model_outputs)
+    ]
+    # run the tests
+    passes_wo_starter, compiles_wo_starter, parsed_codes_wo_starter, error_logs_wo_starter = zip(
+        *[
+            run_pytest(pytest_exec, py_file, test_file)
+            for py_file, test_file in zip(py_files_wo_starter, test_files)
+        ]
+    )
+    # take the best of both. get the indices first
+    best_indices = [
+        np.argmax(
+            np.array([passes[i], passes_wo_starter[i]])
+        )
+        for i in range(len(passes))
+    ]
+    # now take the best of both
+    passes = [
+        passes[i] if best_indices[i] == 0 else passes_wo_starter[i]
+        for i in range(len(passes))
+    ]
+    compiles = [
+        compiles[i] if best_indices[i] == 0 else compiles_wo_starter[i]
+        for i in range(len(compiles))
+    ]
+    parsed_codes = [
+        parsed_codes[i] if best_indices[i] == 0 else parsed_codes_wo_starter[i]
+        for i in range(len(parsed_codes))
+    ]
+    error_logs = [
+        error_logs[i] if best_indices[i] == 0 else error_logs_wo_starter[i]
+        for i in range(len(error_logs))
+    ]
+    return passes, compiles, parsed_codes, error_logs, outputs_cols
+
 
 def eval_sample_k(
     base_path, model_name, row, n, k, idx, seed, temperature, options, regen=False
@@ -591,10 +743,11 @@ def sample_eval_parallel(
     n: int, number of generations from the model
     k: pass @ k evaluation
     """
+    eval_strategy = get_eval_strategy(options.eval_strategy)
     start, end = list(idxs)[0], list(idxs)[-1] + 1
     rows = df_with_outputs.iloc[start:end].iterrows()
     batch_results = Parallel(n_jobs=n_jobs, verbose=0)(
-        delayed(eval_sample_k)(
+        delayed(eval_strategy)(
             base_path,
             model_name,
             row,
