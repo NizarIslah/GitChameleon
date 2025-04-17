@@ -49,7 +49,7 @@ def create_virtual_environment(env_path, python_version, create_anyway=False, li
     return env_path
 
 
-def install_packages(env_path, library, version, additional_dependencies):
+def install_packages(env_path, library, version, additional_dependencies, python_version):
     """Install packages using the Python executable in the virtual environment."""
     python_executable = Path(env_path, "bin", "python")
     
@@ -107,6 +107,35 @@ def install_packages(env_path, library, version, additional_dependencies):
         subprocess.run(["rm", "-rf", env_path])  # Clean up the environment if installation fails
     else:
         print(f"Packages installed successfully in {env_path}")
+
+        # Install pytest if it is not the main library or specified in additional_dependencies
+        deps_lower = [dep.lower() for dep in dependencies]
+        if library.lower() != "pytest" and all("pytest" not in dep for dep in deps_lower):
+            # Define pinpointed pytest versions per python version
+            pytest_versions = {
+                "3.7": "pytest==6.2.5",
+                "3.9": "pytest==7.1.2",
+                "3.10": "pytest==7.2.0",
+            }
+            pytest_spec = pytest_versions.get(python_version)
+            if pytest_spec:
+                pytest_install_cmd = [
+                    python_executable,
+                    "-m",
+                    "pip",
+                    "install",
+                    pytest_spec,
+                    "--quiet",
+                ]
+                result_pytest = subprocess.run(
+                    pytest_install_cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+                )
+                if result_pytest.returncode == 0:
+                    print(f"Pytest installed successfully in {env_path} with version from mapping: {pytest_spec}")
+                else:
+                    print(f"Failed to install pytest in {env_path}: {result_pytest.stderr}")
+            else:
+                print(f"No pytest version mapping found for Python {python_version}. Skipping pytest installation.")
     return result.returncode
 
 
@@ -144,11 +173,11 @@ def main(args):
                 env_name = f"gcham_venv_{example_id}"
                 env_path = Path(base_path, env_name)
 
-                python_executable = Path(env_path, "bin", "python")
-                if not os.path.exists(python_executable):
+                python_exec = Path(env_path, "bin", "python")
+                if not os.path.exists(python_exec):
                     print(f"Python executable not found for {example_id}. Creating environment...")
                     create_virtual_environment(env_path, pyenv_version, create_anyway=create_anyway, library_to_check=library)
-                    returncode = install_packages(env_path, library, version, additional_dependencies)
+                    returncode = install_packages(env_path, library, version, additional_dependencies, python_version)
                     if returncode != 0:
                         failed_count.append(example_id)
                 else:
