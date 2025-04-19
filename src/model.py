@@ -3,12 +3,10 @@ import os
 from abc import ABC, abstractmethod
 from typing import List
 from warnings import warn
+
 import openai
-
-import os
-from tqdm import tqdm
-
 import torch
+from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 try:
@@ -406,6 +404,7 @@ class AnthropicMessageDecoder(AnthropicDecoder):
 
 
 from typing import List
+
 from transformers import AutoTokenizer
 
 EOS = [

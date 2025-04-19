@@ -1,6 +1,6 @@
+import argparse
 import json
 from pathlib import Path
-import argparse
 
 SYS_PROMPT = """You are a skilled Python programmer tasked with solving a coding problem. Your goal is to provide a clear, efficient, and correct solution that meets all the specified requirements.
 

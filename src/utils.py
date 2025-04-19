@@ -3,6 +3,7 @@ import json
 import os
 from os import PathLike
 from typing import Dict, Iterable
+
 import pandas as pd
 from tqdm import tqdm
 
@@ -35,7 +36,7 @@ def write_jsonl(
 
 import gzip
 import json
-from typing import Iterable, Dict
+from typing import Dict, Iterable
 
 
 def stream_jsonl(filename: str, seed: int) -> Iterable[Dict]:
@@ -371,11 +372,11 @@ def concatenate_jsonl_files(input_dir, model_name, temperature, output_file):
 
 
 if __name__ == "__main__":
-    import pandas as pd
     import json
 
-    # concatenate_jsonl_files()
+    import pandas as pd
 
+    # concatenate_jsonl_files()
     # update python version
     samples = []
     with open(
@@ -478,14 +479,11 @@ if __name__ == "__main__":
     #     eval_df_path = f"/home/mila/n/nizar.islah/GitChameleon/results/{model_name}/{model_name}_n{n_generate}_k1_T={temp}_seed{seed}_eval.csv"
     #     jsonl_save_path = f"/home/mila/n/nizar.islah/GitChameleon/results/feedback_prompts/{model_name}_n{n_generate}_k1_T={temp}_feedback_prompts.jsonl"
     #     save_feedback_prompts_jsonl(model_name, n_generate, eval_df_path, jsonl_save_path)
-
     #####  csv to jsonl saving #######0#
-
     # import csv
     # # File paths
     # input_csv = "dataset/all_samples_final.csv"
     # output_jsonl = "dataset/all_samples_final.jsonl"
-
     # # Read CSV and write JSONL
     # with open(input_csv, newline='', encoding='utf-8') as csvfile, open(output_jsonl, 'w', encoding='utf-8') as jsonlfile:
     #     reader = csv.DictReader(csvfile)
@@ -495,7 +493,6 @@ if __name__ == "__main__":
     #         prompt = get_prompt(row, instruct=True, cot=False)
     #         json_obj = {"role": "user", "content": prompt}
     #         jsonlfile.write(json.dumps(json_obj) + "\n")
-
     ### gpt formatting to jsonl ###
     # import pickle
     # temp=0.8

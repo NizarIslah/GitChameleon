@@ -1,8 +1,9 @@
-import wandb
-import json
 import argparse
-import pandas as pd
+import json
 import sys
+
+import pandas as pd
+import wandb
 
 """
 Currently supported
@@ -12,19 +13,18 @@ TODO:
 - parser for reasoning models
 """
 
-import numpy as np
+import os
+import pdb
 import py_compile
 import re
-import os
 import time
-from tqdm import tqdm
-from joblib import Parallel, delayed
-from copy import deepcopy
-from transformers import AutoTokenizer
 from collections import defaultdict
-import pdb
+from copy import deepcopy
 
-import re
+import numpy as np
+from joblib import Parallel, delayed
+from tqdm import tqdm
+from transformers import AutoTokenizer
 
 
 def extract_first_python_code_block(text):
@@ -233,8 +233,8 @@ def corrected_pass_at_k(n, c, k=10):
     return 1.0 - np.prod(1.0 - k / np.arange(n - c + 1, n + 1))
 
 
-import subprocess
 import os
+import subprocess
 
 
 def has_triple_quotes(string):

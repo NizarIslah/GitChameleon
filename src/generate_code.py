@@ -1,22 +1,14 @@
-import os
 import json
+import os
+
 import wandb
+from rich.progress import (BarColumn, MofNCompleteColumn, Progress, TextColumn,
+                           TimeElapsedColumn)
+
 from src.model import DecoderBase, make_model
-from src.utils import (
-    get_prompt,
-    write_jsonl,
-    load_dataset,
-    get_prompt_doc,
-    get_prompt_feedback,
-)
 from src.sanitize import sanitize
-from rich.progress import (
-    BarColumn,
-    MofNCompleteColumn,
-    Progress,
-    TextColumn,
-    TimeElapsedColumn,
-)
+from src.utils import (get_prompt, get_prompt_doc, get_prompt_feedback,
+                       load_dataset, write_jsonl)
 
 
 def codegen(

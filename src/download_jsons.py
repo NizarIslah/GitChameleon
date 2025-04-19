@@ -1,11 +1,11 @@
-import wandb
 import json
-from tqdm import tqdm
-import pandas as pd
-from datetime import datetime
-from collections import defaultdict
 import os
-import json
+from collections import defaultdict
+from datetime import datetime
+
+import pandas as pd
+import wandb
+from tqdm import tqdm
 
 
 def extract_json_from_wandb(filter_key, model_name, seed, temp, n_generate, cot=False):
@@ -305,7 +305,6 @@ if __name__ == "__main__":
     # #     for i in range(10):
     # #         print(f.readline())
     # exit(0)
-
     # # # Concatenate jsonl files
     # # Example usage:
     # input_directory = "/home/mila/n/nizar.islah/GitChameleon/gc_new_feedback/"  # Replace with the actual directory path

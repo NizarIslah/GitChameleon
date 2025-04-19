@@ -1,7 +1,8 @@
-import json
-from transformers import AutoTokenizer
-import tiktoken
 import argparse
+import json
+
+import tiktoken
+from transformers import AutoTokenizer
 
 
 def tokenize_sample(sample, tokenizer):
