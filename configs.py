@@ -2,13 +2,16 @@ import json
 from pathlib import Path
 import argparse
 
+
 def load_config(config_path):
     with open(config_path) as f:
         return json.load(f)
 
+
 def save_config(config_path, config):
-    with open(config_path, 'w') as f:
+    with open(config_path, "w") as f:
         json.dump(config, f, indent=4)
+
 
 def get_generate_args():
     parser = argparse.ArgumentParser()
@@ -17,7 +20,9 @@ def get_generate_args():
     parser.add_argument("--disable-wandb", action="store_true", default=False)
     parser.add_argument("--model", required=True, type=str)
     parser.add_argument(
-        "--dataset_path", default="dataset/all_samples_final_merged_system.jsonl", type=str
+        "--dataset_path",
+        default="dataset/all_samples_final_merged_system.jsonl",
+        type=str,
     )
     parser.add_argument("--save_path", default=None, type=str)
     parser.add_argument("--cot", action="store_true")
@@ -37,9 +42,7 @@ def get_generate_args():
         type=str,
         choices=["vllm", "hf", "openai", "mistral", "anthropic", "google"],
     )
-    parser.add_argument(
-        "--base_url", default=None, type=str
-    ) 
+    parser.add_argument("--base_url", default=None, type=str)
     parser.add_argument("--tp", default=1, type=int)
     parser.add_argument("--trust_remote_code", action="store_true")
     parser.add_argument("--tokenizer_legacy", action="store_true")
@@ -48,34 +51,52 @@ def get_generate_args():
     args = parser.parse_args()
     return args
 
+
 def get_evaluate_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model-name', type=str, default="")
-    parser.add_argument('--instruct', default=False, action='store_true')
-    parser.add_argument('--size', type=int, default=0)
-    parser.add_argument('--dataset-path', type=str, default="/home/mila/n/nizar.islah/GitChameleon/dataset/samples_reordered.csv")
-    parser.add_argument('--dataset-env-path', type=str, default="/home/mila/n/nizar.islah/GitChameleon/dataset/env_ids_reordered.csv")
-    parser.add_argument('--id_start', type=int, default=0)
-    parser.add_argument('--id_end', type=int, default=-1)
-    parser.add_argument('--base-path', type=str, default="eval_venvs/")
-    parser.add_argument('--enable-wandb', action='store_true', default=False)
-    parser.add_argument('--wandb-project', type=str, default='GitChameleon_new')
-    parser.add_argument('--wandb-entity', type=str, default='cl4code')
-    parser.add_argument('--json-out-file', type=str, default='')
-    parser.add_argument('--seed', type=int, default=42)
-    parser.add_argument('--eval-strategy', type=str, choices=['python_concat', 'pytest'], default='python_concat')
-    parser.add_argument('--temperature', type=float, default=0.3)
-    parser.add_argument('--verbose-mode', action='store_true', default=False)
-    parser.add_argument('--debug-mode', action='store_true', default=False)
-    parser.add_argument('--top_p', type=float, default=0.8)
-    parser.add_argument('--top_k', type=int, default=50)
-    parser.add_argument('--max_tokens', type=int, default=6000)
-    parser.add_argument('--test', action='store_true', default=False)
-    parser.add_argument('--scratch', type=str, default="./")
-    parser.add_argument('--output-path', type=str, default="results/starcoder2-15b-instruct-v0.1_temperature0.8.csv")
-    parser.add_argument('--cot', action='store_true', default=False)
-    parser.add_argument('--cot-output-path', type=str, default="cot_generations.jsonl")
-    parser.add_argument('--resume', action='store_true', default=False)
+    parser.add_argument("--model-name", type=str, default="")
+    parser.add_argument("--instruct", default=False, action="store_true")
+    parser.add_argument("--size", type=int, default=0)
+    parser.add_argument(
+        "--dataset-path",
+        type=str,
+        default="/home/mila/n/nizar.islah/GitChameleon/dataset/samples_reordered.csv",
+    )
+    parser.add_argument(
+        "--dataset-env-path",
+        type=str,
+        default="/home/mila/n/nizar.islah/GitChameleon/dataset/env_ids_reordered.csv",
+    )
+    parser.add_argument("--id_start", type=int, default=0)
+    parser.add_argument("--id_end", type=int, default=-1)
+    parser.add_argument("--base-path", type=str, default="eval_venvs/")
+    parser.add_argument("--enable-wandb", action="store_true", default=False)
+    parser.add_argument("--wandb-project", type=str, default="GitChameleon_new")
+    parser.add_argument("--wandb-entity", type=str, default="cl4code")
+    parser.add_argument("--json-out-file", type=str, default="")
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--eval-strategy",
+        type=str,
+        choices=["python_concat", "pytest"],
+        default="python_concat",
+    )
+    parser.add_argument("--temperature", type=float, default=0.3)
+    parser.add_argument("--verbose-mode", action="store_true", default=False)
+    parser.add_argument("--debug-mode", action="store_true", default=False)
+    parser.add_argument("--top_p", type=float, default=0.8)
+    parser.add_argument("--top_k", type=int, default=50)
+    parser.add_argument("--max_tokens", type=int, default=6000)
+    parser.add_argument("--test", action="store_true", default=False)
+    parser.add_argument("--scratch", type=str, default="./")
+    parser.add_argument(
+        "--output-path",
+        type=str,
+        default="results/starcoder2-15b-instruct-v0.1_temperature0.8.csv",
+    )
+    parser.add_argument("--cot", action="store_true", default=False)
+    parser.add_argument("--cot-output-path", type=str, default="cot_generations.jsonl")
+    parser.add_argument("--resume", action="store_true", default=False)
     parser.add_argument("--library", type=str, default="")
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--k", type=int, default=1)  # for pass @ k evaluation

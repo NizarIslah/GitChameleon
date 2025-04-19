@@ -20,3 +20,5 @@ tree_sitter_languages
 pqdm
 seaborn
 tree_sitter_python
+anthropic
+openai

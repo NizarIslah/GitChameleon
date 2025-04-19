@@ -105,11 +105,13 @@ bash tests/test_url.sh
 Currently supported backend:
 
 - `vllm`
+- `openai`
+- `anthropic`
 - `url-serving (openai-compatible)`
 
 Planned support:
 
-- `hf`, `openai`, `mistral`, `anthropic`, `google`
+- `openrouter`
 
 
 # Docker
@@ -141,6 +143,10 @@ source eval_main_venv/bin/activate
 pip install vllm -r requirements.txt
 
 # create the virtual env
-python create_venvs.py --dataset dataset/absolute_final_dataset.jsonl --base_path eval_venvs --create_anyway
+python src/create_venvs.py --dataset dataset/absolute_final_dataset.jsonl --base_path eval_venvs
 ```
-
+## run verify dataset using pytest
+To run dataset verification with pytest, eval_venvs must have been created first 
+```
+python verify_dataset.py dataset/fix_dataset.jsonl eval_venvs dataset/samples/ 
+```

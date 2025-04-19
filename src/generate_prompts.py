@@ -1,6 +1,6 @@
+import argparse
 import json
 from pathlib import Path
-import argparse
 
 SYS_PROMPT = """You are a skilled Python programmer tasked with solving a coding problem. Your goal is to provide a clear, efficient, and correct solution that meets all the specified requirements.
 
@@ -70,13 +70,14 @@ PROMPT_TEMPLATE = f"""1. Required Library:
 {{starter_code}}
 </starter_code>"""
 
+
 def main(input_path: Path, output_path: Path):
     with open(input_path, "r") as fin:
         inputs = [json.loads(line) for line in fin]
 
     for line in inputs:
-        python_version =line["python_version"]
-       
+        python_version = line["python_version"]
+
         line["messages"] = [
             {"role": "system", "content": SYS_PROMPT},
             {
@@ -103,34 +104,34 @@ def main(input_path: Path, output_path: Path):
             },
         ]
 
-
     with open(output_path, "w") as fout:
         for line in inputs:
             fout.write(json.dumps(line) + "\n")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-    description="Process coding problems from a JSONL file to generate formatted prompts for LLMs."
+        description="Process coding problems from a JSONL file to generate formatted prompts for LLMs."
     )
 
     # Add argument for input file path
     parser.add_argument(
         "-i",
         "--input",
-        type=Path, # Use Path object directly
+        type=Path,  # Use Path object directly
         required=True,
         help="Path to the input JSONL file containing coding problems.",
-        metavar="INPUT_PATH"
+        metavar="INPUT_PATH",
     )
 
     # Add argument for output file path
     parser.add_argument(
         "-o",
         "--output",
-        type=Path, # Use Path object directly
+        type=Path,  # Use Path object directly
         required=True,
         help="Path to the output JSONL file where processed prompts will be saved.",
-        metavar="OUTPUT_PATH"
+        metavar="OUTPUT_PATH",
     )
 
     # Parse the command-line arguments

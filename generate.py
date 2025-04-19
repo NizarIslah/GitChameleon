@@ -3,6 +3,7 @@ from configs import get_generate_args
 from src.model import make_model
 from src.generate_code import codegen
 
+
 def main():
     args = get_generate_args()
 

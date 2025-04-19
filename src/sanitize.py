@@ -2,18 +2,15 @@
 import ast
 import os
 import pathlib
-from typing import Dict, Generator, List, Optional, Set, Tuple
-from pqdm.processes import pqdm
-from collections import defaultdict
 import pickle
-from tqdm import tqdm
-from tree_sitter import Node
-from tree_sitter_languages import get_parser
+from collections import defaultdict
+from typing import Dict, Generator, List, Optional, Set, Tuple
 
 import tree_sitter_python
+from pqdm.processes import pqdm
 from tqdm import tqdm
 from tree_sitter import Language, Node, Parser
-
+from tree_sitter_languages import get_parser
 
 CLASS_TYPE = "class_definition"
 FUNCTION_TYPE = "function_definition"
@@ -23,6 +20,7 @@ ATTRIBUTE_TYPE = "attribute"
 RETURN_TYPE = "return_statement"
 EXPRESSION_TYPE = "expression_statement"
 ASSIGNMENT_TYPE = "assignment"
+
 
 def syntax_check(code, verbose=False):
     try:
