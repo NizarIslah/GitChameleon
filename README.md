@@ -105,11 +105,13 @@ bash tests/test_url.sh
 Currently supported backend:
 
 - `vllm`
+- `openai`
+- `anthropic`
 - `url-serving (openai-compatible)`
 
 Planned support:
 
-- `hf`, `openai`, `mistral`, `anthropic`, `google`
+- `openrouter`
 
 
 # Docker
