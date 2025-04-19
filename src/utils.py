@@ -37,15 +37,16 @@ import gzip
 import json
 from typing import Iterable, Dict
 
+
 def stream_jsonl(filename: str, seed: int) -> Iterable[Dict]:
     """
     Parses each JSONL line from the given file and yields it as a dictionary.
     If a line is empty (only whitespace), yields a dictionary with {"output": "", "seed": seed}.
-    
+
     Parameters:
       filename (str): The path to the JSONL file (can be gzip compressed if ends with '.gz').
       seed (int): The seed value to include if an empty line is encountered.
-    
+
     Returns:
       Iterable[Dict]: An iterable of dictionaries parsed from the file.
     """
@@ -69,7 +70,6 @@ def stream_jsonl(filename: str, seed: int) -> Iterable[Dict]:
                     yield json.loads(line)
 
 
-
 def write_directory(directory: PathLike, data: Iterable[Dict]):
     os.makedirs(directory, exist_ok=True)
     counters = {}
@@ -89,6 +89,7 @@ def write_directory(directory: PathLike, data: Iterable[Dict]):
 def to_raw(string):
     return string.encode("unicode-escape").decode().replace("\\\\", "\\")
 
+
 COT_PROMPT_TEMPLATE = """\
 You are to solve this in python using {}-{}.
 First, let's think step by step. Then, provide a self-contained Python script that solves the following problem in a markdown code block.
@@ -100,9 +101,8 @@ You are to solve this in python using {}-{}. Provide a self-contained Python scr
 {}
 """
 
-library_specific_instructions = {
-    "gradio" : "Do not launch a gradio interface."
-}
+library_specific_instructions = {"gradio": "Do not launch a gradio interface."}
+
 
 def get_prompt(example, instruct=False, cot=False):
     if instruct:
@@ -110,51 +110,64 @@ def get_prompt(example, instruct=False, cot=False):
             prompt_template = COT_PROMPT_TEMPLATE
         else:
             prompt_template = PROMPT_TEMPLATE
-        prompt  = prompt_template.format(example['library'], example['version'], example['problem'])
-        if example['library'] in library_specific_instructions.keys():
-            prompt += library_specific_instructions[example['library']] 
+        prompt = prompt_template.format(
+            example["library"], example["version"], example["problem"]
+        )
+        if example["library"] in library_specific_instructions.keys():
+            prompt += library_specific_instructions[example["library"]]
         prompt += """\
 Please start with the following markdown code block:
 ```
 {}
 ```
-""".format(example["starting_code"].replace('\\n', '\n'))
+""".format(
+            example["starting_code"].replace("\\n", "\n")
+        )
         return prompt
     else:
         raise ValueError("Not Implemeneted")
 
+
 def get_prompt_feedback(example, generated_code, error_log):
     prompt_template = PROMPT_TEMPLATE
-    prompt  = prompt_template.format(example['library'], example['version'], example['problem'])
-    if example['library'] in library_specific_instructions.keys():
-        prompt += library_specific_instructions[example['library']] 
+    prompt = prompt_template.format(
+        example["library"], example["version"], example["problem"]
+    )
+    if example["library"] in library_specific_instructions.keys():
+        prompt += library_specific_instructions[example["library"]]
     # add output here
     prompt += """\
 Your solution was:
 ```
 {}
 ```
-""".format(generated_code.replace('\\n', '\n'))
+""".format(
+        generated_code.replace("\\n", "\n")
+    )
     prompt += """\
 Your solution had the following error:
 ```
 {}
 ```
-""".format(error_log.replace('\\n', '\n'))
+""".format(
+        error_log.replace("\\n", "\n")
+    )
 
     prompt += """\
 Please start with the following markdown code block:
 ```
 {}
 ```
-""".format(example["starting_code"].replace('\\n', '\n'))
+""".format(
+        example["starting_code"].replace("\\n", "\n")
+    )
     return prompt
 
 
 def generate_prompt(model_name, example, df_idx, sample_idx):
-    base_model_name = model_name.split('/')[-1]
-    parsed_code = example[f'parsed_code_{sample_idx}']
-    error_log = example[f'error_log_{sample_idx}']
+    base_model_name = model_name.split("/")[-1]
+    parsed_code = example[f"parsed_code_{sample_idx}"]
+    error_log = example[f"error_log_{sample_idx}"]
     # task_id is index of the example
     task_id = df_idx
     # print(type(parsed_code), type(error_log))
@@ -163,18 +176,20 @@ def generate_prompt(model_name, example, df_idx, sample_idx):
     if type(parsed_code) == float:
         parsed_code = ""
     prompt = get_prompt_feedback(example, parsed_code, error_log)
-    prompt = {"task_id": task_id, "sample_id": sample_idx,"prompt": prompt}
+    prompt = {"task_id": task_id, "sample_id": sample_idx, "prompt": prompt}
     return prompt
+
 
 def generate_prompt_with_error_log(model_name, n_generate, eval_df, indices):
     prompts = []
-    df_indices = [i//n_generate for i in indices]
-    sample_indices = [i%n_generate for i in indices]
+    df_indices = [i // n_generate for i in indices]
+    sample_indices = [i % n_generate for i in indices]
     for df_idx, sample_idx in zip(df_indices, sample_indices):
         example = eval_df.iloc[df_idx]
         prompt = generate_prompt(model_name, example, df_idx, sample_idx)
         prompts.append(prompt)
     return prompts
+
 
 def save_feedback_prompts_jsonl(model_name, n_generate, eval_df_path, jsonl_save_path):
     """
@@ -217,12 +232,14 @@ def save_feedback_prompts_jsonl(model_name, n_generate, eval_df_path, jsonl_save
     # Process evaluation data in batches.
     for i in tqdm(range(0, total_gen, bs)):
         stop = min(total_gen, i + bs)
-        prompts = generate_prompt_with_error_log(model_name, n_generate, eval_df, range(i, stop))
+        prompts = generate_prompt_with_error_log(
+            model_name, n_generate, eval_df, range(i, stop)
+        )
         all_prompts.extend(prompts)
 
-    with open(jsonl_save_path, 'w') as f:
+    with open(jsonl_save_path, "w") as f:
         for prompt in all_prompts:
-            f.write(json.dumps(prompt) + '\n')
+            f.write(json.dumps(prompt) + "\n")
     print(f"Saved error log prompts to {jsonl_save_path}")
 
     return all_prompts
@@ -231,25 +248,32 @@ def save_feedback_prompts_jsonl(model_name, n_generate, eval_df_path, jsonl_save
 def get_prompt_doc(example, instruct=False):
     if instruct:
         prompt_template = PROMPT_TEMPLATE
-        prompt  = prompt_template.format(example['library'], example['version'], example['problem'])
-        if example['library'] in library_specific_instructions.keys():
-            prompt += library_specific_instructions[example['library']] 
+        prompt = prompt_template.format(
+            example["library"], example["version"], example["problem"]
+        )
+        if example["library"] in library_specific_instructions.keys():
+            prompt += library_specific_instructions[example["library"]]
         prompt += """\
 Here is the documentation for the function to be used:
 ```
 {}
 ```
 
-""".format(example['docs'])
+""".format(
+            example["docs"]
+        )
         prompt += """\
 Please start with the following markdown code block:
 ```
 {}
 ```
-""".format(example["starting_code"].replace('\\n', '\n'))
+""".format(
+            example["starting_code"].replace("\\n", "\n")
+        )
     else:
         raise ValueError("Not Implemeneted")
     return prompt
+
 
 def load_dataset(data_path):
     df = pd.read_csv(data_path)
@@ -257,13 +281,15 @@ def load_dataset(data_path):
     dataset = {index: row.to_dict() for index, row in df.iterrows()}
     return dataset
 
+
 import pandas as pd
+
 
 def move_rows_to_position(df, idx1, idx2, idx3):
     """
     Moves the block of rows from idx1 to idx2 (inclusive) so that in the final DataFrame,
     the block starts at index position idx2.
-    
+
     Note: This assumes that the DataFrame is 0-indexed and that idx1 <= idx2.
     """
     # Extract the block of rows (using iloc ensures we're working by position)
@@ -272,24 +298,27 @@ def move_rows_to_position(df, idx1, idx2, idx3):
     block = df.iloc[idx1:idx2]
     # Remove these rows from the DataFrame
     df_remaining = df.drop(df.index[idx1:idx2])
-    
+
     # Determine the insertion position in df_remaining:
     # We want the final DataFrame (after concatenation and reindexing) to have the block's first row at position idx2.
     #
     # Since we've removed rows from the original DataFrame, the remaining rows now are in a new order.
     # Here, we simply choose the insertion position as the minimum between idx2 and the number of remaining rows.
-    insertion_index = idx1 + idx3-idx2
-    
+    insertion_index = idx1 + idx3 - idx2
+
     # Insert the block into the remaining DataFrame at the computed insertion index.
-    df_new = pd.concat([
-        df_remaining.iloc[:insertion_index],
-        block,
-        df_remaining.iloc[insertion_index:]
-    ]).reset_index(drop=True)
-    
+    df_new = pd.concat(
+        [
+            df_remaining.iloc[:insertion_index],
+            block,
+            df_remaining.iloc[insertion_index:],
+        ]
+    ).reset_index(drop=True)
+
     return df_new
 
-PROMPT_TEMPLATE="""\
+
+PROMPT_TEMPLATE = """\
 1. Required Library:
 <library>
 {}=={} with python {}
@@ -307,7 +336,8 @@ PROMPT_TEMPLATE="""\
 ```
 
 After writing your solution, please review it to ensure all requirements are met and the code is correct and efficient."""
-    
+
+
 # # Example usage:
 def concatenate_jsonl_files(input_dir, model_name, temperature, output_file):
     # List to hold concatenated data
@@ -317,23 +347,29 @@ def concatenate_jsonl_files(input_dir, model_name, temperature, output_file):
     for filename in os.listdir(input_dir):
         # print(f"Checking file: {filename}")
         # Check if the filename contains the model name and a seed number
-        if model_name in filename and str(temperature) in filename and filename.endswith(".jsonl"):
+        if (
+            model_name in filename
+            and str(temperature) in filename
+            and filename.endswith(".jsonl")
+        ):
             # Open and read each matching jsonl file
             file_path = os.path.join(input_dir, filename)
             print(f"Processing file: {file_path}")
 
-            with open(file_path, 'r') as jsonl_file:
+            with open(file_path, "r") as jsonl_file:
                 for line in jsonl_file:
                     # Each line in a jsonl file is a separate JSON object
                     json_object = json.loads(line)
                     concatenated_data.append(json_object)
 
     # Write concatenated data to the output file
-    with open(output_file, 'w') as output_jsonl_file:
+    with open(output_file, "w") as output_jsonl_file:
         for item in concatenated_data:
-            output_jsonl_file.write(json.dumps(item) + '\n')
+            output_jsonl_file.write(json.dumps(item) + "\n")
 
     print(f"Concatenated {len(concatenated_data)} records into {output_file}")
+
+
 if __name__ == "__main__":
     import pandas as pd
     import json
@@ -342,25 +378,28 @@ if __name__ == "__main__":
 
     # update python version
     samples = []
-    with open("/home/mila/n/nizar.islah/scratch/GitChameleon/GitChameleon/dataset/all_samples_final_merged.jsonl", 'r') as f:
-        idx=0
+    with open(
+        "/home/mila/n/nizar.islah/scratch/GitChameleon/GitChameleon/dataset/all_samples_final_merged.jsonl",
+        "r",
+    ) as f:
+        idx = 0
         for line in f:
             sample = json.loads(line)
-            lib = sample['library']
-            version = sample['version']
-            problem = sample['problem']
-            starter_code = sample['starting_code']
-            python_version = sample['python_version']
+            lib = sample["library"]
+            version = sample["version"]
+            problem = sample["problem"]
+            starter_code = sample["starting_code"]
+            python_version = sample["python_version"]
             if lib in ("plotly", "sympy"):
                 python_version = "3.9"
-            sample['python_version'] = python_version
-            idx+=1
+            sample["python_version"] = python_version
+            idx += 1
             # prompt = PROMPT_TEMPLATE.format(lib,version,python_version,problem,starter_code)
             # samples.append({"role": "user", "content": prompt})
     # write to a jsonl
-    with open("dataset/final_set.jsonl", 'w') as f:
+    with open("dataset/final_set.jsonl", "w") as f:
         for sample in samples:
-            f.write(json.dumps(sample) + '\n')
+            f.write(json.dumps(sample) + "\n")
     print("all samples written to jsonl")
 
     # samples = pd.read_csv("dataset/all_samples_final.csv")
@@ -378,7 +417,6 @@ if __name__ == "__main__":
     # with open("dataset/test_new_prompts.jsonl", 'w') as f:
     #     for prompt in prompts:
     #         f.write(json.dumps(prompt) + '\n')
-
 
     # # combine csvs
     # import csv
@@ -404,7 +442,6 @@ if __name__ == "__main__":
     #     for row in combined:
     #         writer.writerow(row)
 
-
     # df2=pd.read_csv(output_csv)
     # df1=pd.read_csv("/home/mila/n/nizar.islah/GitChameleon/dataset/combined_dataset.csv")
     # # merge with different columns some same.
@@ -416,8 +453,8 @@ if __name__ == "__main__":
     # df=df.reset_index(drop=True)
     # df.to_csv("dataset/all_samples_final.csv", index=False)
 
-
     import csv
+
     ## feedback prompt saving ##
     # model_names = [
     #     "gemini15",
@@ -482,10 +519,9 @@ if __name__ == "__main__":
     #     write_jsonl(out_jsonl_path, data)
 
 
-
 #     # Read the CSV file into a DataFrame
 #     df = pd.read_csv("/home/mila/n/nizar.islah/GitChameleon/dataset/updated_libraries.csv")
-    
+
 #     # Suppose you have a function find_lib that returns the first row position where the "library" column contains a given string.
 #     def find_lib(df, library):
 #         for idx, row in df.iterrows():

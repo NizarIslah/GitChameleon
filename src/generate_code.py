@@ -2,7 +2,13 @@ import os
 import json
 import wandb
 from src.model import DecoderBase, make_model
-from src.utils import get_prompt, write_jsonl, load_dataset, get_prompt_doc, get_prompt_feedback
+from src.utils import (
+    get_prompt,
+    write_jsonl,
+    load_dataset,
+    get_prompt_doc,
+    get_prompt_feedback,
+)
 from src.sanitize import sanitize
 from rich.progress import (
     BarColumn,
@@ -33,7 +39,6 @@ def codegen(
         TextColumn("•"),
         TimeElapsedColumn(),
     ) as p:
-
         if not args.datatype_jsonl:
             dataset = load_dataset(dataset_path)
             prompt_key = "prompt"
@@ -42,8 +47,12 @@ def codegen(
             with open(dataset_path, "r") as f:
                 dataset = [json.loads(line) for line in f]
                 dataset = [(d.get("example_id", id), d) for id, d in enumerate(dataset)]
-                prompt_key = "prompt" if "prompt" in dataset[0][1]["messages"][1] else "content"
-                assert prompt_key in dataset[0][1]["messages"][1], f"Prompt key not found in {dataset[0]}"
+                prompt_key = (
+                    "prompt" if "prompt" in dataset[0][1]["messages"][1] else "content"
+                )
+                assert (
+                    prompt_key in dataset[0][1]["messages"][1]
+                ), f"Prompt key not found in {dataset[0]}"
         # create save_path if it doesn't exist, e.g., a/b.jsonl
         dirname = os.path.dirname(save_path)
         if not os.path.exists(dirname) and dirname != "":

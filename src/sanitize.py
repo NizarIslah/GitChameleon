@@ -24,6 +24,7 @@ RETURN_TYPE = "return_statement"
 EXPRESSION_TYPE = "expression_statement"
 ASSIGNMENT_TYPE = "assignment"
 
+
 def syntax_check(code, verbose=False):
     try:
         ast.parse(code)

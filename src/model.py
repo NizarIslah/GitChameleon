@@ -34,7 +34,7 @@ def extra_eos_for_direct_completion(dataset) -> List[str]:
     raise ValueError(f"Unknown dataset: {dataset}")
 
 
-SYSTEM_PROMPT="""\
+SYSTEM_PROMPT = """\
 You are a skilled Python programmer tasked with solving a coding problem. Your goal is to provide a clear, efficient, and correct solution that meets all the specified requirements.
 
 Please provide your solution following these guidelines:
@@ -58,7 +58,7 @@ After writing your solution, please review it to ensure all requirements are met
 
 Here are the key elements for this task: """
 
-COT_SYSTEM_PROMPT="""\
+COT_SYSTEM_PROMPT = """\
 You are a skilled Python programmer tasked with solving a coding problem. Your goal is to provide a clear, efficient, and correct solution that meets all the specified requirements.
 
 First, let's think step-by-step. Then, please provide your solution following these guidelines:
@@ -84,7 +84,10 @@ After writing your solution, please review it to ensure all requirements are met
 
 Here are the key elements for this task: """
 
-def make_chat_prompt(prompt: str, tokenizer: AutoTokenizer, direct_completion: bool, cot: bool) -> str:
+
+def make_chat_prompt(
+    prompt: str, tokenizer: AutoTokenizer, direct_completion: bool, cot: bool
+) -> str:
     if tokenizer.chat_template is None or direct_completion:
         return prompt
     response = f"""\
@@ -96,8 +99,8 @@ Below is a Python script with a self-contained function that solves the problem 
     if cot:
         prompt = tokenizer.apply_chat_template(
             [
-            {"role": "system", "content": COT_SYSTEM_PROMPT},
-            {"role": "user", "content": prompt},
+                {"role": "system", "content": COT_SYSTEM_PROMPT},
+                {"role": "user", "content": prompt},
             ],
             tokenize=False,
             add_generation_prompt=True,
@@ -105,9 +108,9 @@ Below is a Python script with a self-contained function that solves the problem 
     else:
         prompt = tokenizer.apply_chat_template(
             [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": prompt},
-            {"role": "assistant", "content": response},
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": prompt},
+                {"role": "assistant", "content": response},
             ],
             tokenize=False,
         ).split(_MAGIC_SPLITTER_)[0]
@@ -139,6 +142,7 @@ class DecoderBase(ABC):
         self.tokenizer_name = tokenizer_name
         self.tokenizer_legacy = tokenizer_legacy
         self.cot = cot
+
     @abstractmethod
     def codegen(
         self, prompts: List[str], do_sample: bool = True, num_samples: int = 200
@@ -155,6 +159,7 @@ class DecoderBase(ABC):
     def __str__(self) -> str:
         return self.name
 
+
 class VllmDecoder(DecoderBase):
     def __init__(self, name: str, dataset: str, tp: int, **kwargs) -> None:
         super().__init__(name, **kwargs)
@@ -167,7 +172,9 @@ class VllmDecoder(DecoderBase):
         if self.tokenizer_name is None:
             self.tokenizer_name = self.name
 
-        self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name, **kwargs, legacy=self.tokenizer_legacy)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            self.tokenizer_name, **kwargs, legacy=self.tokenizer_legacy
+        )
         if self.tokenizer.chat_template is None:
             self.eos += extra_eos_for_direct_completion(dataset)
         self.llm = LLM(model=name, max_model_len=self.max_new_tokens, **kwargs)
@@ -195,7 +202,10 @@ class VllmDecoder(DecoderBase):
             use_tqdm=True,
         )
 
-        gen_strs = [[x.text.replace("\t", "    ") for x in output.outputs] for output in vllm_outputs]
+        gen_strs = [
+            [x.text.replace("\t", "    ") for x in output.outputs]
+            for output in vllm_outputs
+        ]
         return gen_strs
 
 
@@ -208,7 +218,10 @@ class GeneralVllmDecoder(VllmDecoder):
     def codegen(
         self, prompts: List[str], do_sample: bool = True, num_samples: int = 200
     ) -> List[str]:
-        prompts = [make_chat_prompt(prompt, self.tokenizer, self.direct_completion, self.cot) for prompt in prompts]
+        prompts = [
+            make_chat_prompt(prompt, self.tokenizer, self.direct_completion, self.cot)
+            for prompt in prompts
+        ]
         return VllmDecoder.codegen(self, prompts, do_sample, num_samples)
 
 
@@ -227,9 +240,11 @@ class HfTorchDecoder(DecoderBase):
         print(f"{kwargs = }", self.tokenizer_name)
         if self.tokenizer_name is None:
             self.tokenizer_name = self.name
-        
-        self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name, **kwargs, legacy=self.tokenizer_legacy)
-        
+
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            self.tokenizer_name, **kwargs, legacy=self.tokenizer_legacy
+        )
+
         if self.tokenizer.chat_template is None:
             self.eos += extra_eos_for_direct_completion(dataset)
 
@@ -286,13 +301,19 @@ class GenenralHfTorchDecoder(HfTorchDecoder):
         super().__init__(name=name, **kwargs)
         self.eos += ["\n```\n"]
         print(f"EOS strings: {self.eos}")
-        self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name if self.tokenizer_name else self.name,
-                                                       **kwargs, legacy=self.tokenizer_legacy)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            self.tokenizer_name if self.tokenizer_name else self.name,
+            **kwargs,
+            legacy=self.tokenizer_legacy,
+        )
 
     def codegen(
         self, prompts: List[str], do_sample: bool = True, num_samples: int = 200
     ) -> List[str]:
-        prompts = [make_chat_prompt(prompt, self.tokenizer, self.direct_completion, self.cot) for prompt in prompts]
+        prompts = [
+            make_chat_prompt(prompt, self.tokenizer, self.direct_completion, self.cot)
+            for prompt in prompts
+        ]
         return HfTorchDecoder.codegen(self, prompts, do_sample, num_samples)
 
 
@@ -313,7 +334,7 @@ class MistralChatDecoder(DecoderBase):
             self.temperature = 0
 
         all_outputs = []
-        
+
         for message in prompts:
             outputs = []
 
@@ -366,7 +387,7 @@ class AnthropicMessageDecoder(AnthropicDecoder):
             outputs = []
             for _ in range(num_samples):
                 ret = anthropic_request.make_auto_request(
-                        client=self.client,
+                    client=self.client,
                     model=self.name,
                     messages=[
                         {
@@ -382,6 +403,8 @@ class AnthropicMessageDecoder(AnthropicDecoder):
 
             all_outputs.append(outputs)
         return outputs
+
+
 from typing import List
 from transformers import AutoTokenizer
 
@@ -419,7 +442,7 @@ def make_request(
     max_tokens: int = 512,
     temperature: float = 1,
     n: int = 1,
-    **kwargs
+    **kwargs,
 ) -> ChatCompletion:
     system_msg = "You are a helpful assistant good at coding."
     if (
@@ -437,7 +460,7 @@ def make_request(
         max_tokens=max_tokens,
         temperature=temperature,
         n=n,
-        **kwargs
+        **kwargs,
     )
 
 
@@ -505,6 +528,7 @@ class OpenAIChatDecoder(DecoderBase):
 
     def is_direct_completion(self) -> bool:
         return False
+
 
 def make_model(
     model: str,

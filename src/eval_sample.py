@@ -2,7 +2,8 @@ import os
 import subprocess
 import tempfile
 
-def eval_sample(example_id: int, env_path, code_dict: dict, strategy='pytest') -> dict:
+
+def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest") -> dict:
     """
     Evaluate sample code using the specified strategy in the provided virtual environment.
 
@@ -63,42 +64,44 @@ def eval_sample(example_id: int, env_path, code_dict: dict, strategy='pytest') -
 
     for code_id, content in codes.items():
         code = content.get("code", "")
-        sample_result = {
-            "code": code,
-            "output": "",
-            "pass": False,
-            "compile": True
-        }
-        
-        if strategy.lower() == 'pytest':
+        sample_result = {"code": code, "output": "", "pass": False, "compile": True}
+
+        if strategy.lower() == "pytest":
             # Create a temporary directory to host the sample code and the test file
             with tempfile.TemporaryDirectory() as temp_dir:
                 # Write the sample code to a file
                 code_filepath = os.path.join(temp_dir, f"sample_{example_id}.py")
                 with open(code_filepath, "w") as f_code:
                     f_code.write(code)
-                
+
                 # Write the common pytest test file
                 test_filepath = os.path.join(temp_dir, "test_sample.py")
                 with open(test_filepath, "w") as f_test:
                     f_test.write(test_file_content)
-                
+
                 # Construct the python executable path from the virtual environment
                 python_executable = os.path.join(env_path, "bin", "python")
                 # Build the pytest command; using -q for quiet output, stopping at the first failure
-                cmd = [python_executable, "-m", "pytest", "--disable-warnings", "-q", temp_dir]
-                
+                cmd = [
+                    python_executable,
+                    "-m",
+                    "pytest",
+                    "--disable-warnings",
+                    "-q",
+                    temp_dir,
+                ]
+
                 try:
                     proc = subprocess.run(
                         cmd,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE,
                         text=True,
-                        timeout=30
+                        timeout=30,
                     )
                     sample_result["output"] = proc.stdout + proc.stderr
                     # A return code of 0 indicates that the tests passed.
-                    sample_result["pass"] = (proc.returncode == 0)
+                    sample_result["pass"] = proc.returncode == 0
                 except subprocess.TimeoutExpired as e:
                     sample_result["output"] = f"Timeout: {str(e)}"
                     sample_result["pass"] = False
@@ -108,7 +111,7 @@ def eval_sample(example_id: int, env_path, code_dict: dict, strategy='pytest') -
         else:
             sample_result["output"] = "Unsupported evaluation strategy."
             sample_result["pass"] = False
-        
+
         results["codes"][code_id] = sample_result
     return results
 
@@ -129,12 +132,9 @@ if __name__ == "__main__":
     # Read the sample code content and update the code_dict
     with open(example_id_0_greedy_path, "r") as sample_file:
         sample_code_content = sample_file.read()
-    code_dict["codes"] = {
-        "example_id_0_greedy": {
-            "code": sample_code_content
-        }
-    }
-    
+    code_dict["codes"] = {"example_id_0_greedy": {"code": sample_code_content}}
+
     results = eval_sample(0, env_path, code_dict, strategy)
     import pprint
+
     pprint.pprint(results)
