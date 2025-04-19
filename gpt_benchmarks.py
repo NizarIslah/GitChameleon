@@ -83,7 +83,12 @@ if args.model == "gpt-4o":
 # Load the data from the JSONL file
 with open(args.input_data) as f:
     prompts = [
-        json.loads(line).get("cot_messages" if args.cot else "messages") for line in f
+        {
+            "id": data.get("example_id", str(i)),
+            "prompt": data.get("cot_messages" if args.cot else "messages"),
+        }
+        for i, line in enumerate(f)
+        for data in [json.loads(line)]
     ]
 
 client = AzureOpenAI(
@@ -142,48 +147,34 @@ Path(args.output_data).mkdir(parents=True, exist_ok=True)
 
 for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing seeds"):
     responses = Parallel(n_jobs=-1, prefer="threads")(
-        delayed(get_completion_with_retry)(prompt, seed, args) for prompt in prompts
+        delayed(get_completion_with_retry)(prompt["prompt"], seed, args) for prompt in prompts
     )
 
     r_final = []
     for prompt, response in zip(prompts, responses):
-        if isinstance(response, str) and response.startswith("Error"):
-            r_final.append(
-                {
-                    "prompt": prompt,
-                    "response": response,
-                    "log_prob_mean": None,
-                    "log_prob_sum": None,
-                }
-            )
-            continue
-
-        content = response.choices[0].message.content
-        if args.logprobs and args.model in ["gpt-4o", "gpt-4o-mini"]:
-            log_probs = [
-                logprob
-                for logprob in (response.choices[0].logprobs.get("content", []) or [])
-                if hasattr(logprob, "logprob")
-            ]
-            log_prob_mean = statistics.mean(log_probs) if log_probs else None
-            log_prob_sum = sum(log_probs) if log_probs else None
-        else:
-            log_prob_mean = None
-            log_prob_sum = None
+        content = (
+            response.choices[0].message.content
+            if not isinstance(response, str) and not response.startswith("Error")
+            else response
+        )
+        log_probs = (
+            response.choices[0].logprobs.get("content", [])
+            if args.logprobs and args.model in ["gpt-4o", "gpt-4o-mini"] and not isinstance(response, str)
+            else []
+        )
+        log_prob_mean = statistics.mean(log_probs) if log_probs else None
+        log_prob_sum = sum(log_probs) if log_probs else None
 
         r_final.append(
             {
-                "prompt": prompt,
+                "example_id": prompt["id"],
+                "prompt": prompt["prompt"],
                 "response": content,
                 "log_prob_mean": log_prob_mean,
                 "log_prob_sum": log_prob_sum,
             }
         )
 
-    # Save the responses to a file
-    output_file = (
-        Path(args.output_data)
-        / f"responses_{args.temperature}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{seed}.pkl"
-    )
-    with output_file.open("wb") as f:
-        pickle.dump(r_final, f)
+    output_file = Path(args.output_data) / f"responses_{args.temperature}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{seed}.json"
+    with output_file.open("w") as f:
+        json.dump(r_final, f, indent=4)
