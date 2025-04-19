@@ -147,7 +147,8 @@ Path(args.output_data).mkdir(parents=True, exist_ok=True)
 
 for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing seeds"):
     responses = Parallel(n_jobs=-1, prefer="threads")(
-        delayed(get_completion_with_retry)(prompt["prompt"], seed, args) for prompt in prompts
+        delayed(get_completion_with_retry)(prompt["prompt"], seed, args)
+        for prompt in prompts
     )
 
     r_final = []
@@ -159,7 +160,9 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
         )
         log_probs = (
             response.choices[0].logprobs.get("content", [])
-            if args.logprobs and args.model in ["gpt-4o", "gpt-4o-mini"] and not isinstance(response, str)
+            if args.logprobs
+            and args.model in ["gpt-4o", "gpt-4o-mini"]
+            and not isinstance(response, str)
             else []
         )
         log_prob_mean = statistics.mean(log_probs) if log_probs else None
@@ -175,6 +178,9 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
             }
         )
 
-    output_file = Path(args.output_data) / f"responses_{args.temperature}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{seed}.json"
+    output_file = (
+        Path(args.output_data)
+        / f"responses_{args.temperature}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{seed}.json"
+    )
     with output_file.open("w") as f:
         json.dump(r_final, f, indent=4)

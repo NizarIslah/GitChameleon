@@ -3,6 +3,7 @@ import json
 import argparse
 import pandas as pd
 import sys
+
 """
 Currently supported
 -best of both: adding starter code + model output + test, or just model output + test
@@ -25,45 +26,56 @@ import pdb
 
 import re
 
+
 def extract_first_python_code_block(text):
     match = re.search(r"```python(.*?)```", text, re.DOTALL)
     return match.group(1) if match else None
 
+
 def load_outputs_from_json(options):
     if options.cot:
         # greedy, 1 file, "solution"
-        model_name = options.model_name.split('/')[-1]
+        model_name = options.model_name.split("/")[-1]
         outputs = defaultdict(list)
-        with open(options.json_out_file, 'r') as f:
+        with open(options.json_out_file, "r") as f:
             for line_idx, line in enumerate(f):
                 resp = json.loads(line)
                 for k in range(options.n_generate):
-                    outputs[f"output_{k}"].append(extract_first_python_code_block(resp["output"]))
+                    outputs[f"output_{k}"].append(
+                        extract_first_python_code_block(resp["output"])
+                    )
 
     else:
-        assert os.path.exists(options.json_out_file), f"Json file {options.json_out_file} does not exist."
-        
+        assert os.path.exists(
+            options.json_out_file
+        ), f"Json file {options.json_out_file} does not exist."
+
         # gpt greedy
         if ".pkl" in options.json_out_file:
             import pickle
+
             # handle gpt pickle file. assume greedy
             outputs = pickle.load(open(options.json_out_file, "rb"))
-            output_df = pd.DataFrame({'output_0': [extract_first_python_code_block(o) for o in outputs]})
+            output_df = pd.DataFrame(
+                {"output_0": [extract_first_python_code_block(o) for o in outputs]}
+            )
             print(output_df)
             return output_df
 
-        if '/' in options.model_name:
-            model_name = options.model_name.split('/')[-1]
+        if "/" in options.model_name:
+            model_name = options.model_name.split("/")[-1]
         else:
             model_name = options.model_name
         outputs = defaultdict(list)
         possible_keys = ["task_id", "seed"]
+
         def get_task(resp):
             for key in possible_keys:
                 if key in list(resp.keys()):
                     return key, resp[key]
             return None
-        with open(options.json_out_file, 'r') as f:
+
+        with open(options.json_out_file, "r") as f:
             k = 0
             cur_task_id = 0
             for line_idx, line in enumerate(f):
@@ -73,14 +85,16 @@ def load_outputs_from_json(options):
                 except Exception as e:
                     exit(1)
 
-                if task_key == 'task_id':
+                if task_key == "task_id":
                     if task_id != cur_task_id:
                         # pdb.set_trace()
                         options.n_generate = k
                         try:
                             assert options.k <= options.n_generate
                         except Exception as e:
-                            print("value of --k should be <= to number of samples generated.")
+                            print(
+                                "value of --k should be <= to number of samples generated."
+                            )
                             exit(1)
                         k = 0
                         cur_task_id = task_id
@@ -88,7 +102,9 @@ def load_outputs_from_json(options):
                         solution = extract_first_python_code_block(resp["solution"])
                     except Exception as e:
                         solution = resp["solution"]
-                elif task_key == 'seed':   # gemini or gpt non greedy format: "output", "seed"
+                elif (
+                    task_key == "seed"
+                ):  # gemini or gpt non greedy format: "output", "seed"
                     k = task_id % options.n_generate
                     try:
                         solution = extract_first_python_code_block(resp["output"])
@@ -97,28 +113,29 @@ def load_outputs_from_json(options):
                 else:
                     raise ValueError("task_id not found in json output.")
                 outputs[f"output_{k}"].append(solution)
-                if task_key == 'task_id':
+                if task_key == "task_id":
                     k += 1
 
     if outputs is not None:
         # pdb.set_trace()
         output_df = pd.DataFrame(outputs)
         if options.cot:
-            output_df = output_df.map(lambda x: extract_code_cot(x) if x is not None else x)
+            output_df = output_df.map(
+                lambda x: extract_code_cot(x) if x is not None else x
+            )
     else:
         output_df = None
-    
+
     # pdb.set_trace()
-    assert 'output_0' in output_df.columns, "output_0 not found in output_df."
+    assert "output_0" in output_df.columns, "output_0 not found in output_df."
     return output_df
+
 
 def check_empty_outputs(options, df):
     # check that outputs are not empty
     for k in range(options.n_generate):
         if any(df[f"output_{k}"].isna()):
-            print(
-                f"Empty outputs for output_{k}"
-            )
+            print(f"Empty outputs for output_{k}")
         # drop rows with empty outputs
         df = df[~df[f"output_{k}"].isna()]
     if df.shape[0] == 0:
@@ -129,24 +146,26 @@ def check_empty_outputs(options, df):
     df.reset_index(drop=True, inplace=True)
     return df
 
+
 def prepare_eval_df(options, df, output_df):
     id_end = len(output_df) if options.id_end == -1 else options.id_end
-    df = df.iloc[options.id_start:id_end]
-    output_df = output_df.iloc[options.id_start:id_end]
+    df = df.iloc[options.id_start : id_end]
+    output_df = output_df.iloc[options.id_start : id_end]
     output_df.reset_index(drop=True, inplace=True)
     if options.library != "":
         df = df[df["library"] == options.library]
         output_df = output_df[df["library"] == options.library]
 
     print(len(df), len(output_df))
-    assert len(df) == len(output_df), "Length of input and output dataframes do not match."
+    assert len(df) == len(
+        output_df
+    ), "Length of input and output dataframes do not match."
     df = pd.merge(df, output_df, left_index=True, right_index=True)
 
-    df = add_ranking_index(
-        df, options.model_name.split("/")[-1], options.n_generate
-    )
+    df = add_ranking_index(df, options.model_name.split("/")[-1], options.n_generate)
     df = check_empty_outputs(options, df)
     return df
+
 
 def get_ranks(model_name, row):
     """
@@ -186,12 +205,8 @@ def add_ranking_index(df, model_name, n, regen=False):
         df_filtered[sum_logp_cols].idxmax(axis=1).apply(lambda x: int(x.split("_")[-1]))
     )
     # make the values ints
-    df[f"best_mean_logp_index"] = df[
-        f"best_mean_logp_index"
-    ].astype(int)
-    df[f"best_sum_logp_index"] = df[
-        f"best_sum_logp_index"
-    ].astype(int)
+    df[f"best_mean_logp_index"] = df[f"best_mean_logp_index"].astype(int)
+    df[f"best_sum_logp_index"] = df[f"best_sum_logp_index"].astype(int)
     # Add a random output column
     df[f"random_index"] = np.random.randint(0, n, size=len(df))
     return df
@@ -308,7 +323,6 @@ def run_script(python_executable, py_file="temp.py"):
 
 
 def extract_code_cot(text):
-
     if "[/THOUGHT]" in text:
         try:
             text = text.split("[/THOUGHT]")[1]
@@ -385,7 +399,13 @@ def write_py_file(code, py_file):
 
 
 def make_py_file(
-    starting_code, model_out, test, instruct, py_file="temp.py", add_starter=True, verbose_mode=False
+    starting_code,
+    model_out,
+    test,
+    instruct,
+    py_file="temp.py",
+    add_starter=True,
+    verbose_mode=False,
 ):
     if model_out is None or pd.isna(model_out) or model_out == "":
         return None
@@ -409,7 +429,8 @@ def make_py_file(
     write_py_file(code_wo_starter, py_file_wo_starter)
     return py_file_wo_starter
 
- def eval_strategy(strategy: str):
+
+def eval_strategy(strategy: str):
     """
     Function to evaluate the model outputs at k
     strategy: str, evaluation strategy to use
@@ -420,6 +441,7 @@ def make_py_file(
         return pytest_eval_sample_k
     else:
         raise ValueError(f"Unknown strategy: {strategy}")
+
 
 def run_pytest(pytest_exec, py_file, test_file):
     """
@@ -450,6 +472,7 @@ def run_pytest(pytest_exec, py_file, test_file):
         error_log = "TimeoutError"
     return 1 - exit_code, 1 - exit_code, "", error_log
 
+
 def pytest_eval_sample_k(
     base_path, model_name, row, n, k, idx, seed, temperature, options, regen=False
 ):
@@ -467,9 +490,7 @@ def pytest_eval_sample_k(
         print(f"Error: pytest executable not found, skipping sample {idx}...")
         return None, None, None, None, None
     # pytest tests will be in a separate folder and file. make the structure
-    test_dir = os.path.join(
-        base_path, "tests", model_name, str(seed), str(temperature)
-    )
+    test_dir = os.path.join(base_path, "tests", model_name, str(seed), str(temperature))
     # extract the columns with test_ in the name
     test_cols = [col for col in row.index if "test_" in col]
     # extract the test codes
@@ -477,9 +498,7 @@ def pytest_eval_sample_k(
 
     assert len(test_codes) > 0, "No test keys found in the row."
     for test_key, test_code in enumerate(test_codes):
-        test_file = os.path.join(
-            test_dir, f"{test_key}_{idx}.py"
-        )
+        test_file = os.path.join(test_dir, f"{test_key}_{idx}.py")
         os.makedirs(os.path.dirname(test_file), exist_ok=True)
         # write the test file
         with open(test_file, "w") as file:
@@ -487,8 +506,7 @@ def pytest_eval_sample_k(
 
     # concat k's + sample ranking heuristics
     outputs_cols = [f"{regen_str}output_{i}" for i in range(n)] + [
-        f"{regen_str}output_{rank}"
-        for rank in get_ranks(model_name, row)
+        f"{regen_str}output_{rank}" for rank in get_ranks(model_name, row)
     ]  # [k:] is ranking heuristics
     model_outputs = extract_columns(row, outputs_cols)
     # make the py files for each model output
@@ -498,9 +516,7 @@ def pytest_eval_sample_k(
             model_out,
             test,
             options.instruct,
-            py_file=os.path.join(
-                test_dir, f"temp_{idx}_{k}.py"
-            ),
+            py_file=os.path.join(test_dir, f"temp_{idx}_{k}.py"),
             add_starter=True,
             verbose_mode=options.verbose_mode,
         )
@@ -520,16 +536,19 @@ def pytest_eval_sample_k(
             model_out,
             test,
             options.instruct,
-            py_file=os.path.join(
-                test_dir, f"temp_{idx}_{k}_wo_starter.py"
-            ),
+            py_file=os.path.join(test_dir, f"temp_{idx}_{k}_wo_starter.py"),
             add_starter=False,
             verbose_mode=options.verbose_mode,
         )
         for k, model_out in enumerate(model_outputs)
     ]
     # run the tests
-    passes_wo_starter, compiles_wo_starter, parsed_codes_wo_starter, error_logs_wo_starter = zip(
+    (
+        passes_wo_starter,
+        compiles_wo_starter,
+        parsed_codes_wo_starter,
+        error_logs_wo_starter,
+    ) = zip(
         *[
             run_pytest(pytest_exec, py_file, test_file)
             for py_file, test_file in zip(py_files_wo_starter, test_files)
@@ -537,9 +556,7 @@ def pytest_eval_sample_k(
     )
     # take the best of both. get the indices first
     best_indices = [
-        np.argmax(
-            np.array([passes[i], passes_wo_starter[i]])
-        )
+        np.argmax(np.array([passes[i], passes_wo_starter[i]]))
         for i in range(len(passes))
     ]
     # now take the best of both
@@ -574,7 +591,11 @@ def eval_sample_k(
     k: int, number of k to evaluate
     return: results_dict, containing eval results for each model and for each of the k then sample ranking heuristics (sum_logp, mean_logp, random)
     """
-    starting_code, test, venv_name = row["starting_code"], row["test"], f'gcham_venv_{row["example_id"]}' # row["env_id"]
+    starting_code, test, venv_name = (
+        row["starting_code"],
+        row["test"],
+        f'gcham_venv_{row["example_id"]}',
+    )  # row["env_id"]
     py_exec = get_python_executable(base_path, venv_name)
     regen_str = "regen_" if regen else ""
     try:
@@ -586,8 +607,7 @@ def eval_sample_k(
 
     # concat k's + sample ranking heuristics
     outputs_cols = [f"{regen_str}output_{i}" for i in range(n)] + [
-        f"{regen_str}output_{rank}"
-        for rank in get_ranks(model_name, row)
+        f"{regen_str}output_{rank}" for rank in get_ranks(model_name, row)
     ]  # [k:] is ranking heuristics
     model_outputs = extract_columns(row, outputs_cols)
 
@@ -600,9 +620,7 @@ def eval_sample_k(
             model_out,
             test,
             options.instruct,
-            py_file=os.path.join(
-                tmp_path, f"temp_{idx}_{k}.py"
-            ),
+            py_file=os.path.join(tmp_path, f"temp_{idx}_{k}.py"),
             add_starter=True,
             verbose_mode=options.verbose_mode,
         )
@@ -620,22 +638,21 @@ def eval_sample_k(
             model_out,
             test,
             options.instruct,
-            py_file=os.path.join(
-                tmp_path, f"temp_{idx}_{k}_wo_starter.py"
-            ),
+            py_file=os.path.join(tmp_path, f"temp_{idx}_{k}_wo_starter.py"),
             add_starter=False,
             verbose_mode=options.verbose_mode,
         )
         for k, model_out in enumerate(model_outputs)
     ]
-    passes_wo_starter, compiles_wo_starter, parsed_codes_wo_starter, error_logs_wo_starter = zip(
-        *[run_script(py_exec, py_file) for py_file in py_files_wo_starter]
-    )
+    (
+        passes_wo_starter,
+        compiles_wo_starter,
+        parsed_codes_wo_starter,
+        error_logs_wo_starter,
+    ) = zip(*[run_script(py_exec, py_file) for py_file in py_files_wo_starter])
     # take the best of both. get the indices first
     best_indices = [
-        np.argmax(
-            np.array([passes[i], passes_wo_starter[i]])
-        )
+        np.argmax(np.array([passes[i], passes_wo_starter[i]]))
         for i in range(len(passes))
     ]
     # now take the best of both
@@ -681,9 +698,7 @@ def make_result_df(results, options, regen=False):
             ]
         ]
         col_names += [f"{regen_str}pass_at_{k_}" for k_ in range(1, k + 1)]
-        col_names += [
-            f"{regen_str}compile_at_{k_}" for k_ in range(1, k + 1)
-        ]
+        col_names += [f"{regen_str}compile_at_{k_}" for k_ in range(1, k + 1)]
         empty_df = pd.DataFrame({col: [None] for col in col_names})
         return empty_df
 

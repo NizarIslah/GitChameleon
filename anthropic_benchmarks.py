@@ -11,7 +11,9 @@ import argparse
 from pathlib import Path
 from tqdm import tqdm
 
-parser = argparse.ArgumentParser(description="Arguments for Anthropic (Claude suite) benchmarking")
+parser = argparse.ArgumentParser(
+    description="Arguments for Anthropic (Claude suite) benchmarking"
+)
 parser.add_argument(
     "--seed", type=int, default=42, help="Random seed for reproducibility"
 )
@@ -51,20 +53,18 @@ parser.add_argument("--api_key", type=str, required=True, help="Anthropic API ke
 
 parser.add_argument(
     "--system_prompt",
-    type=bool, 
+    type=bool,
     default=False,
     help="Include a system prompt to set the role of the model",
 )
 parser.add_argument(
     "--thinking_mode",
-    type=bool, 
+    type=bool,
     default=False,
     help="Enable thinking mode for anthropic models",
 )
 
-parser.add_argument(
-    "--feedback",  help="Whether to include feedback"
-)
+parser.add_argument("--feedback", help="Whether to include feedback")
 parser.add_argument(
     "--cot", type=bool, default=False, help="Whether to include chain of thought"
 )
@@ -96,12 +96,13 @@ client = anthropic.Anthropic(
     api_key=args.api_key,
 )
 
+
 # Function to call Anthropic's chat completion with retry logic, including seed and temperature
 def get_completion_with_retry(prompt, seed, args, max_retries=5, delay=10):
     retries = 0
     message = prompt[0]["content"] + prompt[1]["content"]
-    message = message.split('.', 1)[-1].strip()
-    
+    message = message.split(".", 1)[-1].strip()
+
     while retries < max_retries:
         try:
             if args.system_prompt and args.thinking_mode:
@@ -110,14 +111,12 @@ def get_completion_with_retry(prompt, seed, args, max_retries=5, delay=10):
                     system="You are a seasoned python developer and data scientist at a Fortune 500 company. Your goal is to provide clean, correct and efficient solutions to coding problems.",
                     thinking={
                         "type": "enabled",
-                        "budget_tokens": int(0.6 * args.max_tokens)
+                        "budget_tokens": int(0.6 * args.max_tokens),
                     },
                     max_tokens=args.max_tokens,
                     temperature=args.temperature,
                     top_p=args.top_p,
-                    messages=[
-                        {"role": "user", "content": message}
-                    ]
+                    messages=[{"role": "user", "content": message}],
                 )
             elif args.system_prompt and not args.thinking_mode:
                 response = client.messages.create(
@@ -126,23 +125,19 @@ def get_completion_with_retry(prompt, seed, args, max_retries=5, delay=10):
                     max_tokens=args.max_tokens,
                     temperature=args.temperature,
                     top_p=args.top_p,
-                    messages=[
-                        {"role": "user", "content": message}
-                    ]
+                    messages=[{"role": "user", "content": message}],
                 )
             elif args.thinking_mode and not args.system_prompt:
                 response = client.messages.create(
                     model=args.model,
                     thinking={
                         "type": "enabled",
-                        "budget_tokens": int(0.6 * args.max_tokens)
+                        "budget_tokens": int(0.6 * args.max_tokens),
                     },
                     max_tokens=args.max_tokens,
                     temperature=args.temperature,
                     top_p=args.top_p,
-                    messages=[
-                        {"role": "user", "content": message}
-                    ]
+                    messages=[{"role": "user", "content": message}],
                 )
             else:
                 response = client.messages.create(
@@ -150,9 +145,7 @@ def get_completion_with_retry(prompt, seed, args, max_retries=5, delay=10):
                     max_tokens=args.max_tokens,
                     temperature=args.temperature,
                     top_p=args.top_p,
-                    messages=[
-                        {"role": "user", "content": message}
-                    ]
+                    messages=[{"role": "user", "content": message}],
                 )
             return response
         except anthropic.RateLimitError as e:
@@ -166,12 +159,7 @@ def get_completion_with_retry(prompt, seed, args, max_retries=5, delay=10):
     return f"Failed after {max_retries} retries."
 
 
-num_samples = (
-    1
-    if args.temperature == 0
-    or args.feedback
-    else 10
-)
+num_samples = 1 if args.temperature == 0 or args.feedback else 10
 
 # Use joblib to run the requests in parallel
 # Ensure output directory exists
@@ -179,7 +167,8 @@ Path(args.output_data).mkdir(parents=True, exist_ok=True)
 
 for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing seeds"):
     responses = Parallel(n_jobs=-1, prefer="threads")(
-        delayed(get_completion_with_retry)(prompt["prompt"], seed, args) for prompt in prompts
+        delayed(get_completion_with_retry)(prompt["prompt"], seed, args)
+        for prompt in prompts
     )
 
     r_final = []
@@ -194,7 +183,7 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
             else:
                 thinking = None
                 content = getattr(response.content[0], "text", None)
-        
+
         r_final.append(
             {
                 "example_id": prompt["id"],
@@ -204,6 +193,9 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
             }
         )
 
-    output_file = Path(args.output_data) / f"responses_{args.temperature}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{'sys' if args.system_prompt else ''}_{'thinking' if args.thinking_mode else ''}_{seed}.json"
+    output_file = (
+        Path(args.output_data)
+        / f"responses_{args.temperature}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{'sys' if args.system_prompt else ''}_{'thinking' if args.thinking_mode else ''}_{seed}.json"
+    )
     with output_file.open("w") as f:
         json.dump(r_final, f, indent=4)
