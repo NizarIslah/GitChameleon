@@ -17,21 +17,21 @@ python_versions = {
 # Function to create a virtual environment
 def create_virtual_environment(env_path, python_version, create_anyway=False, library_to_check=None):
     """Create and return the path of a virtual environment."""
-    python_executable = f"/root/.pyenv/versions/{python_version}/bin/python"
-    if not os.path.exists(python_executable):
-        print(f"Python version {python_version} not found. Skipping {env_path}.")
-        return
+    # python_executable = f"/root/.pyenv/versions/{python_version}/bin/python"
+    # if not os.path.exists(python_executable):
+    #     print(f"Python version {python_version} not found. Skipping {env_path}.")
+    #     return
     
     if not os.path.exists(env_path):
         os.makedirs(env_path, exist_ok=True)
-        subprocess.run([python_executable, "-m", "venv", env_path], check=True)
+        subprocess.run(["python", "-m", "venv", env_path], check=True)
         print(f"Virtual environment created: {env_path}")
     else:
         print(f"Virtual environment already exists: {env_path}")
         if create_anyway:
             subprocess.run(["rm", "-rf", env_path])
             os.makedirs(env_path, exist_ok=True)
-            subprocess.run([python_executable, "-m", "venv", env_path], check=True)
+            subprocess.run(["python", "-m", "venv", env_path], check=True)
             print(f"Virtual environment recreated: {env_path}")
     
     if library_to_check:
@@ -130,6 +130,9 @@ def main(args):
         for line in file:
             sample = json.loads(line)
             python_version = sample.get("python_version")
+            if str(python_version) != args.python_version:
+                print(f"Skipping sample with Python version {python_version}.")
+                continue
             example_id = sample.get("example_id")
             library = sample.get("library")
             version = sample.get("version")
@@ -147,7 +150,7 @@ def main(args):
                 python_executable = Path(env_path, "bin", "python")
                 if not os.path.exists(python_executable):
                     print(f"Python executable not found for {example_id}. Creating environment...")
-                    create_virtual_environment(env_path, pyenv_version, create_anyway=create_anyway, library_to_check=library)
+                    create_virtual_environment(env_path, python_version, create_anyway=create_anyway, library_to_check=library)
                     returncode = install_packages(env_path, library, version, additional_dependencies)
                     if returncode != 0:
                         failed_count.append(example_id)
@@ -164,6 +167,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", type=str, required=True, help="Path to the JSONL dataset file.")
+    parser.add_argument("--python_version", type=str, default="3.10", help="Python version to use for the virtual environments.")
     parser.add_argument("--base_path", type=str, default="eval_venvs", help="Base path for virtual environments.")
     parser.add_argument("--create_anyway", action="store_true", default=False, help="Recreate environments if they already exist.")
     args = parser.parse_args()

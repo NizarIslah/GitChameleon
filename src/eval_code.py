@@ -219,7 +219,14 @@ def pass_at_k(model_test_results, k=10):
     return [int(result == 0) for result in model_test_results]
 
 
-def corrected_pass_at_k(n, c, k=10):
+def corrected_pass_at_k(n: int, c: int, k=10) -> float:
+    """
+    Function to calculate the corrected pass rate at k
+    n: int, number of generations from the model
+    c: int, number of passes
+    k: int, number of k to evaluate
+    return: float, corrected pass rate at k
+    """
     if n - c < k:
         return 1.0
     return 1.0 - np.prod(1.0 - k / np.arange(n - c + 1, n + 1))
