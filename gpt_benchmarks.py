@@ -12,6 +12,13 @@ import argparse
 from pathlib import Path
 from tqdm import tqdm
 
+from pydantic import BaseModel
+
+# 1) Define your schema as a Pydantic model
+class MyResponse(BaseModel):
+    answer: str
+    explanation: str
+
 parser = argparse.ArgumentParser(description="Arguments for GPT benchmarking")
 parser.add_argument(
     "--seed", type=int, default=42, help="Random seed for reproducibility"
@@ -93,8 +100,8 @@ with open(args.input_data) as f:
 
 client = AzureOpenAI(
     azure_endpoint=args.azure_endpoint,
-    azure_api_key=args.api_key,
-    azure_api_version=args.azure_api_version,
+    api_key=args.api_key,
+    api_version=args.azure_api_version,
 )
 
 
@@ -108,11 +115,11 @@ def get_completion_with_retry(prompt, seed, args, max_retries=5, delay=10):
     while retries < max_retries:
         try:
             if args.model in ["o1", "o1-mini", "o3-mini"]:
-                response = client.chat.completions.create(
-                    model=args.model, messages=prompt, seed=seed
+                response = client.beta.chat.completions.parse(
+                    model=args.model, messages=prompt, seed=seed, response_format=MyResponse
                 )
             else:
-                response = client.chat.completions.create(
+                response = client.beta.chat.completions.parse(
                     model=args.model,
                     messages=prompt,
                     seed=seed,
@@ -120,6 +127,7 @@ def get_completion_with_retry(prompt, seed, args, max_retries=5, delay=10):
                     top_p=args.top_p,
                     temperature=args.temperature,
                     logprobs=args.logprobs,
+                    response_format=MyResponse,
                 )
             return response
         except openai.RateLimitError as e:
@@ -154,27 +162,32 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
     r_final = []
     for prompt, response in zip(prompts, responses):
         content = (
-            response.choices[0].message.content
-            if not isinstance(response, str) and not response.startswith("Error")
+            response.choices[0].message.parsed
+            if not isinstance(response, str) # and not response.startswith("Error") # this would throw an error for pydantic because its not a string
             else response
         )
-        log_probs = (
-            response.choices[0].logprobs.get("content", [])
-            if args.logprobs
-            and args.model in ["gpt-4o", "gpt-4o-mini"]
-            and not isinstance(response, str)
-            else []
-        )
-        log_prob_mean = statistics.mean(log_probs) if log_probs else None
-        log_prob_sum = sum(log_probs) if log_probs else None
+        explanation = content.explanation if hasattr(content, "explanation") else ""
+        answer = content.answer if hasattr(content, "answer") else ""
+        
+        # i think this threw an error which is why i commented it out but feel free to uncomment
+        # log_probs = (
+        #     response.choices[0].logprobs.get("content", [])
+        #     if args.logprobs
+        #     and args.model in ["gpt-4o", "gpt-4o-mini"]
+        #     and not isinstance(response, str)
+        #     else []
+        # )
+        # log_prob_mean = statistics.mean(log_probs) if log_probs else None
+        # log_prob_sum = sum(log_probs) if log_probs else None
 
         r_final.append(
             {
                 "example_id": prompt["id"],
                 "prompt": prompt["prompt"],
-                "response": content,
-                "log_prob_mean": log_prob_mean,
-                "log_prob_sum": log_prob_sum,
+                "answer": answer,
+                "explanation": explanation,
+                # "log_prob_mean": log_prob_mean,
+                # "log_prob_sum": log_prob_sum,
             }
         )
 
