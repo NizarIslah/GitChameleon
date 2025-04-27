@@ -1,0 +1,49 @@
+import json
+import unittest
+import falcon
+from dataset.solutions.sample_242 import custom_http_error
+
+
+class TestSample242(unittest.TestCase):
+    def test_custom_http_error_returns_bytes(self):
+        """Test that custom_http_error returns bytes."""
+        result = custom_http_error("Test Title", "Test Description")
+        self.assertIsInstance(result, bytes)
+
+    def test_custom_http_error_content(self):
+        """Test that custom_http_error returns correct JSON content."""
+        result = custom_http_error("Test Title", "Test Description")
+        
+        # Convert bytes to dict
+        error_dict = json.loads(result)
+        
+        # Check structure and content
+        self.assertIn("title", error_dict)
+        self.assertIn("description", error_dict)
+        self.assertEqual(error_dict["title"], "Test Title")
+        self.assertEqual(error_dict["description"], "Test Description")
+        self.assertEqual(error_dict["status"], falcon.HTTP_400)
+
+    def test_custom_http_error_with_empty_strings(self):
+        """Test custom_http_error with empty strings."""
+        result = custom_http_error("", "")
+        error_dict = json.loads(result)
+        
+        self.assertEqual(error_dict["title"], "")
+        self.assertEqual(error_dict["description"], "")
+        self.assertEqual(error_dict["status"], falcon.HTTP_400)
+
+    def test_custom_http_error_with_special_characters(self):
+        """Test custom_http_error with special characters."""
+        title = "Special: !@#$%^&*()"
+        description = "More special: <>?,./"
+        
+        result = custom_http_error(title, description)
+        error_dict = json.loads(result)
+        
+        self.assertEqual(error_dict["title"], title)
+        self.assertEqual(error_dict["description"], description)
+
+
+if __name__ == "__main__":
+    unittest.main()
