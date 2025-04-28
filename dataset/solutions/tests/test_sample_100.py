@@ -3,9 +3,9 @@ import sys
 import os
 from django.utils import timezone
 
-# Add the parent directory to sys.path to import the module
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.solutions.sample_100 import get_time_in_utc
+# Add the parent directory to sys.path to allow importing from the parent directory
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_100 import get_time_in_utc
 
 
 class TestGetTimeInUTC(unittest.TestCase):

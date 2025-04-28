@@ -1,10 +1,14 @@
 import unittest
 from unittest.mock import MagicMock, patch
+import sys
+import os
 
 from django.forms import Form
 from django.forms.models import BaseModelFormSet
 
-from dataset.solutions.sample_101 import save_existing
+# Add the parent directory to sys.path to allow importing from the parent directory
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_101 import save_existing
 
 
 class TestSample101(unittest.TestCase):

@@ -2,8 +2,8 @@ import unittest
 import sys
 import os
 
-# Add the solutions directory to the path so we can import the module
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'solutions'))
+# Add the parent directory to sys.path to allow importing from the parent directory
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Import the module to test
 from sample_105 import Square, create_square, display_side_and_area

@@ -2,9 +2,9 @@ import unittest
 import sys
 import os
 
-# Add the directory containing sample_108.py to the Python path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.solutions.sample_108 import MyModel, color
+# Add the parent directory to sys.path to allow importing from the parent directory
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_108 import MyModel, color
 
 class TestSample108(unittest.TestCase):
     def test_model_structure(self):

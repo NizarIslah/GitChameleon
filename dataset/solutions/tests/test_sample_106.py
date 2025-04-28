@@ -5,7 +5,7 @@ import os
 # Add the parent directory to sys.path to import the module
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from dataset.solutions.sample_106 import Square, create_square, display_side_and_area
+from sample_106 import Square, create_square, display_side_and_area
 
 
 class TestSquareModel(unittest.TestCase):
