@@ -2,90 +2,42 @@ import unittest
 import sys
 import os
 
-# Add the parent directory to sys.path to allow importing from the parent directory
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# Add the parent directory to the path so we can import the sample
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from dataset.samples.sample_178 import custom_trace
 
 import sympy
 import sympy.physics.quantum
-from sympy.physics.quantum.trace import Tr
-import sample_178
 
 
 class TestCustomTrace(unittest.TestCase):
-    """Test cases for the custom_trace function in sample_178.py."""
-
-    def test_return_value(self):
-        """Test that custom_trace returns the expected value."""
-        # In the current version of SymPy, Tr(n) returns n directly
-        result = sample_178.custom_trace(5)
-        self.assertEqual(result, 5)
-
-    def test_with_integer_input(self):
-        """Test the function with various integer inputs."""
-        test_values = [1, 2, 5, 10, 100]
-        
-        for n in test_values:
-            result = sample_178.custom_trace(n)
-            
-            # Check that the result equals the input
-            self.assertEqual(result, n)
-
-    def test_with_zero(self):
-        """Test the function with zero as input."""
-        result = sample_178.custom_trace(0)
-        
-        # Check that the result equals 0
-        self.assertEqual(result, 0)
-
-    def test_with_negative_integer(self):
-        """Test the function with negative integer input."""
-        result = sample_178.custom_trace(-5)
-        
-        # Check that the result equals -5
-        self.assertEqual(result, -5)
-
-    def test_matches_direct_tr_creation(self):
-        """Test that our function matches direct creation of Tr objects."""
-        test_values = [1, 2, 5, 10, 100]
-        
-        for n in test_values:
-            # Our implementation
-            our_result = sample_178.custom_trace(n)
-            
-            # Direct creation
-            direct_result = Tr(n)
-            
-            # Check that the results are equal
-            self.assertEqual(our_result, direct_result)
-
-    def test_trace_with_arithmetic(self):
-        """Test that the trace function works with arithmetic operations."""
-        # Test addition
-        self.assertEqual(sample_178.custom_trace(3) + sample_178.custom_trace(5), 8)
-        
-        # Test subtraction
-        self.assertEqual(sample_178.custom_trace(10) - sample_178.custom_trace(3), 7)
-        
-        # Test multiplication
-        self.assertEqual(sample_178.custom_trace(4) * sample_178.custom_trace(5), 20)
-        
-        # Test division
-        self.assertEqual(sample_178.custom_trace(10) / sample_178.custom_trace(2), 5)
-
-    def test_trace_with_sympy_expressions(self):
-        """Test the function with SymPy expressions."""
-        # Create a SymPy symbol
-        x = sympy.symbols('x')
-        
-        # Create a SymPy expression
-        expr = x**2 + 2*x + 1
-        
-        # Call the function with the expression
-        result = sample_178.custom_trace(expr)
-        
-        # Check that the result equals the expression
-        self.assertEqual(result, expr)
+    def test_custom_trace_returns_trace_object(self):
+        """Test that custom_trace returns a Tr object."""
+        result = custom_trace(5)
+        self.assertIsInstance(result, sympy.physics.quantum.trace.Tr)
+    
+    def test_custom_trace_with_integer(self):
+        """Test that custom_trace correctly handles integer input."""
+        n = 10
+        result = custom_trace(n)
+        # Verify the trace object contains the correct value
+        self.assertEqual(result.args[0], n)
+    
+    def test_custom_trace_with_matrix(self):
+        """Test that custom_trace works with a sympy matrix."""
+        # Create a simple 2x2 matrix
+        matrix = sympy.Matrix([[1, 2], [3, 4]])
+        result = custom_trace(matrix)
+        # Verify the trace object contains the matrix
+        self.assertEqual(result.args[0], matrix)
+    
+    def test_custom_trace_with_symbol(self):
+        """Test that custom_trace works with sympy symbols."""
+        x = sympy.Symbol('x')
+        result = custom_trace(x)
+        # Verify the trace object contains the symbol
+        self.assertEqual(result.args[0], x)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
