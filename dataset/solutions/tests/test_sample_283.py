@@ -1,18 +1,18 @@
-import unittest
-import os
-import numpy as np
-import tempfile
-import soundfile as sf
-import librosa
-import sys
 import io
-from unittest.mock import patch, MagicMock
-
 # Add the parent directory to import sys
 import os
 import sys
+import tempfile
+import unittest
+from unittest.mock import MagicMock, patch
+
+import librosa
+import numpy as np
+import soundfile as sf
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sample_283 import compute_stream
+
 
 class TestSample283(unittest.TestCase):
     

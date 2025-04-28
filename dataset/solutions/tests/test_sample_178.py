@@ -1,14 +1,12 @@
-import unittest
-import sys
 import os
-
 # Add the parent directory to the path so we can import the sample
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from sample_178 import custom_trace
+import unittest
 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import sympy
 import sympy.physics.quantum
+from sample_178 import custom_trace
 
 
 class TestCustomTrace(unittest.TestCase):

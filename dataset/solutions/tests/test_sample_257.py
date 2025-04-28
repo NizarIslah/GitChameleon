@@ -1,13 +1,11 @@
-import unittest
-import sys
 import os
-
 # Add the parent directory to import sys
 import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from sample_257 import CustomRouter, solution
+import unittest
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import falcon
+from sample_257 import CustomRouter, solution
 
 
 class TestCustomRouter(unittest.TestCase):

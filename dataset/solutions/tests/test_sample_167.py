@@ -1,15 +1,15 @@
-import unittest
-import os
-import sys
-import numpy as np
-import flask
-from werkzeug.exceptions import NotFound
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+
+import flask
+import numpy as np
+from werkzeug.exceptions import NotFound
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sample_167 import stack_and_save
+
 
 class TestStackAndSave(unittest.TestCase):
     def setUp(self):

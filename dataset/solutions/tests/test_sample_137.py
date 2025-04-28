@@ -1,10 +1,13 @@
-import unittest
-import numpy as np
-from scipy.ndimage import minimum_filter
 import os
 import sys
+import unittest
+
+import numpy as np
+from scipy.ndimage import minimum_filter
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_137 import apply_minimum_filter
+
 
 class TestMinimumFilter(unittest.TestCase):
     

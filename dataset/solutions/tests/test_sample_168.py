@@ -1,16 +1,16 @@
-import unittest
-import os
-import tempfile
-import numpy as np
-import sys
-import werkzeug.exceptions
-from pathlib import Path
-
 # Add the parent directory to import sys
 import os
 import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+import numpy as np
+import werkzeug.exceptions
+
 sys.path.append(str(Path(__file__).parent.parent))
-from sample_168 import stack_and_save, error404
+from sample_168 import error404, stack_and_save
+
 
 class TestStackAndSave(unittest.TestCase):
     def setUp(self):

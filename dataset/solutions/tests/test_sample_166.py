@@ -1,14 +1,13 @@
-import unittest
 import json
-import numpy as np
-import sys
-import os
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+
+import numpy as np
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from sample_166 import app, data, eval_app, MyCustomJSONHandler
+from sample_166 import MyCustomJSONHandler, app, data, eval_app
 
 
 class TestSample166(unittest.TestCase):

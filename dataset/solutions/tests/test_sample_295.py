@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 # Test file for sample_295.py
 
-import unittest
-import sys
 import os
-import numpy as np
-
 # Add the parent directory to the path so we can import the sample module
 import sys
+import unittest
+
+import numpy as np
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'samples'))
 from sample_295 import compute_samples_like
+
 
 class TestComputeSamplesLike(unittest.TestCase):
     """Test cases for the compute_samples_like function."""

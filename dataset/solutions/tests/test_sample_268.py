@@ -1,18 +1,16 @@
-import unittest
-import sys
-import os
-from pathlib import Path
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+from pathlib import Path
+
 sys.path.append(str(Path(__file__).parent.parent))
 
 import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from sample_268 import custom_fig
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import plotly.graph_objects as go
+from sample_268 import custom_fig
 
 
 class TestSample268(unittest.TestCase):

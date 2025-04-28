@@ -1,12 +1,11 @@
-import unittest
-import numpy as np
-import librosa
-import sys
-import os
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+
+import librosa
+import numpy as np
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_314 import compute_mel_to_audio
 

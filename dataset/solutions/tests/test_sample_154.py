@@ -1,9 +1,12 @@
-import unittest
-import jinja2
 import os
 import sys
+import unittest
+
+import jinja2
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_154 import setup_environment, solution
+
 
 class TestSample154(unittest.TestCase):
     

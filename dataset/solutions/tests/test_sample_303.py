@@ -1,12 +1,13 @@
-import unittest
-import numpy as np
-import sys
 import os
-
 # Add the parent directory to the path so we can import the sample module
 import sys
+import unittest
+
+import numpy as np
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_303 import compute_localmin
+
 
 class TestSample303(unittest.TestCase):
     

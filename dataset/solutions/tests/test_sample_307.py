@@ -1,17 +1,17 @@
 # Test file for sample_307.py
-import sys
-import os
-import unittest
-import numpy as np
-import librosa
-import scipy
-from typing import Tuple
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+from typing import Tuple
+
+import librosa
+import numpy as np
+import scipy
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_307 import compute_pyin
+
 
 class TestComputePYIN(unittest.TestCase):
     """Test cases for the compute_pyin function."""

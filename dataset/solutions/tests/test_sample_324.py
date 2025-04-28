@@ -1,8 +1,8 @@
-import unittest
-import sys
-import io
-from unittest.mock import patch
 import importlib.util
+import io
+import sys
+import unittest
+from unittest.mock import patch
 
 # Import the module from the solutions directory
 spec = importlib.util.spec_from_file_location("sample_324", "../sample_324.py")
@@ -36,7 +36,7 @@ class TestSample324(unittest.TestCase):
         """Test that the progress bar is created with the correct total."""
         # Create a new progress bar with the same parameters
         from tqdm import tqdm
-        
+
         # Run a small portion of the progress bar to test its creation
         # We'll limit it to just a few iterations to keep the test fast
         with patch.object(sample_324, 'infinite', return_value=range(5)):
@@ -54,7 +54,7 @@ class TestSample324(unittest.TestCase):
     def test_progress_bar_description(self):
         """Test that the progress bar description is set correctly."""
         from tqdm import tqdm
-        
+
         # Create a progress bar with a small range
         test_range = range(5)
         progress_bar = tqdm(test_range, total=len(test_range))

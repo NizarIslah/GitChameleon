@@ -1,15 +1,12 @@
-import unittest
-import sys
-import os
-
 # Add the parent directory to import sys
 import os
 import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from sample_270 import custom_make_subplots
+import unittest
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import plotly
 import plotly.graph_objects as go
+from sample_270 import custom_make_subplots
 
 
 class TestSample270(unittest.TestCase):

@@ -1,14 +1,15 @@
 import json
 import os
+import sys
 import tempfile
 import unittest
+
 from flask import Flask
 
 # Import the function to test
 
-import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from sample_147 import load_config, app
+from sample_147 import app, load_config
 
 
 class TestSample147(unittest.TestCase):

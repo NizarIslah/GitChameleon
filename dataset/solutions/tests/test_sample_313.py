@@ -1,14 +1,15 @@
-import unittest
-import numpy as np
-import librosa
-import sys
 import os
-from typing import Union, Optional
-
 # Add the parent directory to the path so we can import the sample
 import sys
+import unittest
+from typing import Optional, Union
+
+import librosa
+import numpy as np
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sample_313 import compute_mel_to_audio
+
 
 class TestMelToAudio(unittest.TestCase):
     def setUp(self):

@@ -1,12 +1,12 @@
-import unittest
-import sys
 import os
-from io import BytesIO
-
 # Add the directory containing sample_237.py to the Python path
 import sys
+import unittest
+from io import BytesIO
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_237 import DummyRequest, get_bounded_stream
+
 
 class TestSample237(unittest.TestCase):
     def test_dummy_request_initialization(self):

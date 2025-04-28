@@ -1,17 +1,15 @@
-import unittest
-import sys
-import os
-import warnings
-from unittest.mock import patch, MagicMock
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+import warnings
+from unittest.mock import MagicMock, patch
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from sklearn.cross_decomposition import CCA
 import numpy as np
 import sample_46
+from sklearn.cross_decomposition import CCA
 
 # Filter deprecation warnings
 warnings.filterwarnings('ignore', category=DeprecationWarning)

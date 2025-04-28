@@ -1,15 +1,16 @@
-import unittest
-import numpy as np
-import librosa
-import sys
 import os
-
 # Add the directory containing sample_296.py to the Python path
 import sys
+import unittest
+
+import librosa
+import numpy as np
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'samples')))
 
 # Import the function to test
 from sample_296 import compute_samples_like
+
 
 class TestComputeSamplesLike(unittest.TestCase):
     def setUp(self):

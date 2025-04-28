@@ -1,14 +1,12 @@
+# Add the parent directory to import sys
+import os
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
-import sys
-import os
 
 from django.forms import Form
 from django.forms.models import BaseModelFormSet
 
-# Add the parent directory to import sys
-import os
-import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_101 import save_existing
 

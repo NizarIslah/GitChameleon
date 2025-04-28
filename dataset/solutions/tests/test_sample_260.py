@@ -1,16 +1,15 @@
-import unittest
-import tornado.testing
-import tornado.websocket
-import tornado.web
-import tornado.ioloop
-import tornado.netutil
-import socket
-import sys
-import os
-
 # Add the parent directory to import sys
 import os
+import socket
 import sys
+import unittest
+
+import tornado.ioloop
+import tornado.netutil
+import tornado.testing
+import tornado.web
+import tornado.websocket
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_260 import custom_websocket_connect
 

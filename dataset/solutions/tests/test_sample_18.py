@@ -1,18 +1,17 @@
-import unittest
-import sys
-import os
-import pandas as pd
-import numpy as np
-import time
-
 # Add the parent directory to import sys
 import os
 import sys
+import time
+import unittest
+
+import numpy as np
+import pandas as pd
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import geopandas as gpd
-from shapely.geometry import Point, Polygon
 from sample_18 import spatial_join
+from shapely.geometry import Point, Polygon
 
 
 class TestSpatialJoin(unittest.TestCase):

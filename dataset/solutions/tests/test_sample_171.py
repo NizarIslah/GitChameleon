@@ -1,16 +1,16 @@
-import pytest
 import json
-import numpy as np
-import sys
-import os
-
 # Add the parent directory to import sys
 import os
 import sys
+
+import numpy as np
+import pytest
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from sample_171 import app, data, eval_app, MyCustomJSONHandler
+from sample_171 import MyCustomJSONHandler, app, data, eval_app
 from scipy.stats import hmean
+
 
 class TestSample171:
     @pytest.fixture

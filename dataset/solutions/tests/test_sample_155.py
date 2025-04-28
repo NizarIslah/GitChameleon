@@ -1,10 +1,12 @@
-import unittest
-from jinja2 import Environment
-from markupsafe import Markup
 import os
 import sys
+import unittest
+
+from jinja2 import Environment
+from markupsafe import Markup
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from sample_155 import solution, get_output, nl2br_core
+from sample_155 import get_output, nl2br_core, solution
 
 
 class TestSample155(unittest.TestCase):

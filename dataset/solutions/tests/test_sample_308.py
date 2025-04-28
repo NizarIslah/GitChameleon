@@ -1,13 +1,12 @@
-import unittest
-import numpy as np
-import librosa
-import sys
-import os
-from unittest.mock import patch, MagicMock
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+from unittest.mock import MagicMock, patch
+
+import librosa
+import numpy as np
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_308 import compute_pyin
 

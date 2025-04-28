@@ -1,13 +1,11 @@
-import os
-import unittest
-import sys
-from unittest.mock import patch
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+from unittest.mock import patch
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from sample_149 import safe_join_fail_404, error404
+from sample_149 import error404, safe_join_fail_404
 
 
 class TestSafeJoinFail404(unittest.TestCase):

@@ -1,16 +1,15 @@
-import unittest
-import torch
-import numpy as np
-import sys
-import os
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+
+import numpy as np
+import torch
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from scipy.special import gammaln as scipy_gammaln
 from sample_6 import gamma_ln
+from scipy.special import gammaln as scipy_gammaln
 
 
 class TestGammaLn(unittest.TestCase):

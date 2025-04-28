@@ -1,18 +1,19 @@
-import unittest
-import tornado.testing
-import tornado.web
-import tornado.httpserver
-import sys
-import os
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+
+import tornado.httpserver
+import tornado.testing
+import tornado.web
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from sample_262 import SetCookieHandler, COOKIE_SECRET
+from sample_262 import COOKIE_SECRET, SetCookieHandler
+
 
 class TestSetCookieHandler(tornado.testing.AsyncHTTPTestCase):
     def get_app(self):

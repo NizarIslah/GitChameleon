@@ -1,13 +1,14 @@
 # Test file for sample_298.py
-import sys
 import os
-import unittest
-import numpy as np
-
 # Add the samples directory to the path so we can import the module
 import sys
+import unittest
+
+import numpy as np
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'samples'))
 from sample_298 import compute_tone
+
 
 class TestComputeTone(unittest.TestCase):
     """Test cases for the compute_tone function."""

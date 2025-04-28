@@ -1,14 +1,15 @@
 # Test file for sample_289.py
-import sys
 import os
-import unittest
-import numpy as np
-
 # Add the directory containing sample_289.py to the Python path
 import sys
+import unittest
+
+import numpy as np
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'samples')))
 
 from sample_289 import compute_fourier_tempogram
+
 
 class TestFourierTempogram(unittest.TestCase):
     def test_compute_fourier_tempogram_shape(self):

@@ -1,11 +1,12 @@
+import os
+import sys
 import unittest
+
 from jinja2 import Environment
 from markupsafe import Markup
 
-import os
-import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from sample_156 import solution, get_output, nl2br_core
+from sample_156 import get_output, nl2br_core, solution
 
 
 class TestSample156(unittest.TestCase):
@@ -57,7 +58,7 @@ class TestSample156(unittest.TestCase):
     def test_nl2br_core_function(self):
         """Test the core function directly"""
         from jinja2.runtime import EvalContext
-        
+
         # Create eval contexts for testing
         autoescape_ctx = EvalContext(self.env, None, None)
         autoescape_ctx.autoescape = True

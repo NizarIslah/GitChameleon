@@ -1,10 +1,13 @@
-import unittest
 import json
-import numpy as np
 import os
 import sys
+import unittest
+
+import numpy as np
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from sample_164 import app, data, eval_app, MyCustomJSONHandler
+from sample_164 import MyCustomJSONHandler, app, data, eval_app
+
 
 class TestSample164(unittest.TestCase):
     

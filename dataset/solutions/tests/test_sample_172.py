@@ -1,15 +1,15 @@
-import unittest
 import json
-import numpy as np
-from scipy.stats import hmean
-import sys
-import os
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+
+import numpy as np
+from scipy.stats import hmean
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from sample_172 import app, data, eval, MyCustomJSONHandler
+from sample_172 import MyCustomJSONHandler, app, data, eval
+
 
 class TestSample172(unittest.TestCase):
     

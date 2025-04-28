@@ -1,10 +1,13 @@
-import unittest
-import numpy as np
-from scipy.ndimage import median_filter
 import os
 import sys
+import unittest
+
+import numpy as np
+from scipy.ndimage import median_filter
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_133 import apply_median_filter
+
 
 class TestMedianFilter(unittest.TestCase):
     

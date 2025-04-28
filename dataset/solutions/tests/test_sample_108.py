@@ -1,12 +1,11 @@
-import unittest
-import sys
-import os
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_108 import MyModel, color
+
 
 class TestSample108(unittest.TestCase):
     def test_model_structure(self):
@@ -53,7 +52,7 @@ class TestSample108(unittest.TestCase):
     def test_model_validation(self):
         """Test that the model validates color values."""
         from django.core.exceptions import ValidationError
-        
+
         # Create a model with an invalid color
         model_invalid = MyModel(color='YELLOW')
         

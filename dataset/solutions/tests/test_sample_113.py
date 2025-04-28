@@ -1,10 +1,13 @@
-import unittest
-import numpy as np
-from scipy import stats
 import os
 import sys
+import unittest
+
+import numpy as np
+from scipy import stats
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_113 import combine_pvalues
+
 
 class TestSample113(unittest.TestCase):
     

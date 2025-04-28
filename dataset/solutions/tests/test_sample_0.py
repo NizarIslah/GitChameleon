@@ -1,16 +1,16 @@
-import pytest
-import torch
-import numpy as np
-import sys
-import os
-
 # Add the parent directory to import sys
 import os
 import sys
+
+import numpy as np
+import pytest
+import torch
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from scipy.stats import norm
 from sample_0 import log_ndtr
+from scipy.stats import norm
+
 
 class TestLogNdtr:
     @pytest.fixture

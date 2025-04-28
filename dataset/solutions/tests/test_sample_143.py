@@ -1,13 +1,12 @@
-import unittest
 import json
-import sys
-import os
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import sample_143
+
 
 class TestSample143(unittest.TestCase):
     def setUp(self):

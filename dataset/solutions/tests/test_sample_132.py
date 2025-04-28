@@ -1,13 +1,14 @@
-import unittest
-import numpy as np
-import sys
 import os
-from scipy.ndimage import percentile_filter
-
 # Add the parent directory to the path so we can import the module
 import sys
+import unittest
+
+import numpy as np
+from scipy.ndimage import percentile_filter
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_132 import apply_percentile_filter
+
 
 class TestPercentileFilter(unittest.TestCase):
     

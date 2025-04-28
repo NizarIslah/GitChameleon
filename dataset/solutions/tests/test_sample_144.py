@@ -1,13 +1,11 @@
-import unittest
 import json
-import sys
-import os
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from sample_144 import app, data, eval, app_set_up
+from sample_144 import app, app_set_up, data, eval
 
 
 class TestSample144(unittest.TestCase):

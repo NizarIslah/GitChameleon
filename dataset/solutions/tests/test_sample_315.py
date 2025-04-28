@@ -5,15 +5,15 @@
 Unit tests for sample_315.py which contains the compute_mfcc_to_mel function.
 """
 
-import unittest
-import numpy as np
-import scipy
-import librosa
-import sys
 import os
-
 # Add the parent directory to the path so we can import the sample module
 import sys
+import unittest
+
+import librosa
+import numpy as np
+import scipy
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../dataset/samples')))
 from sample_315 import compute_mfcc_to_mel
 

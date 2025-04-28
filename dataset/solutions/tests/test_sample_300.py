@@ -1,13 +1,13 @@
-import unittest
-import numpy as np
-import sys
-import os
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+
+import numpy as np
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sample_300 import compute_chirp
+
 
 class TestComputeChirp(unittest.TestCase):
     def test_compute_chirp_basic(self):

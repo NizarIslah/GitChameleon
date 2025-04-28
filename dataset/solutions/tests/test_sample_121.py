@@ -1,10 +1,13 @@
-import unittest
-import numpy as np
-from scipy.linalg import det
 import os
 import sys
+import unittest
+
+import numpy as np
+from scipy.linalg import det
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_121 import compute_determinant
+
 
 class TestComputeDeterminant(unittest.TestCase):
     

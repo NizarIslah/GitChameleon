@@ -1,13 +1,14 @@
-import unittest
-import numpy as np
-from scipy.linalg import lu_factor, lu_solve
-import sys
 import os
-
 # Add the parent directory to the path so we can import the module
 import sys
+import unittest
+
+import numpy as np
+from scipy.linalg import lu_factor, lu_solve
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_124 import compute_lu_decomposition
+
 
 class TestLUDecomposition(unittest.TestCase):
     

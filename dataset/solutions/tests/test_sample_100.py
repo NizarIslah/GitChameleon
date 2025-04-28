@@ -1,11 +1,10 @@
-import unittest
-import sys
-import os
-from django.utils import timezone
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+
+from django.utils import timezone
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_100 import get_time_in_utc
 

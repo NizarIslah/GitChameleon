@@ -1,12 +1,11 @@
-import unittest
-import torch
-import numpy as np
-import sys
-import os
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+
+import numpy as np
+import torch
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from sample_11 import invert_mask

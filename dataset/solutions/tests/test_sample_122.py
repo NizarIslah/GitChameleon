@@ -1,14 +1,15 @@
-import unittest
-import numpy as np
-import sys
 import os
-
 # Add the directory containing sample_122.py to the Python path
 import sys
+import unittest
+
+import numpy as np
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'solutions'))
 
 # Import the function to test
 from sample_122 import compute_determinant
+
 
 class TestComputeDeterminant(unittest.TestCase):
     

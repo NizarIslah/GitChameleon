@@ -1,19 +1,17 @@
-import unittest
-import sys
-import os
-import warnings
-from unittest.mock import patch, MagicMock
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+import warnings
+from unittest.mock import MagicMock, patch
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import numpy as np
-from sklearn.datasets import load_digits
-from sklearn.utils import Bunch
-from sklearn.decomposition import FastICA
 import sample_49
+from sklearn.datasets import load_digits
+from sklearn.decomposition import FastICA
+from sklearn.utils import Bunch
 
 # Filter deprecation warnings
 warnings.filterwarnings('ignore', category=DeprecationWarning)

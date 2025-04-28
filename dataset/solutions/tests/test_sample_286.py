@@ -1,12 +1,12 @@
-import unittest
-import numpy as np
-import librosa
-import sys
 import os
-from unittest.mock import patch
-
 # Add the parent directory to the path so we can import the sample module
 import sys
+import unittest
+from unittest.mock import patch
+
+import librosa
+import numpy as np
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_286 import compute_griffinlim
 

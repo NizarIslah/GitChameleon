@@ -1,14 +1,15 @@
-import unittest
-import numpy as np
-from scipy.linalg import det
-import sys
 import os
-import warnings
-
 # Add the parent directory to the path so we can import the module
 import sys
+import unittest
+import warnings
+
+import numpy as np
+from scipy.linalg import det
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sample_157 import check_invertibility
+
 
 class TestCheckInvertibility(unittest.TestCase):
     

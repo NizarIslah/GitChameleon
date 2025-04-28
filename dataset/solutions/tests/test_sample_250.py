@@ -1,11 +1,12 @@
 import json
-import unittest
-from falcon import Request
-from falcon.testing import create_environ
-
 # Import the function to test
 import os
 import sys
+import unittest
+
+from falcon import Request
+from falcon.testing import create_environ
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_250 import custom_media
 

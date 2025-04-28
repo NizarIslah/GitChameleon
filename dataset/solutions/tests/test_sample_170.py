@@ -1,12 +1,14 @@
-import unittest
 import json
-import numpy as np
-from scipy import linalg
-import flask
 import os
 import sys
+import unittest
+
+import flask
+import numpy as np
+from scipy import linalg
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from sample_170 import app, data, eval, MyCustomJSONHandler
+from sample_170 import MyCustomJSONHandler, app, data, eval
 
 
 class TestSample170(unittest.TestCase):

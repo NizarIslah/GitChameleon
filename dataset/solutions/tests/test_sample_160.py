@@ -1,14 +1,14 @@
-import unittest
-import numpy as np
-from scipy.stats import hmean
-import sys
-import os
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+
+import numpy as np
+from scipy.stats import hmean
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sample_160 import count_unique_hmean
+
 
 class TestCountUniqueHmean(unittest.TestCase):
     

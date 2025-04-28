@@ -1,13 +1,14 @@
-import unittest
-import numpy as np
-import sys
 import os
-from typing import Optional
-
 # Add the parent directory to the path so we can import the sample module
 import sys
+import unittest
+from typing import Optional
+
+import numpy as np
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_285 import compute_griffinlim
+
 
 class TestGriffinLim(unittest.TestCase):
     def setUp(self):

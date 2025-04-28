@@ -1,9 +1,12 @@
-import unittest
-import numpy as np
 import os
 import sys
+import unittest
+
+import numpy as np
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_140 import apply_maximum_filter
+
 
 class TestApplyMaximumFilter(unittest.TestCase):
     

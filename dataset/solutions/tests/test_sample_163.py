@@ -1,15 +1,15 @@
-import unittest
 import json
-import numpy as np
-from flask import Flask
-import sys
-import os
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+
+import numpy as np
+from flask import Flask
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from sample_163 import app, data, eval, MyCustomJSONHandler
+from sample_163 import MyCustomJSONHandler, app, data, eval
+
 
 class TestSample163(unittest.TestCase):
     def setUp(self):

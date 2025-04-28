@@ -1,13 +1,11 @@
-import unittest
-import sys
-import os
-import re
-
 # Add the parent directory to import sys
 import os
+import re
 import sys
+import unittest
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from sample_103 import SampleForm, render_output, get_template_string
+from sample_103 import SampleForm, get_template_string, render_output
 
 
 class TestSample103(unittest.TestCase):

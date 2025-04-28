@@ -1,13 +1,14 @@
-import unittest
-import numpy as np
-from scipy.ndimage import rank_filter
-import sys
 import os
-
 # Add the parent directory to the path so we can import the module
 import sys
+import unittest
+
+import numpy as np
+from scipy.ndimage import rank_filter
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_130 import apply_rank_filter
+
 
 class TestApplyRankFilter(unittest.TestCase):
     

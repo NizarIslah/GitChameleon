@@ -1,14 +1,15 @@
-import sys
 import os
-import unittest
-import numpy as np
-
 # Add the directory containing sample_126.py to the Python path
 import sys
+import unittest
+
+import numpy as np
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'solutions'))
 
 # Import the function to test
 from sample_126 import compute_lanczos_window
+
 
 class TestLanczosWindow(unittest.TestCase):
     

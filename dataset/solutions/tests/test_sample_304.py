@@ -1,10 +1,10 @@
-import unittest
-import numpy as np
-import sys
 import os
-
 # Add the dataset/samples directory to the Python path
 import sys
+import unittest
+
+import numpy as np
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'samples')))
 
 # Import the function to test

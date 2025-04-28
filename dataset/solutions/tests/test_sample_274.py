@@ -1,18 +1,17 @@
-import unittest
-import sys
-import os
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_274 import custom_scatter
+
 
 class TestCustomScatter(unittest.TestCase):
     def test_custom_scatter_creates_figure(self):
         """Test that custom_scatter returns a plotly Figure object."""
         import plotly.graph_objs as go
-        
+
         # Test with a specific color
         test_color = "red"
         fig = custom_scatter(test_color)
@@ -23,7 +22,7 @@ class TestCustomScatter(unittest.TestCase):
     def test_custom_scatter_sets_color(self):
         """Test that custom_scatter sets the marker color correctly."""
         import plotly.graph_objs as go
-        
+
         # Test with a specific color
         test_color = "blue"
         fig = custom_scatter(test_color)

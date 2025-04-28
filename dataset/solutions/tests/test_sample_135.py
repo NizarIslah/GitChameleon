@@ -1,14 +1,14 @@
-import unittest
-import numpy as np
-from scipy.ndimage import uniform_filter
-import sys
-import os
-
 # Add the parent directory to import sys
 import os
 import sys
+import unittest
+
+import numpy as np
+from scipy.ndimage import uniform_filter
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_135 import apply_uniform_filter
+
 
 class TestUniformFilter(unittest.TestCase):
     

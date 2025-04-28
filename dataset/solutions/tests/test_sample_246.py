@@ -1,10 +1,11 @@
-import unittest
-from typing import Dict, Any
-import falcon.testing
-
 # Import the function to test
 import os
 import sys
+import unittest
+from typing import Any, Dict
+
+import falcon.testing
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_246 import custom_environ
 

@@ -1,11 +1,11 @@
-import unittest
-import numpy as np
-from PIL import Image
-import sys
 import os
-
 # Add the samples directory to the path so we can import the module
 import sys
+import unittest
+
+import numpy as np
+from PIL import Image
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'samples'))
 from sample_319 import imaging
 
