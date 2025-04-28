@@ -2,7 +2,10 @@ import unittest
 from unittest.mock import MagicMock
 import falcon
 
-from dataset.solutions.sample_245 import ExampleMiddleware, custom_middleware_variable
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_245 import ExampleMiddleware, custom_middleware_variable
 
 
 class TestExampleMiddleware(unittest.TestCase):

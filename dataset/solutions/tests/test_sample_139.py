@@ -1,7 +1,10 @@
 import unittest
 import numpy as np
 from scipy.ndimage import maximum_filter
-from dataset.solutions.sample_139 import apply_maximum_filter
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_139 import apply_maximum_filter
 
 class TestMaximumFilter(unittest.TestCase):
     

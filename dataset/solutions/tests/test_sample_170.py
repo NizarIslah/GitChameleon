@@ -3,7 +3,10 @@ import json
 import numpy as np
 from scipy import linalg
 import flask
-from dataset.solutions.sample_170 import app, data, eval, MyCustomJSONHandler
+
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_170 import app, data, eval, MyCustomJSONHandler
 
 
 class TestSample170(unittest.TestCase):

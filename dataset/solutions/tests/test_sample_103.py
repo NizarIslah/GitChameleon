@@ -3,7 +3,9 @@ import sys
 import os
 import re
 
-# Add the parent directory to sys.path to allow importing from the parent directory
+# Add the parent directory to import sys
+import os
+import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_103 import SampleForm, render_output, get_template_string
 

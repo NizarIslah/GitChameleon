@@ -3,9 +3,11 @@ import numpy as np
 import sys
 import os
 
-# Add the parent directory to sys.path to import the module
+# Add the parent directory to import sys
+import os
+import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.samples.sample_300 import compute_chirp
+from sample_300 import compute_chirp
 
 class TestComputeChirp(unittest.TestCase):
     def test_compute_chirp_basic(self):

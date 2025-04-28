@@ -3,7 +3,10 @@ from typing import Dict, Any
 import falcon.testing
 
 # Import the function to test
-from dataset.solutions.sample_246 import custom_environ
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_246 import custom_environ
 
 
 class TestCustomEnviron(unittest.TestCase):

@@ -8,6 +8,7 @@ from unittest.mock import patch
 from tqdm import tqdm
 
 # Import the functions from sample_323
+import sys
 sys.path.append('/repo/dataset/solutions')
 from sample_323 import infinite, sol_dict
 

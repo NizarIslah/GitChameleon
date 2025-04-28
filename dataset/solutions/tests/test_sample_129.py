@@ -3,9 +3,11 @@ import numpy as np
 import sys
 import os
 
-# Add the parent directory to sys.path to import the module
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.solutions.sample_129 import apply_rank_filter
+# Add the parent directory to import sys
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_129 import apply_rank_filter
 
 
 class TestApplyRankFilter(unittest.TestCase):

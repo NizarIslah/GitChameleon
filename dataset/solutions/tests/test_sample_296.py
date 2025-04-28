@@ -5,6 +5,7 @@ import sys
 import os
 
 # Add the directory containing sample_296.py to the Python path
+import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'samples')))
 
 # Import the function to test

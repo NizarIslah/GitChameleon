@@ -7,7 +7,10 @@ from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
 # Import the function to test
-from dataset.solutions.sample_328 import modify
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_328 import modify
 
 class TestSample328(unittest.TestCase):
     def setUp(self):

@@ -7,8 +7,9 @@ import os
 from unittest.mock import patch, MagicMock
 
 # Add the parent directory to the path so we can import the sample
+import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from dataset.samples.sample_292 import compute_plp
+from sample_292 import compute_plp
 
 
 class TestComputePLP(unittest.TestCase):

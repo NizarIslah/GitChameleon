@@ -1,7 +1,10 @@
 import unittest
 from jinja2 import Environment
 from markupsafe import Markup
-from dataset.solutions.sample_155 import solution, get_output, nl2br_core
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_155 import solution, get_output, nl2br_core
 
 
 class TestSample155(unittest.TestCase):

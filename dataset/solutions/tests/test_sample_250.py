@@ -4,7 +4,10 @@ from falcon import Request
 from falcon.testing import create_environ
 
 # Import the function to test
-from dataset.solutions.sample_250 import custom_media
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_250 import custom_media
 
 
 class TestSample250(unittest.TestCase):

@@ -4,6 +4,7 @@ import unittest
 import numpy as np
 
 # Add the directory containing sample_126.py to the Python path
+import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'solutions'))
 
 # Import the function to test

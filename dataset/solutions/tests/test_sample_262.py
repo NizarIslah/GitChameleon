@@ -5,9 +5,14 @@ import tornado.httpserver
 import sys
 import os
 
-# Add the parent directory to sys.path to import the module
+# Add the parent directory to import sys
+import os
+import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from dataset.solutions.sample_262 import SetCookieHandler, COOKIE_SECRET
+
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_262 import SetCookieHandler, COOKIE_SECRET
 
 class TestSetCookieHandler(tornado.testing.AsyncHTTPTestCase):
     def get_app(self):

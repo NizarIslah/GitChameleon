@@ -5,6 +5,7 @@ import unittest
 import numpy as np
 
 # Add the samples directory to the path so we can import the module
+import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'samples'))
 from sample_299 import compute_chirp
 

@@ -2,10 +2,15 @@ import unittest
 import sys
 import os
 
-# Add the parent directory to sys.path to import the module
+# Add the parent directory to import sys
+import os
+import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from dataset.solutions.sample_265 import custom_get_ioloop
+
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_265 import custom_get_ioloop
 import tornado.ioloop
 
 

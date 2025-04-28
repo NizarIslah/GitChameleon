@@ -1,7 +1,10 @@
 import unittest
 import numpy as np
 from scipy.stats import norm, uniform, expon
-from dataset.solutions.sample_119 import compute_moment
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_119 import compute_moment
 
 class TestComputeMoment(unittest.TestCase):
     def test_normal_distribution_moments(self):

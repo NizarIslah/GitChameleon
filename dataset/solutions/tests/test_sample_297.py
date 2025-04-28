@@ -4,8 +4,9 @@ import unittest
 import numpy as np
 
 # Add the parent directory to the path so we can import the sample module
+import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from dataset.samples.sample_297 import compute_tone
+from sample_297 import compute_tone
 
 
 class TestComputeTone(unittest.TestCase):

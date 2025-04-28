@@ -2,9 +2,11 @@ import unittest
 import sys
 import os
 
-# Add the parent directory to sys.path to import the solution module
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.solutions.sample_257 import CustomRouter, solution
+# Add the parent directory to import sys
+sys.path to import the solution module
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_257 import CustomRouter, solution
 
 import falcon
 

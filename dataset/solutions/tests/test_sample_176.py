@@ -5,8 +5,9 @@ import sympy
 import numpy as np
 
 # Add the parent directory to the path so we can import the module
+import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.samples.sample_176 import custom_computeDFT
+from sample_176 import custom_computeDFT
 
 class TestCustomDFT(unittest.TestCase):
     def test_dft_size(self):

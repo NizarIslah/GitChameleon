@@ -3,9 +3,11 @@ import sys
 import os
 from typing import List
 
-# Add the parent directory to sys.path to import the module
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.solutions.sample_271 import custom_figure
+# Add the parent directory to import sys
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_271 import custom_figure
 
 
 class TestSample271(unittest.TestCase):

@@ -1,7 +1,10 @@
 import unittest
 import numpy as np
 from scipy.stats import hmean
-from dataset.solutions.sample_159 import count_unique_hmean
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_159 import count_unique_hmean
 
 
 class TestCountUniqueHmean(unittest.TestCase):

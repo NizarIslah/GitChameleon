@@ -5,6 +5,7 @@ import unittest
 import numpy as np
 
 # Add the directory containing sample_289.py to the Python path
+import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'samples')))
 
 from sample_289 import compute_fourier_tempogram

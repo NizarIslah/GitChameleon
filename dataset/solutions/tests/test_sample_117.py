@@ -4,8 +4,9 @@ import sys
 import os
 
 # Add the parent directory to the path so we can import the module
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.solutions.sample_117 import compute_circular_variance
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_117 import compute_circular_variance
 
 class TestCircularVariance(unittest.TestCase):
     
@@ -72,8 +73,9 @@ import sys
 import os
 
 # Add the parent directory to the path so we can import the module
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.solutions.sample_117 import compute_circular_variance
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_117 import compute_circular_variance
 
 class TestCircularVariance(unittest.TestCase):
     

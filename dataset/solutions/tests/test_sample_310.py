@@ -4,9 +4,11 @@ import librosa
 import sys
 import os
 
-# Add the parent directory to sys.path to import the module
+# Add the parent directory to import sys
+import os
+import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from dataset.samples.sample_310 import compute_vqt
+from sample_310 import compute_vqt
 
 
 class TestSample310(unittest.TestCase):

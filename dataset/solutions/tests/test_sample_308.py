@@ -5,9 +5,11 @@ import sys
 import os
 from unittest.mock import patch, MagicMock
 
-# Add the parent directory to sys.path to import the module
+# Add the parent directory to import sys
+import os
+import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from dataset.samples.sample_308 import compute_pyin
+from sample_308 import compute_pyin
 
 
 class TestComputePyin(unittest.TestCase):

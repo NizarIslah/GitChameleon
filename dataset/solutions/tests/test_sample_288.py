@@ -5,8 +5,9 @@ import os
 import librosa
 
 # Add the parent directory to the path so we can import the sample module
+import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.samples.sample_288 import compute_lpc_coef
+from sample_288 import compute_lpc_coef
 
 class TestLPCCoefficients(unittest.TestCase):
     def setUp(self):

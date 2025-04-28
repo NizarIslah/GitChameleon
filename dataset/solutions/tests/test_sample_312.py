@@ -5,8 +5,9 @@ import sys
 import os
 
 # Add the parent directory to the path so we can import the sample
+import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.samples.sample_312 import compute_griffinlim_cqt
+from sample_312 import compute_griffinlim_cqt
 
 
 class TestSample312(unittest.TestCase):

@@ -8,9 +8,11 @@ import tornado.httpclient
 import sys
 import os
 
-# Add the parent directory to sys.path to import sample_259
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.solutions.sample_259 import simple_wsgi_app, find_free_port, custom_wsgi_container
+# Add the parent directory to import sys
+sys.path to import sample_259
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_259 import simple_wsgi_app, find_free_port, custom_wsgi_container
 
 class TestSample259(unittest.TestCase):
     

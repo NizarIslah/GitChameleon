@@ -1,7 +1,10 @@
 import unittest
 import numpy as np
 from scipy.linalg import det
-from dataset.solutions.sample_121 import compute_determinant
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_121 import compute_determinant
 
 class TestComputeDeterminant(unittest.TestCase):
     

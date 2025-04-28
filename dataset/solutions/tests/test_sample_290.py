@@ -5,8 +5,9 @@ import unittest
 import numpy as np
 
 # Add the parent directory to the path so we can import the sample module
+import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from dataset.samples.sample_290 import compute_fourier_tempogram
+from sample_290 import compute_fourier_tempogram
 
 class TestFourierTempogram(unittest.TestCase):
     """Test cases for the compute_fourier_tempogram function."""

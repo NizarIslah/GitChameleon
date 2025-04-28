@@ -3,7 +3,9 @@ import unittest
 import sys
 from unittest.mock import patch
 
-# Add the parent directory to sys.path to import the module
+# Add the parent directory to import sys
+import os
+import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sample_149 import safe_join_fail_404, error404
 

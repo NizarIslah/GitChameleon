@@ -1,7 +1,10 @@
 import unittest
 import numpy as np
 from scipy.ndimage import median_filter
-from dataset.solutions.sample_133 import apply_median_filter
+
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_133 import apply_median_filter
 
 class TestMedianFilter(unittest.TestCase):
     
@@ -67,7 +70,10 @@ if __name__ == '__main__':
     unittest.main()import unittest
 import numpy as np
 from scipy.ndimage import median_filter
-from dataset.solutions.sample_133 import apply_median_filter
+
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_133 import apply_median_filter
 
 class TestMedianFilter(unittest.TestCase):
     

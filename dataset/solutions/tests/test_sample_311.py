@@ -8,8 +8,9 @@ import sys
 import os
 
 # Add the parent directory to the path so we can import the sample
+import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-from dataset.samples.sample_311 import compute_griffinlim_cqt
+from sample_311 import compute_griffinlim_cqt
 
 class TestGriffinLimCQT(unittest.TestCase):
     def setUp(self):

@@ -3,9 +3,11 @@ import numpy as np
 import sys
 import os
 
-# Add the parent directory to sys.path to import the module
+# Add the parent directory to import sys
+import os
+import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from dataset.samples.sample_302 import compute_shear
+from sample_302 import compute_shear
 
 class TestComputeShear(unittest.TestCase):
     

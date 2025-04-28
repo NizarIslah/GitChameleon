@@ -1,7 +1,10 @@
 import unittest
 from unittest.mock import MagicMock
 import falcon
-from dataset.solutions.sample_249 import custom_link
+
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_249 import custom_link
 
 
 class TestCustomLink(unittest.TestCase):
@@ -38,7 +41,10 @@ if __name__ == '__main__':
     unittest.main()import unittest
 from unittest.mock import MagicMock
 import falcon
-from dataset.solutions.sample_249 import custom_link
+
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_249 import custom_link
 
 
 class TestCustomLink(unittest.TestCase):

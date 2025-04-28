@@ -4,8 +4,9 @@ import sys
 import os
 
 # Add the parent directory to the path so we can import the sample module
+import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.samples.sample_280 import compute_fill_diagonal
+from sample_280 import compute_fill_diagonal
 
 
 class TestSample280(unittest.TestCase):

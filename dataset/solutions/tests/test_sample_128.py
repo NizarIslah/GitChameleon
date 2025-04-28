@@ -4,9 +4,14 @@ from scipy.ndimage import gaussian_filter1d
 import sys
 import os
 
-# Add the parent directory to sys.path to import the module
+# Add the parent directory to import sys
+import os
+import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from dataset.solutions.sample_128 import apply_gaussian_filter1d
+
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_128 import apply_gaussian_filter1d
 
 class TestGaussianFilter1D(unittest.TestCase):
     

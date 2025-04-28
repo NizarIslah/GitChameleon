@@ -6,7 +6,9 @@ import sys
 import werkzeug.exceptions
 from pathlib import Path
 
-# Add the parent directory to sys.path to import the module
+# Add the parent directory to import sys
+import os
+import sys
 sys.path.append(str(Path(__file__).parent.parent))
 from sample_168 import stack_and_save, error404
 

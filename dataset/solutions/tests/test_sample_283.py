@@ -8,9 +8,11 @@ import sys
 import io
 from unittest.mock import patch, MagicMock
 
-# Add the parent directory to sys.path to import the module
+# Add the parent directory to import sys
+import os
+import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.samples.sample_283 import compute_stream
+from sample_283 import compute_stream
 
 class TestSample283(unittest.TestCase):
     

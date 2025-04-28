@@ -5,7 +5,9 @@ import sys
 import tempfile
 from pathlib import Path
 
-# Add the parent directory to sys.path to import the module
+# Add the parent directory to import sys
+import os
+import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 import sample_174
 

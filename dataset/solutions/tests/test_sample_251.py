@@ -1,7 +1,10 @@
 import unittest
 import pytest
 import falcon
-from dataset.solutions.sample_251 import raise_too_large_error
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_251 import raise_too_large_error
 
 
 class TestSample251(unittest.TestCase):

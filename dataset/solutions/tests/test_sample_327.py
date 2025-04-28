@@ -7,6 +7,7 @@ from matplotlib.axes import Axes
 # Import the function to test
 import sys
 import os
+import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'solutions')))
 from sample_327 import modify
 

@@ -1,7 +1,7 @@
 import unittest
 import sympy
 from sympy import symbols, eye, Matrix
-from dataset.samples.sample_177 import custom_laplace_transform
+from sample_177 import custom_laplace_transform
 
 class TestCustomLaplaceTransform(unittest.TestCase):
     def test_custom_laplace_transform(self):

@@ -1,7 +1,10 @@
 import unittest
 import asyncio
 import tornado.testing
-from dataset.solutions.sample_263 import DummyAuth
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_263 import DummyAuth
 
 
 class TestDummyAuth(tornado.testing.AsyncTestCase):

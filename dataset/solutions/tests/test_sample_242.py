@@ -1,7 +1,10 @@
 import json
 import unittest
 import falcon
-from dataset.solutions.sample_242 import custom_http_error
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_242 import custom_http_error
 
 
 class TestSample242(unittest.TestCase):

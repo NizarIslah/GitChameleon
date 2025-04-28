@@ -5,8 +5,9 @@ import os
 from typing import Optional
 
 # Add the parent directory to the path so we can import the sample module
+import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from dataset.samples.sample_285 import compute_griffinlim
+from sample_285 import compute_griffinlim
 
 class TestGriffinLim(unittest.TestCase):
     def setUp(self):

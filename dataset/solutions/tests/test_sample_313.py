@@ -6,8 +6,9 @@ import os
 from typing import Union, Optional
 
 # Add the parent directory to the path so we can import the sample
+import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.samples.sample_313 import compute_mel_to_audio
+from sample_313 import compute_mel_to_audio
 
 class TestMelToAudio(unittest.TestCase):
     def setUp(self):

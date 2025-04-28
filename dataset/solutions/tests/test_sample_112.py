@@ -5,8 +5,9 @@ import sys
 import os
 
 # Add the parent directory to the path so we can import the module
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.solutions.sample_112 import compute_matrix_exponential
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_112 import compute_matrix_exponential
 
 class TestMatrixExponential(unittest.TestCase):
     def test_identity_matrix(self):

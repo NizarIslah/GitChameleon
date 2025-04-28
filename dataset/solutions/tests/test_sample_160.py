@@ -4,7 +4,9 @@ from scipy.stats import hmean
 import sys
 import os
 
-# Add the parent directory to sys.path to import the module
+# Add the parent directory to import sys
+import os
+import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sample_160 import count_unique_hmean
 

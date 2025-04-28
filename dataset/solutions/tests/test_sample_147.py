@@ -5,7 +5,10 @@ import unittest
 from flask import Flask
 
 # Import the function to test
-from dataset.solutions.sample_147 import load_config, app
+
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_147 import load_config, app
 
 
 class TestSample147(unittest.TestCase):

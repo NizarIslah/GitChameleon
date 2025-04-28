@@ -4,7 +4,9 @@ from scipy.ndimage import uniform_filter
 import sys
 import os
 
-# Add the parent directory to sys.path to import the module
+# Add the parent directory to import sys
+import os
+import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_135 import apply_uniform_filter
 

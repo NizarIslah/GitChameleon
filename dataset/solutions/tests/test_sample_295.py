@@ -7,6 +7,7 @@ import os
 import numpy as np
 
 # Add the parent directory to the path so we can import the sample module
+import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'samples'))
 from sample_295 import compute_samples_like
 

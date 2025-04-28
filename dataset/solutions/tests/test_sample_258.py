@@ -5,6 +5,7 @@ import sys
 from unittest.mock import patch, MagicMock
 
 # Import the function to test
+import sys
 sys.path.append('/repo/dataset/solutions')
 from sample_258 import custom_add_callback_from_signal
 

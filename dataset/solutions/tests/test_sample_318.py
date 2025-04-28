@@ -5,8 +5,9 @@ import sys
 import os
 
 # Add the parent directory to the path so we can import the sample
+import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.samples.sample_318 import imaging
+from sample_318 import imaging
 
 class TestSample318(unittest.TestCase):
     def setUp(self):

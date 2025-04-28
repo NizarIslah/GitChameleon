@@ -4,8 +4,9 @@ import os
 from io import BytesIO
 
 # Add the directory containing sample_237.py to the Python path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.solutions.sample_237 import DummyRequest, get_bounded_stream
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_237 import DummyRequest, get_bounded_stream
 
 class TestSample237(unittest.TestCase):
     def test_dummy_request_initialization(self):
@@ -75,8 +76,9 @@ import os
 from io import BytesIO
 
 # Add the directory containing sample_237.py to the Python path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.solutions.sample_237 import DummyRequest, get_bounded_stream
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_237 import DummyRequest, get_bounded_stream
 
 class TestSample237(unittest.TestCase):
     def test_dummy_request_initialization(self):

@@ -6,8 +6,9 @@ import os
 from unittest.mock import patch
 
 # Add the parent directory to the path so we can import the sample module
+import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from dataset.samples.sample_286 import compute_griffinlim
+from sample_286 import compute_griffinlim
 
 
 class TestComputeGriffinLim(unittest.TestCase):

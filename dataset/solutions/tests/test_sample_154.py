@@ -1,6 +1,9 @@
 import unittest
 import jinja2
-from dataset.solutions.sample_154 import setup_environment, solution
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_154 import setup_environment, solution
 
 class TestSample154(unittest.TestCase):
     

@@ -1,7 +1,10 @@
 # Test for sample_330.py
 import unittest
 import matplotlib.pyplot as plt
-from dataset.solutions.sample_330 import use_seaborn
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_330 import use_seaborn
 
 class TestSample330(unittest.TestCase):
     def setUp(self):

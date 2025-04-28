@@ -6,6 +6,7 @@ import os
 import warnings
 
 # Add the parent directory to the path so we can import the module
+import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sample_157 import check_invertibility
 

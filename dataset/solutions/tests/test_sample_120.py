@@ -4,8 +4,9 @@ import os
 import numpy as np
 
 # Add the parent directory to the path so we can import the solution module
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.solutions.sample_120 import compute_moment
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_120 import compute_moment
 
 from scipy.stats import norm, uniform, expon
 

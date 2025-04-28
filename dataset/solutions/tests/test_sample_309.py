@@ -6,8 +6,9 @@ import sys
 import os
 
 # Add the parent directory to the path so we can import the sample
+import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.samples.sample_309 import compute_vqt
+from sample_309 import compute_vqt
 
 class TestComputeVQT(unittest.TestCase):
     def setUp(self):

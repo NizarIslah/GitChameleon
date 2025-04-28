@@ -5,7 +5,9 @@ from werkzeug.exceptions import NotFound
 import sys
 import tempfile
 
-# Add the parent directory to sys.path to import the module
+# Add the parent directory to import sys
+import os
+import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sample_173 import save_exponential
 
