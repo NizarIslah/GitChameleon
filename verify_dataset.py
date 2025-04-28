@@ -34,35 +34,30 @@ def main():
     for idx, record in tqdm(
         enumerate(data), total=len(data), desc="Processing JSON lines"
     ):
-        # Pull each field from the record, defaulting to "-" if missing
-        example_id = int(record.get("example_id", ""))
-        code = record.get("starting_code", "-")
-        solution = record.get("solution", "-")
-        env_path = os.path.join(args.env_dir, f"gcham_venv_{example_id}")
+        try:
+            # Pull each field from the record, defaulting to "-" if missing
+            example_id = int(record.get("example_id", ""))
+            code = record.get("starting_code", "-")
+            solution = record.get("solution", "-")
+            env_path = os.path.join(args.env_dir, f"gcham_venv_{example_id}")
 
-        test_folder_path = os.path.join(
-            args.test_dir, f"test_early_sample_{example_id}/"
-        )
+            test_folder_path =  args.test_dir
+            # # Get the first file starting with "test" in the test folder
+            test_file_path = os.path.join(test_folder_path, f"test_sample_{example_id}.py")
+            code_dict = {}
+            # Read the test file content
+            with open(test_file_path, "r") as test_file:
+                test_file_content = test_file.read()
+            # Update the code_dict with the test file content
+            code_dict["test_file"] = test_file_content
+            code_dict["codes"] = {"solution_code": {"code": code + solution}}
+            print(
+                f"Verifying example {example_id} with env_path: {env_path} and test_file_path: {test_file_path}"
+            )
+            print(eval_sample(example_id, env_path, code_dict)["codes"]["solution_code"]["output"])
 
-        # Get the first file starting with "test" in the test folder
-        test_files = [
-            f
-            for f in os.listdir(test_folder_path)
-            if f.startswith("test") and f.endswith(".py")
-        ]
-        assert (
-            len(test_files) == 1
-        ), f"Expected exactly one test file in {test_folder_path}, but found {len(test_files)}"
-        test_file_path = os.path.join(test_folder_path, test_files[0])
-        code_dict = {}
-        # Read the test file content
-        with open(test_file_path, "r") as test_file:
-            test_file_content = test_file.read()
-        # Update the code_dict with the test file content
-        code_dict["test_file"] = test_file_content
-        code_dict["codes"] = {"solution_code": {"code": code + solution}}
-        print(eval_sample(example_id, env_path, code_dict))
-
-
+        except Exception as e:
+            print(f"Error processing record {idx}: {e}")
+            continue
 if __name__ == "__main__":
     main()
