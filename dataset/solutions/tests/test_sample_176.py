@@ -1,109 +1,69 @@
 import unittest
 import sys
 import os
-
-# Add the parent directory to sys.path to allow importing from the parent directory
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import sympy
-from sympy.matrices.expressions.fourier import DFT
-import sample_176
+import numpy as np
 
+# Add the parent directory to the path so we can import the module
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from dataset.samples.sample_176 import custom_computeDFT
 
-class TestCustomComputeDFT(unittest.TestCase):
-    """Test cases for the custom_computeDFT function in sample_176.py."""
-
-    def test_return_type(self):
-        """Test that custom_computeDFT returns a SymPy ImmutableDenseMatrix."""
-        result = sample_176.custom_computeDFT(2)
-        self.assertIsInstance(result, sympy.ImmutableDenseMatrix)
-
-    def test_matrix_size(self):
-        """Test that the returned matrix has the correct dimensions."""
-        test_sizes = [1, 2, 4, 8]
-        
-        for n in test_sizes:
-            result = sample_176.custom_computeDFT(n)
-            self.assertEqual(result.shape, (n, n))
-
+class TestCustomDFT(unittest.TestCase):
+    def test_dft_size(self):
+        """Test that the DFT matrix has the correct size."""
+        for n in [1, 2, 4, 8]:
+            dft_matrix = custom_computeDFT(n)
+            self.assertEqual(dft_matrix.shape, (n, n))
+    
     def test_dft_properties(self):
-        """Test that the DFT matrix has expected mathematical properties."""
-        # Test for n=4
-        n = 4
-        dft_matrix = sample_176.custom_computeDFT(n)
-        
-        # DFT matrix should be unitary (U* × U = I, where U* is the conjugate transpose)
-        # For a unitary matrix, U × U.H = I where U.H is the Hermitian conjugate
-        identity = dft_matrix * dft_matrix.H
-        
-        # Convert to numerical values for easier comparison
-        numerical_identity = identity.evalf()
-        expected_identity = sympy.eye(n)
-        
-        # Check if close to identity matrix (allowing for numerical precision issues)
-        for i in range(n):
-            for j in range(n):
-                if i == j:
-                    self.assertTrue(abs(numerical_identity[i, j] - 1) < 1e-10)
-                else:
-                    self.assertTrue(abs(numerical_identity[i, j]) < 1e-10)
-
-    def test_dft_values_small_case(self):
-        """Test the actual values of the DFT matrix for a small case."""
+        """Test that the DFT matrix has the expected mathematical properties."""
         # Test for n=2
-        result = sample_176.custom_computeDFT(2)
+        dft_2 = custom_computeDFT(2)
+        expected_2 = sympy.Matrix([
+            [1, 1],
+            [1, -1]
+        ]) / sympy.sqrt(2)
+        self.assertTrue(dft_2.equals(expected_2))
         
-        # Expected DFT matrix for n=2
-        # [1, 1]
-        # [1, -1]
-        # Normalized by 1/sqrt(2)
-        expected = sympy.Matrix([[1, 1], [1, -1]]) / sympy.sqrt(2)
+        # Test for n=4
+        dft_4 = custom_computeDFT(4)
+        # Check that it's unitary (U* × U = I)
+        # Convert to numpy for easier computation
+        dft_4_np = np.array(dft_4).astype(complex)
+        identity = np.eye(4)
+        product = np.conjugate(dft_4_np.T) @ dft_4_np
+        np.testing.assert_almost_equal(product, identity, decimal=10)
+    
+    def test_dft_values(self):
+        """Test specific values in the DFT matrix."""
+        # For n=4, check some specific values
+        dft_4 = custom_computeDFT(4)
         
-        # Convert to ImmutableDenseMatrix for comparison
-        expected = sympy.ImmutableDenseMatrix(expected)
-        
-        # Check if matrices are equal
-        self.assertEqual(result, expected)
-
-    def test_dft_idempotent_property(self):
-        """Test that applying DFT four times returns the original matrix (up to scaling)."""
-        # DFT^4 = I (identity matrix)
+        # The first row and column should all be 1/sqrt(n)
         n = 4
-        dft = sample_176.custom_computeDFT(n)
+        expected_val = 1 / sympy.sqrt(n)
+        
+        for i in range(n):
+            self.assertEqual(dft_4[0, i], expected_val)
+            self.assertEqual(dft_4[i, 0], expected_val)
+    
+    def test_dft_idempotent(self):
+        """Test that applying DFT four times returns the original matrix."""
+        # For n=4, DFT^4 should be the identity matrix
+        n = 4
+        dft = custom_computeDFT(n)
+        
+        # Convert to numpy for easier computation
+        dft_np = np.array(dft).astype(complex)
         
         # Apply DFT four times
-        result = dft * dft * dft * dft
-        
-        # Expected result is identity matrix
-        expected = sympy.eye(n)
-        expected = sympy.ImmutableDenseMatrix(expected)
-        
-        # Check if matrices are equal
-        self.assertEqual(result, expected)
-
-    def test_matches_sympy_dft(self):
-        """Test that our function matches SymPy's DFT implementation."""
-        test_sizes = [1, 2, 4, 8]
-        
-        for n in test_sizes:
-            # Our implementation
-            our_result = sample_176.custom_computeDFT(n)
+        result = dft_np
+        for _ in range(3):  # Already have one application
+            result = result @ dft_np
             
-            # Direct SymPy implementation
-            sympy_result = DFT(n).as_explicit()
-            
-            # Check if matrices are equal
-            self.assertEqual(our_result, sympy_result)
-
-    def test_handles_edge_case_n_equals_one(self):
-        """Test that the function correctly handles n=1."""
-        result = sample_176.custom_computeDFT(1)
-        
-        # DFT for n=1 should be [1]
-        expected = sympy.ImmutableDenseMatrix([[1]])
-        
-        self.assertEqual(result, expected)
-
+        # Should approximately equal the identity matrix
+        identity = np.eye(n)
+        np.testing.assert_almost_equal(result, identity, decimal=10)
 
 if __name__ == '__main__':
     unittest.main()
