@@ -3,9 +3,12 @@ import io
 import sys
 import unittest
 from unittest.mock import patch
+import os
+
+dir_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Import the module from the solutions directory
-spec = importlib.util.spec_from_file_location("sample_324", "../sample_324.py")
+spec = importlib.util.spec_from_file_location("sample_324", os.path.join(dir_path, "sample_324.py"))
 sample_324 = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(sample_324)
 
