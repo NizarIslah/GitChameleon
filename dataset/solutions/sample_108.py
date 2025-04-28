@@ -5,7 +5,8 @@ import django
 from django.conf import settings
 from django.db import models
 
-settings.configure()
+if not settings.configured:
+    settings.configure()
 django.setup()
 
 color = models.TextChoices('Color', 'RED GREEN BLUE')

@@ -6,6 +6,7 @@ from django.forms.models import BaseModelFormSet
 from django.forms.renderers import get_default_renderer
 from django.forms import Form
 
-settings.configure()
+if not settings.configured:
+    settings.configure()
 def save_existing(formset: BaseModelFormSet, form : Form, obj:str) -> None:
     return formset.save_existing(form=form,instance=obj)

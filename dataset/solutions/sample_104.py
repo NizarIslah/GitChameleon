@@ -7,13 +7,14 @@ from django.conf import settings
 from django import forms
 from django.template import Template, Context
 
-settings.configure(
-      TEMPLATES=[
-          {
-              'BACKEND': 'django.template.backends.django.DjangoTemplates',
-          },
-      ],
-  )
+if not settings.configured:
+  settings.configure(
+        TEMPLATES=[
+            {
+                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            },
+        ],
+    )
 django.setup()
 
 def render_output(template_string):
