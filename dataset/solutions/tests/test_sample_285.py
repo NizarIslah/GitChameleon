@@ -45,8 +45,8 @@ class TestGriffinLim(unittest.TestCase):
                                              pad_mode, n_fft)
         
         # Replace the original function with our patched version
-        import dataset.samples.sample_285
-        dataset.samples.sample_285.compute_griffinlim = patched_compute_griffinlim
+        import sample_285
+        sample_285.compute_griffinlim = patched_compute_griffinlim
         
         # Now run the test
         result = compute_griffinlim(
@@ -85,8 +85,8 @@ class TestGriffinLim(unittest.TestCase):
                                              pad_mode, n_fft)
         
         # Replace the original function with our patched version
-        import dataset.samples.sample_285
-        dataset.samples.sample_285.compute_griffinlim = patched_compute_griffinlim
+        import sample_285
+        sample_285.compute_griffinlim = patched_compute_griffinlim
         
         # Test with different window function and center=False
         result = compute_griffinlim(
@@ -123,8 +123,8 @@ class TestGriffinLim(unittest.TestCase):
                                              pad_mode, n_fft)
         
         # Replace the original function with our patched version
-        import dataset.samples.sample_285
-        dataset.samples.sample_285.compute_griffinlim = patched_compute_griffinlim
+        import sample_285
+        sample_285.compute_griffinlim = patched_compute_griffinlim
         
         # Run the function twice with the same random_state
         result1 = compute_griffinlim(

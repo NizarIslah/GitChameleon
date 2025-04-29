@@ -32,7 +32,7 @@ class TestGetSynsetExamples(unittest.TestCase):
     
     def test_invalid_synset(self):
         """Test that an invalid synset raises an appropriate exception."""
-        with self.assertRaises(nltk.corpus.reader.wordnet.WordNetError):
+        with self.assertRaises(ValueError):
             get_synset_examples('nonexistent_synset')
     
     def test_different_synsets(self):

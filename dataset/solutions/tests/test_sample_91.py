@@ -1,7 +1,10 @@
 import unittest
 import spacy
 from spacy.pipeline.span_ruler import SpanRuler
-from dataset.solutions.sample_91 import get_labels
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_91 import get_labels
 
 
 class TestGetLabels(unittest.TestCase):

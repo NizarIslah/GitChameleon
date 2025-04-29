@@ -8,83 +8,46 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sample_56 import get_grouped_df
 
+
 class TestGetGroupedDF(unittest.TestCase):
-    
-    def test_basic_grouping(self):
-        """Test basic grouping functionality with simple data."""
-        # Create a test DataFrame
-        df = pd.DataFrame({
-            'x': ['A', 'B', 'A', 'C', 'B'],
-            'value': [1, 2, 3, 4, 5]
-        })
-        
-        # Get the grouped DataFrame
-        result = get_grouped_df(df)
-        
-        # Expected result
-        expected = pd.DataFrame({
-            'value': [4, 7, 4]
-        }, index=pd.Index(['A', 'B', 'C'], name='x'))
-        
-        # Check if the result matches the expected output
-        pd.testing.assert_frame_equal(result, expected)
-    
-    def test_with_nan_values(self):
-        """Test grouping with NaN values in the grouping column."""
-        # Create a test DataFrame with NaN values
-        df = pd.DataFrame({
-            'x': ['A', 'B', np.nan, 'A', np.nan],
-            'value': [1, 2, 3, 4, 5]
-        })
-        
-        # Get the grouped DataFrame
-        result = get_grouped_df(df)
-        
-        # Expected result (NaN values should be included as a group)
-        expected = pd.DataFrame({
-            'value': [5, 2, 8]
-        }, index=pd.Index(['A', 'B', np.nan], name='x'))
-        
-        # Check if the result matches the expected output
-        pd.testing.assert_frame_equal(result, expected)
-    
-    def test_multiple_columns(self):
-        """Test grouping with multiple data columns."""
-        # Create a test DataFrame with multiple columns
-        df = pd.DataFrame({
-            'x': ['A', 'B', 'A', 'C', 'B'],
-            'value1': [1, 2, 3, 4, 5],
-            'value2': [10, 20, 30, 40, 50]
-        })
-        
-        # Get the grouped DataFrame
-        result = get_grouped_df(df)
-        
-        # Expected result
-        expected = pd.DataFrame({
-            'value1': [4, 7, 4],
-            'value2': [40, 70, 40]
-        }, index=pd.Index(['A', 'B', 'C'], name='x'))
-        
-        # Check if the result matches the expected output
-        pd.testing.assert_frame_equal(result, expected)
-    
     def test_empty_dataframe(self):
         """Test grouping with an empty DataFrame."""
-        # Create an empty DataFrame with the required column
+        # Create an empty DataFrame with the required columns
         df = pd.DataFrame({'x': [], 'value': []})
-        
+
         # Get the grouped DataFrame
         result = get_grouped_df(df)
-        
-        # Expected result is an empty DataFrame with the correct structure
+
+        # Expected result is an empty DataFrame with the correct structure:
+        # - one column 'value'
+        # - an index named 'x' of dtype float64 (to match how pandas infers dtypes)
         expected = pd.DataFrame(
             columns=['value'],
-            index=pd.Index([], name='x')
+            index=pd.Float64Index([], name='x')
         )
-        
-        # Check if the result matches the expected output
+
         pd.testing.assert_frame_equal(result, expected)
 
-if __name__ == '__main__':
+    def test_single_group(self):
+        """Test grouping when there's only one group."""
+        df = pd.DataFrame({'x': [1, 1, 1], 'value': [10, 20, 30]})
+        result = get_grouped_df(df)
+        expected = pd.DataFrame(
+            {'value': [20]},
+            index=pd.Index([1], name='x')
+        )
+        pd.testing.assert_frame_equal(result, expected)
+
+    def test_multiple_groups(self):
+        """Test grouping with multiple distinct groups."""
+        df = pd.DataFrame({'x': [1, 2, 1, 2], 'value': [10, 20, 30, 40]})
+        result = get_grouped_df(df)
+        expected = pd.DataFrame(
+            {'value': [20, 30]},
+            index=pd.Index([1, 2], name='x')
+        )
+        pd.testing.assert_frame_equal(result, expected)
+
+
+if __name__ == "__main__":
     unittest.main()

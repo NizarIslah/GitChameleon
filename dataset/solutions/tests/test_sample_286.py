@@ -25,7 +25,7 @@ class TestComputeGriffinLim(unittest.TestCase):
         # Compute the magnitude spectrogram
         self.S = np.abs(librosa.stft(self.y, n_fft=self.n_fft, hop_length=self.hop_length))
 
-    @patch('dataset.samples.sample_286.librosa.griffinlim')
+    @patch('sample_286.librosa.griffinlim')
     def test_compute_griffinlim_calls_librosa_correctly(self, mock_griffinlim):
         # Set up the mock to return a known value
         expected_output = np.array([1.0, 2.0, 3.0])

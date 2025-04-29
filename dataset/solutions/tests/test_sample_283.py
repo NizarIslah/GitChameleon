@@ -40,7 +40,7 @@ class TestSample283(unittest.TestCase):
         # Clean up temporary directory
         self.temp_dir.cleanup()
     
-    @patch('dataset.samples.sample_283.sf.blocks')
+    @patch('sample_283.sf.blocks')
     def test_compute_stream(self, mock_blocks):
         # Create a mock for sf.blocks
         mock_block = np.array([[0.1, 0.2], [0.3, 0.4]])
@@ -48,10 +48,10 @@ class TestSample283(unittest.TestCase):
         
         # Mock librosa.to_mono to return a simple array
         mono_output = np.array([0.2, 0.35])
-        with patch('dataset.samples.sample_283.librosa.to_mono', return_value=mono_output):
+        with patch('sample_283.librosa.to_mono', return_value=mono_output):
             # Mock librosa.stft to return a simple complex array
             stft_output = np.array([[1+2j, 3+4j], [5+6j, 7+8j]])
-            with patch('dataset.samples.sample_283.librosa.stft', return_value=stft_output):
+            with patch('sample_283.librosa.stft', return_value=stft_output):
                 # Call the function with our test data
                 stream, stream_blocks = compute_stream(
                     self.y, self.sr, self.n_fft, self.hop_length
@@ -78,7 +78,7 @@ class TestSample283(unittest.TestCase):
         # 'filename' is not defined in the function parameters
         
         # We'll patch the function to fix the bug for testing purposes
-        with patch('dataset.samples.sample_283.sf.blocks') as mock_blocks:
+        with patch('sample_283.sf.blocks') as mock_blocks:
             # Create a mock audio block
             mock_block = np.random.rand(2, 1000)  # Stereo audio block
             mock_blocks.return_value = [mock_block]
