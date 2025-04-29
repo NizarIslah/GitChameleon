@@ -20,7 +20,7 @@ class TestSample225(unittest.TestCase):
         self.assertIsInstance(result, Headers)
         
         # Verify the header was set correctly
-        self.assertEqual(result[header_name], initial_value)
+        self.assertEqual(result[header_name], initial_value.decode("utf-8"))
         
     def test_custom_function_with_empty_values(self):
         # Test with empty header value
@@ -30,7 +30,7 @@ class TestSample225(unittest.TestCase):
         result = custom_function(header_name, initial_value)
         
         self.assertIsInstance(result, Headers)
-        self.assertEqual(result[header_name], initial_value)
+        self.assertEqual(result[header_name], initial_value.decode("utf-8"))
     
     def test_custom_function_with_multiple_headers(self):
         # The function only adds one header, but we can verify the Headers object
