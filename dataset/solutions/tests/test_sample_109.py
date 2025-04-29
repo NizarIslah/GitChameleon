@@ -37,9 +37,9 @@ class TestComputeWMinkowski(unittest.TestCase):
         result = compute_wminkowski(u, v, p, w)
         
         self.assertEqual(result, expected)
-        # Manual calculation: sqrt((0.5*(4-1)^2 + 1.0*(5-2)^2 + 2.0*(6-3)^2))
-        # = sqrt(0.5*9 + 1.0*9 + 2.0*9) = sqrt(4.5 + 9 + 18) = sqrt(31.5)
-        self.assertAlmostEqual(result, np.sqrt(31.5), places=10)
+        # Manual calculation: sqrt((|0.5*(1-4)|^2 + |1.0*(2-5)|^2 + |2.0*(3-6)|^2))
+        # = sqrt(2.25 + 9 + 36) = sqrt(47.25)
+        self.assertAlmostEqual(result, np.sqrt(47.25), places=10)
     
     def test_different_p_value(self):
         """Test with a different p value (Manhattan distance)."""

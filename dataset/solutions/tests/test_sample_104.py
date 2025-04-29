@@ -24,7 +24,7 @@ class TestSample104(unittest.TestCase):
     def test_template_string(self):
         """Test that the template string contains expected Django template tags"""
         self.assertIn('{{ form.name.label_tag }}', self.template_string)
-        self.assertIn('{{ form.name.help_text }}', self.template_string)
+        self.assertIn('{{ form.name.help_text|safe }}', self.template_string)
         self.assertIn('{{ form.name }}', self.template_string)
         self.assertIn('{% if form.name.help_text %}', self.template_string)
         self.assertIn('{% endif %}', self.template_string)

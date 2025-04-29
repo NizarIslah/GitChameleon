@@ -2,7 +2,6 @@
 # Test file for sample_323.py
 
 import io
-# Import the functions from sample_323
 import sys
 import unittest
 from unittest.mock import patch
@@ -35,8 +34,8 @@ class TestSample323(unittest.TestCase):
         """Test that sol_dict is initialized with total set to None."""
         self.assertIsNone(sol_dict['total'])
         
-    @patch('sys.stdout', new_callable=io.StringIO)
-    def test_progress_bar_creation(self, mock_stdout):
+    @patch('sys.stderr', new_callable=io.StringIO)
+    def test_progress_bar_creation(self, mock_stderr):
         """Test that a progress bar can be created with the infinite generator."""
         # Create a small test with a defined total
         test_total = 10
@@ -50,7 +49,7 @@ class TestSample323(unittest.TestCase):
                 pbar.set_description(f"Testing {i}")
         
         # Check that the progress bar output contains expected text
-        output = mock_stdout.getvalue()
+        output = mock_stderr.getvalue()
         self.assertIn("Testing", output)
         
     def test_progress_bar_with_none_total(self):

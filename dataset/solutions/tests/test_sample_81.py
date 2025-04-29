@@ -1,61 +1,40 @@
-import sys
-import os
 import numpy as np
 import pytest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
-# Add the parent directory to sys.path to import the module
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sample_81 import predict_start
-import sample_81
 
+@pytest.fixture
+def mock_model():
+    model = Mock()
+    model.predict = Mock(return_value=np.array([10, 20, 30]))
+    return model
 
-class TestPredictStart(unittest.TestCase):
-    def setUp(self):
-        self.mock_model = Mock()
-        # Default prediction
-        self.mock_model.predict = Mock(return_value=np.array([10, 20, 30]))
-        self.test_data = np.array([1, 2, 3])
+@pytest.fixture
+def test_data():
+    return np.array([1, 2, 3])
 
-    def test_predict_start_calls_model_predict_with_correct_params(self):
-        """Test that predict_start calls model.predict with the correct parameters."""
-        # Patch the function to use the intended call signature
-        with patch('sample_81.predict_start', lambda model, start_iter, data:
-                  model.predict(data, start_iteration=start_iter)):
-            result = sample_81.predict_start(self.mock_model, 5, self.test_data)
-            # Ensure model.predict was called with data and start_iteration=5
-            self.mock_model.predict.assert_called_with(self.test_data, start_iteration=5)
-            # And that the return value is passed back
-            np.testing.assert_array_equal(result, np.array([10, 20, 30]))
+def test_predict_start_calls_model_predict_with_correct_params(mock_model, test_data):
+    result = predict_start(mock_model, 5, test_data)
+    mock_model.predict.assert_called_with(test_data, start_iteration=5)
+    np.testing.assert_array_equal(result, np.array([10, 20, 30]))
 
-    def test_predict_start_with_different_start_iterations(self):
-        """Test predict_start with start_iter = 0."""
-        with patch('sample_81.predict_start', lambda model, start_iter, data:
-                  model.predict(data, start_iteration=start_iter)):
-            sample_81.predict_start(self.mock_model, 0, self.test_data)
-            self.mock_model.predict.assert_called_with(self.test_data, start_iteration=0)
+def test_predict_start_with_different_start_iterations(mock_model, test_data):
+    predict_start(mock_model, 0, test_data)
+    mock_model.predict.assert_called_with(test_data, start_iteration=0)
 
-    def test_predict_start_returns_correct_predictions(self):
-        """Test that predict_start returns the correct predictions on successive calls."""
-        preds1 = np.array([1, 2, 3])
-        preds2 = np.array([4, 5, 6])
-        self.mock_model.predict.side_effect = [preds1, preds2]
-        with patch('sample_81.predict_start', lambda model, start_iter, data:
-                  model.predict(data, start_iteration=start_iter)):
-            r1 = sample_81.predict_start(self.mock_model, 5, self.test_data)
-            r2 = sample_81.predict_start(self.mock_model, 6, self.test_data)
-            np.testing.assert_array_equal(r1, preds1)
-            np.testing.assert_array_equal(r2, preds2)
+def test_predict_start_returns_correct_predictions(test_data):
+    mock_model = Mock()
+    preds1 = np.array([1, 2, 3])
+    preds2 = np.array([4, 5, 6])
+    mock_model.predict.side_effect = [preds1, preds2]
+    r1 = predict_start(mock_model, 5, test_data)
+    r2 = predict_start(mock_model, 6, test_data)
+    np.testing.assert_array_equal(r1, preds1)
+    np.testing.assert_array_equal(r2, preds2)
 
-    def test_predict_start_with_empty_data(self):
-        """Test predict_start with empty data returns empty array."""
-        empty = np.array([])
-        self.mock_model.predict.return_value = empty
-        with patch('sample_81.predict_start', lambda model, start_iter, data:
-                  model.predict(data, start_iteration=start_iter)):
-            result = sample_81.predict_start(self.mock_model, 5, empty)
-            np.testing.assert_array_equal(result, empty)
-
-
-if __name__ == "__main__":
-    unittest.main()
+def test_predict_start_with_empty_data(mock_model):
+    empty = np.array([])
+    mock_model.predict.return_value = empty
+    result = predict_start(mock_model, 5, empty)
+    np.testing.assert_array_equal(result, empty)

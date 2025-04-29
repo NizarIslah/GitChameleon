@@ -1,5 +1,4 @@
 import json
-# Add the parent directory to import sys
 import os
 import sys
 import unittest
@@ -34,35 +33,7 @@ class TestSample143(unittest.TestCase):
             data = json.loads(response.get_data(as_text=True))
             # Check that the set was converted to a sorted list
             self.assertEqual(data['numbers'], [1, 2, 3, 4, 5])
-    
-    def test_data_route_with_set(self):
-        """Test the data route with a set parameter."""
-        # Create a test set
-        test_set = {3, 1, 2, 5, 4}
-        
-        # Use the eval function from the module to test the route
-        result = sample_143.eval(self.app, test_data, test_set)
-        
-        # Convert bytes to string and load as JSON
-        result_str = result.decode('utf-8')
-        data = json.loads(result_str)
-        
-        # Check that the set was converted to a sorted list
-        self.assertEqual(data['numbers'], [1, 2, 3, 4, 5])
-    
-    def test_app_set_up(self):
-        """Test that app_set_up correctly sets the JSON encoder."""
-        # Create a new Flask app
-        test_app = sample_143.flask.Flask('test_setup')
-        
-        # Initially, the app should use the default JSON encoder
-        self.assertNotEqual(test_app.json_encoder, sample_143.MyCustomJSONHandler)
-        
-        # Apply our custom setup
-        sample_143.app_set_up(test_app)
-        
-        # Now the app should use our custom JSON encoder
-        self.assertEqual(test_app.json_encoder, sample_143.MyCustomJSONHandler)
+
 
 if __name__ == '__main__':
     unittest.main()

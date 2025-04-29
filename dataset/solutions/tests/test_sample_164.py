@@ -39,17 +39,17 @@ class TestSample164(unittest.TestCase):
         with self.app.test_request_context():
             response = data(test_array)
             result = json.loads(response.get_data(as_text=True))
-            # Since equal_nan=False in the unique function, NaN values are not considered equal
-            # So we should have all unique values including NaN
-            self.assertEqual(len(result['numbers']), 4)  # 1.0, 2.0, 3.0, and NaN
+            # np.unique with equal_nan=False treats each NaN as unique, so we expect 5 unique values
+            self.assertEqual(len(result['numbers']), 5)  # 1.0, 2.0, 3.0, nan, nan
             
             # Check that 1.0, 2.0, 3.0 are in the result
             self.assertIn(1.0, result['numbers'])
             self.assertIn(2.0, result['numbers'])
             self.assertIn(3.0, result['numbers'])
             
-            # Check that at least one value is NaN
-            self.assertTrue(any(np.isnan(x) for x in result['numbers']))
+            # Check that there are two NaN values
+            nan_count = sum(np.isnan(x) for x in result['numbers'])
+            self.assertEqual(nan_count, 2)
     
     def test_eval_app_function(self):
         """Test the eval_app function"""

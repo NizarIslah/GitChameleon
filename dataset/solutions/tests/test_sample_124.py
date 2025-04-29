@@ -1,5 +1,4 @@
 import os
-# Add the parent directory to the path so we can import the module
 import sys
 import unittest
 
@@ -29,11 +28,7 @@ class TestLUDecomposition(unittest.TestCase):
         self.assertEqual(u.shape, (4, 4))
         
         # Verify that P*A = L*U
-        # Convert permutation matrix to actual permutation
-        p_indices = np.argmax(p, axis=1)
-        A_permuted = A[p_indices]
-        
-        # Check if L*U equals the permuted A
+        A_permuted = p @ A
         LU = np.matmul(l, u)
         np.testing.assert_allclose(A_permuted, LU, rtol=1e-10, atol=1e-10)
         
@@ -65,11 +60,7 @@ class TestLUDecomposition(unittest.TestCase):
         self.assertEqual(u.shape, (3, 3))
         
         # Verify that P*A = L*U
-        # Convert permutation matrix to actual permutation
-        p_indices = np.argmax(p, axis=1)
-        A_permuted = A[p_indices]
-        
-        # Check if L*U equals the permuted A
+        A_permuted = p @ A
         LU = np.matmul(l, u)
         np.testing.assert_allclose(A_permuted, LU, rtol=1e-10, atol=1e-10)
     
@@ -89,11 +80,7 @@ class TestLUDecomposition(unittest.TestCase):
         self.assertEqual(u.shape, (3, 3))
         
         # Verify that P*A = L*U
-        # Convert permutation matrix to actual permutation
-        p_indices = np.argmax(p, axis=1)
-        A_permuted = A[p_indices]
-        
-        # Check if L*U equals the permuted A
+        A_permuted = p @ A
         LU = np.matmul(l, u)
         np.testing.assert_allclose(A_permuted, LU, rtol=1e-10, atol=1e-10)
     
@@ -117,7 +104,7 @@ class TestLUDecomposition(unittest.TestCase):
         
         # Solve the system using our decomposition
         # First apply the permutation to b
-        b_permuted = b[p_indices]
+        b_permuted = p @ b
         
         # Solve L*y = P*b for y
         y = np.zeros_like(b, dtype=float)

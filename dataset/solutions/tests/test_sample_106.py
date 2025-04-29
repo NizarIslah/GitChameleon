@@ -1,4 +1,3 @@
-# Add the parent directory to import sys
 import os
 import sys
 import unittest
@@ -9,12 +8,6 @@ from sample_106 import Square, create_square, display_side_and_area
 
 
 class TestSquareModel(unittest.TestCase):
-    def setUp(self):
-        # Create the necessary tables in the in-memory database
-        from django.db import connection
-        with connection.schema_editor() as schema_editor:
-            schema_editor.create_model(Square)
-
     def tearDown(self):
         # Clean up after each test
         Square.objects.all().delete()

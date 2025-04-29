@@ -35,8 +35,8 @@ class TestSample237(unittest.TestCase):
         # Check that the returned object is a BoundedStream
         self.assertIsInstance(bounded_stream, stream.BoundedStream)
         
-        # Check that the bounded stream has the correct length
-        self.assertEqual(bounded_stream.content_length, len(test_data))
+        # Check that the bounded stream has the correct remaining bytes
+        self.assertEqual(bounded_stream.remaining, len(test_data))
 
     def test_bounded_stream_read(self):
         """Test that the bounded stream can be read and contains the expected data."""

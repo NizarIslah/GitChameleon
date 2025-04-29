@@ -40,12 +40,13 @@ class TestSample163(unittest.TestCase):
         with self.app.test_request_context():
             response = data(test_arr)
             response_data = json.loads(response.get_data(as_text=True))
-            # Check length (should be 4: 1.0, 2.0, 3.0, and one NaN)
-            self.assertEqual(len(response_data['numbers']), 4)
+            # np.unique returns [1.0, 2.0, 3.0, nan, nan] (length 5)
+            self.assertEqual(len(response_data['numbers']), 5)
             # Check that the first three elements are the unique non-NaN values
             self.assertEqual(response_data['numbers'][:3], [1.0, 2.0, 3.0])
-            # The last element should be null (NaN in JSON)
+            # The last two elements should be null (NaN in JSON)
             self.assertIsNone(response_data['numbers'][3])
+            self.assertIsNone(response_data['numbers'][4])
     
     def test_eval_function(self):
         """Test the eval function"""
@@ -72,12 +73,13 @@ class TestSample163(unittest.TestCase):
         # Test with array containing NaN values
         test_arr = np.array([1.0, 2.0, np.nan, 3.0, np.nan])
         encoded = encoder.default(test_arr)
-        # Check length (should be 4: 1.0, 2.0, 3.0, and one NaN)
-        self.assertEqual(len(encoded), 4)
+        # np.unique returns [1.0, 2.0, 3.0, nan, nan] (length 5)
+        self.assertEqual(len(encoded), 5)
         # Check that the first three elements are the unique non-NaN values
         self.assertEqual(encoded[:3], [1.0, 2.0, 3.0])
-        # The last element should be NaN
+        # The last two elements should be NaN
         self.assertTrue(np.isnan(encoded[3]))
+        self.assertTrue(np.isnan(encoded[4]))
         
         # Test with non-numpy object (should raise TypeError)
         with self.assertRaises(TypeError):

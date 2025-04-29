@@ -12,41 +12,39 @@ from sample_56 import get_grouped_df
 class TestGetGroupedDF(unittest.TestCase):
     def test_empty_dataframe(self):
         """Test grouping with an empty DataFrame."""
-        # Create an empty DataFrame with the required columns
         df = pd.DataFrame({'x': [], 'value': []})
-
-        # Get the grouped DataFrame
         result = get_grouped_df(df)
 
-        # Expected result is an empty DataFrame with the correct structure:
-        # - one column 'value'
-        # - an index named 'x' of dtype float64 (to match how pandas infers dtypes)
         expected = pd.DataFrame(
             columns=['value'],
-            index=pd.Float64Index([], name='x')
+            index=pd.Index([], name='x')
         )
-
-        pd.testing.assert_frame_equal(result, expected)
+        # Ignore dtype differences (empty sum yields float64)
+        pd.testing.assert_frame_equal(result, expected, check_dtype=False)
 
     def test_single_group(self):
         """Test grouping when there's only one group."""
         df = pd.DataFrame({'x': [1, 1, 1], 'value': [10, 20, 30]})
         result = get_grouped_df(df)
+
+        # Sum of [10,20,30] = 60
         expected = pd.DataFrame(
-            {'value': [20]},
+            {'value': [60]},
             index=pd.Index([1], name='x')
         )
-        pd.testing.assert_frame_equal(result, expected)
+        pd.testing.assert_frame_equal(result, expected, check_dtype=False)
 
     def test_multiple_groups(self):
         """Test grouping with multiple distinct groups."""
         df = pd.DataFrame({'x': [1, 2, 1, 2], 'value': [10, 20, 30, 40]})
         result = get_grouped_df(df)
+
+        # Group sums: x=1 → 10+30=40; x=2 → 20+40=60
         expected = pd.DataFrame(
-            {'value': [20, 30]},
+            {'value': [40, 60]},
             index=pd.Index([1, 2], name='x')
         )
-        pd.testing.assert_frame_equal(result, expected)
+        pd.testing.assert_frame_equal(result, expected, check_dtype=False)
 
 
 if __name__ == "__main__":

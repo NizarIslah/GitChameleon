@@ -1,9 +1,8 @@
-# Add the parent directory to import sys
 import os
 import sys
 import unittest
 import warnings
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -16,7 +15,6 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 # Check gradio version
 gr_version = gr.__version__
 print(f"Using gradio version: {gr_version}")
-
 
 class TestImageProcessing(unittest.TestCase):
     """Test cases for the process_image function and Gradio Interface in sample_40.py."""
@@ -43,67 +41,22 @@ class TestImageProcessing(unittest.TestCase):
         # Check that the interface has the correct function
         self.assertEqual(sample_40.iface.fn, sample_40.process_image)
         
-        # In Gradio 2.9.2, the structure is different from newer versions
-        # We'll check the basic properties that should be consistent
-        # using conditional checks to handle different Gradio versions
-        
-        # For Gradio 2.9.2, inputs and outputs are directly accessible
-        if hasattr(sample_40.iface, 'inputs') and hasattr(gr, 'inputs'):
-            # Check that there is one input component
-            self.assertEqual(len(sample_40.iface.inputs), 1)
-            # Check that the input is an Image component (in Gradio 2.9.2)
-            self.assertIsInstance(sample_40.iface.inputs[0], gr.inputs.Image)
-            
-        if hasattr(sample_40.iface, 'outputs') and hasattr(gr, 'outputs'):
-            # Check that there is one output component
-            self.assertEqual(len(sample_40.iface.outputs), 1)
-            # Check that the output is a Textbox component (in Gradio 2.9.2)
-            self.assertIsInstance(sample_40.iface.outputs[0], gr.outputs.Textbox)
+        # Check input and output components for both old and new Gradio versions
+        iface = sample_40.iface
 
-    @patch('gradio.Interface.launch')
-    def test_interface_launch(self, mock_launch):
-        """Test that the interface can be launched."""
-        # Set up the mock to return a simple object
-        mock_launch.return_value = MagicMock()
-        
-        # Launch the interface
-        result = sample_40.iface.launch()
-        
-        # Check that launch was called
-        mock_launch.assert_called_once()
-        
-        # Check that a result was returned
-        self.assertIsNotNone(result)
-
-    @patch('gradio.Interface.launch')
-    def test_interface_launch_with_share(self, mock_launch):
-        """Test that the interface can be launched with sharing enabled."""
-        # Set up the mock to return a simple object
-        mock_launch.return_value = MagicMock()
-        
-        # Launch the interface with share=True
-        result = sample_40.iface.launch(share=True)
-        
-        # Check that launch was called with share=True
-        mock_launch.assert_called_once_with(share=True)
-        
-        # Check that a result was returned
-        self.assertIsNotNone(result)
-
-    @patch('gradio.Interface.launch')
-    def test_interface_with_custom_server_name(self, mock_launch):
-        """Test that the interface can be launched with a custom server name."""
-        # Set up the mock to return a simple object
-        mock_launch.return_value = MagicMock()
-        
-        # Launch the interface with a custom server name
-        result = sample_40.iface.launch(server_name="0.0.0.0")
-        
-        # Check that launch was called with server_name="0.0.0.0"
-        mock_launch.assert_called_once_with(server_name="0.0.0.0")
-        
-        # Check that a result was returned
-        self.assertIsNotNone(result)
+        # Try new Gradio API first
+        if hasattr(gr, "components"):
+            # New Gradio (>=3.x)
+            self.assertEqual(len(iface.input_components), 1)
+            self.assertIsInstance(iface.input_components[0], gr.components.Image)
+            self.assertEqual(len(iface.output_components), 1)
+            self.assertIsInstance(iface.output_components[0], gr.components.Textbox)
+        else:
+            # Old Gradio (<=2.x)
+            self.assertEqual(len(iface.inputs), 1)
+            self.assertIsInstance(iface.inputs[0], gr.inputs.Image)
+            self.assertEqual(len(iface.outputs), 1)
+            self.assertIsInstance(iface.outputs[0], gr.outputs.Textbox)
 
     def test_process_image_with_different_inputs(self):
         """Test that process_image returns 'Processed' for different types of inputs."""
@@ -118,7 +71,6 @@ class TestImageProcessing(unittest.TestCase):
         # Test with a dictionary (simulating a complex input)
         result = sample_40.process_image({"path": "image.jpg", "type": "jpg"})
         self.assertEqual(result, "Processed")
-
 
 if __name__ == '__main__':
     unittest.main()

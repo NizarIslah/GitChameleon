@@ -12,14 +12,11 @@ class TestCreateWhitespaceVariant(unittest.TestCase):
         # blank English model
         self.nlp = spacy.blank("en")
         text = "This is a test sentence."
-        # build a minimal Example with just tokenization
+        # build a minimal Example with just tokenization and empty entities
         doc = self.nlp(text)
         self.example = Example.from_dict(
             doc,
-            {
-                "token_annotation": {"ORTH": [t.text for t in doc]},
-                "doc_annotation": {"entities": ["O"] * len(doc), "links": {}, "spans": {}},
-            },
+            {"entities": []}
         )
 
     def test_create_whitespace_variant_end(self):

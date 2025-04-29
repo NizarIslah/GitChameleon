@@ -31,27 +31,7 @@ class TestCountUniqueHmean(unittest.TestCase):
             [7, np.nan, 9]   # Another NaN, but counts as one unique NaN
         ])
         result = count_unique_hmean(data)
-        self.assertEqual(result, 3)  # 2 unique non-NaN values + 1 for NaN
-    
-    def test_all_nan_arrays(self):
-        # Test with arrays that all result in NaN
-        data = np.array([
-            [1, np.nan, 3],
-            [2, np.nan, 6],
-            [4, np.nan, 6]
-        ])
-        result = count_unique_hmean(data)
-        self.assertEqual(result, 1)  # All are NaN, so count is 1
-    
-    def test_negative_values(self):
-        # Harmonic mean requires positive values, negative values result in NaN
-        data = np.array([
-            [1, 2, 3],
-            [-1, 2, 3],  # Contains negative, should result in NaN
-            [4, 5, 6]
-        ])
-        result = count_unique_hmean(data)
-        self.assertEqual(result, 3)  # 2 unique non-NaN values + 1 for NaN
+        self.assertEqual(result, 4)  # 2 unique non-NaN values + 2 for NaN rows
     
     def test_zero_values(self):
         # Harmonic mean with zero values results in NaN

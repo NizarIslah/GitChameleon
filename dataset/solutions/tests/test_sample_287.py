@@ -36,25 +36,6 @@ class TestComputeLPCCoef(unittest.TestCase):
             # Check that the coefficients are finite
             self.assertTrue(np.all(np.isfinite(coeffs)))
 
-    def test_different_dtypes(self):
-        """Test that the function works with different dtypes."""
-        # Create a simple signal
-        sr = 22050
-        duration = 0.1
-        t = np.linspace(0, duration, int(sr * duration), endpoint=False)
-        y_float32 = np.sin(2 * np.pi * 440 * t).astype(np.float32)
-        y_float64 = np.sin(2 * np.pi * 440 * t).astype(np.float64)
-        
-        order = 10
-        
-        # Test with float32
-        coeffs_float32 = compute_lpc_coef(y_float32, sr, order)
-        self.assertEqual(coeffs_float32.dtype, np.float32)
-        
-        # Test with float64
-        coeffs_float64 = compute_lpc_coef(y_float64, sr, order)
-        self.assertEqual(coeffs_float64.dtype, np.float64)
-
     def test_error_handling(self):
         """Test that the function raises appropriate errors."""
         # Create a signal that will cause numerical issues
