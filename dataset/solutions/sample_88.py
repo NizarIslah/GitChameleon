@@ -13,4 +13,4 @@ def create_c_array(values: list, ctype: type) -> ctypes.Array:
     Returns:
         ctypes.Array: A ctypes array containing the values.
     """
-    return basic._c_array(CTYPE, VALUES)
+    return basic._c_array(ctype, values)
