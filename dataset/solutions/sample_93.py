@@ -16,4 +16,4 @@ def remove_pattern_by_id(ruler: SpanRuler, pattern_id: str) -> None:
     Returns:
         None
     """
-    ruler.remove_by_id(pattern_id_to_remove)
+    ruler.remove_by_id(pattern_id)
