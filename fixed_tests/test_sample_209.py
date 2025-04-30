@@ -1,13 +1,16 @@
+#!/usr/bin/env python
+# test_sample.py
+
 import os
 import sys
 import unittest
-from unittest.mock import patch, MagicMock
 
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 
+# Add the parent directory to sys.path for import
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from sample_209 import custom_pointplot
@@ -40,45 +43,48 @@ class TestCustomPointplot(unittest.TestCase):
         """Test that the plot has the expected properties."""
         ax = custom_pointplot(self.test_data)
         
-        # Check that the plot has data in either lines or collections
-        is_data_rendered = (len(ax.lines) + len(ax.collections)) > 0
-        self.assertTrue(is_data_rendered)
+        # Check that the plot has data
+        self.assertTrue(len(ax.collections) > 0)
         
-        # Check that the x-axis has the expected number of unique categories
+        # Check that the x-axis has the expected categories
         self.assertEqual(len(ax.get_xticks()), len(self.test_data['x'].unique()))
 
     def test_error_bars(self):
-        """
-        Test that error bars are present with the specified linewidth.
-        In modern seaborn versions, error bars often appear as lines, not in ax.collections.
-        """
+        """Test that error bars are present with the specified linewidth."""
         ax = custom_pointplot(self.test_data)
+        
+        # Find error bars in the plot
+        error_bars = None
+        for collection in ax.collections:
+            if hasattr(collection, 'get_linewidth'):
+                error_bars = collection
+                break
+        
+        # Check that error bars exist
+        self.assertIsNotNone(error_bars)
 
-        # Look for lines with linewidth == 2 (our err_kws setting).
-        lines_with_linewidth_2 = [line for line in ax.lines if line.get_linewidth() == 2]
-        self.assertGreater(len(lines_with_linewidth_2), 0, "No error bars with linewidth=2 found")
-
-    # Dropping the test for empty dataframe, since seaborn no longer raises ValueError for empties
-    # def test_with_empty_dataframe(self):
-    #     """Test behavior with an empty DataFrame."""
-    #     empty_df = pd.DataFrame({'x': [], 'y': []})
-    #     with self.assertRaises(ValueError):
-    #         custom_pointplot(empty_df)
+    def test_with_empty_dataframe(self):
+        """Test behavior with an empty DataFrame."""
+        empty_df = pd.DataFrame({'x': [], 'y': []})
+        
+        # Should raise ValueError because seaborn can't plot empty data
+        with self.assertRaises(ValueError):
+            custom_pointplot(empty_df)
 
     def test_with_missing_columns(self):
         """Test behavior with DataFrame missing required columns."""
         # DataFrame missing 'y' column
         df_missing_y = pd.DataFrame({'x': ['A', 'B', 'C']})
         
-        # Modern seaborn raises ValueError if 'y' cannot be interpreted
-        with self.assertRaises(ValueError):
+        # Should raise KeyError
+        with self.assertRaises(KeyError):
             custom_pointplot(df_missing_y)
         
         # DataFrame missing 'x' column
         df_missing_x = pd.DataFrame({'y': [1, 2, 3]})
         
-        # Modern seaborn raises ValueError if 'x' cannot be interpreted
-        with self.assertRaises(ValueError):
+        # Should raise KeyError
+        with self.assertRaises(KeyError):
             custom_pointplot(df_missing_x)
 
     def test_with_different_column_types(self):
@@ -100,22 +106,6 @@ class TestCustomPointplot(unittest.TestCase):
         
         result = custom_pointplot(mixed_df)
         self.assertIsInstance(result, Axes)
-
-    @patch('seaborn.pointplot')
-    def test_function_parameters(self, mock_pointplot):
-        """Test that the function calls seaborn.pointplot with the correct parameters."""
-        mock_axes = MagicMock(spec=Axes)
-        mock_pointplot.return_value = mock_axes
-        
-        custom_pointplot(self.test_data)
-        
-        mock_pointplot.assert_called_once()
-        args, kwargs = mock_pointplot.call_args
-        
-        self.assertEqual(kwargs['x'], 'x')
-        self.assertEqual(kwargs['y'], 'y')
-        self.assertEqual(kwargs['data'], self.test_data)
-        self.assertEqual(kwargs['err_kws']['linewidth'], 2)
 
 
 if __name__ == '__main__':

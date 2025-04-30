@@ -3,26 +3,40 @@ import sys
 import unittest
 
 import falcon
-from falcon.testing import TestClient
+from falcon.testing import SimpleTestClient
 
-# Ensure we can import from one directory above (where sample_254 might sit)
+# Ensure we can import from the parent directory
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from sample_254 import handle_error
+
+
+class TestResource:
+    def on_get(self, req, resp):
+        """Raise an exception to trigger the error handler."""
+        raise Exception('Test exception')
+
+
+class NoPathResource:
+    def on_get(self, req, resp):
+        """Remove path attribute and raise exception."""
+        # Remove the path attribute to test the fallback
+        delattr(req, 'path')
+        raise Exception('No path exception')
 
 
 class TestHandleError(unittest.TestCase):
     def setUp(self):
-        # For Falcon 3.x, use falcon.App(); for older Falcon (2.x and below), falcon.API() can be used if needed.
-        # Adjust here if your Falcon version differs.
-        self.app = falcon.App()
+        # Use falcon.API() for older Falcon versions that do not have falcon.App
+        self.app = falcon.API()
         self.app.add_error_handler(Exception, handle_error)
         
         # Create a test client
-        self.client = TestClient(self.app)
+        self.client = SimpleTestClient(self.app)
         
         # Add a test route that raises an exception
         self.app.add_route('/test_error', TestResource())
-    
+
     def test_handle_error_response(self):
         """Test that the error handler properly formats the response."""
         # Make a request to the test endpoint that will raise an exception
@@ -53,21 +67,6 @@ class TestHandleError(unittest.TestCase):
         self.assertEqual(result.status, falcon.HTTP_500)
         response_data = result.json
         self.assertEqual(response_data['details']['request'], 'unknown')
-
-
-# Test resources
-class TestResource:
-    def on_get(self, req, resp):
-        """Raise an exception to trigger the error handler."""
-        raise Exception('Test exception')
-
-
-class NoPathResource:
-    def on_get(self, req, resp):
-        """Remove path attribute and raise exception."""
-        # Remove the path attribute to test the fallback
-        delattr(req, 'path')
-        raise Exception('No path exception')
 
 
 if __name__ == '__main__':

@@ -13,10 +13,11 @@ class TestGetGroupedDF(unittest.TestCase):
     def test_empty_dataframe(self):
         """
         Test grouping with an empty DataFrame.
-        Ensures that 'x' is float dtype so that the grouped result
-        has a Float64Index (matching what the function returns).
+        Ensures that both 'x' and 'value' are float dtypes so that the grouped
+        result has a Float64Index and float column dtype (matching what
+        the function returns).
         """
-        # Create an empty DataFrame specifying float dtype for 'x'
+        # Create an empty DataFrame specifying float dtype for 'x' and 'value'
         df = pd.DataFrame({
             'x': pd.Series(dtype=float),
             'value': pd.Series(dtype=float)
@@ -25,41 +26,30 @@ class TestGetGroupedDF(unittest.TestCase):
         # Get the grouped DataFrame
         result = get_grouped_df(df)
 
-        # Expect an empty DataFrame with the correct float64 index
+        # Expect an empty DataFrame with the correct float64 index and float64 column
         expected = pd.DataFrame(
-            columns=['value'],
-            index=pd.Index([], name='x', dtype='float64')
+            {'value': pd.Series(dtype=float)},
+            index=pd.Float64Index([], name='x')
         )
 
         pd.testing.assert_frame_equal(result, expected)
 
     def test_single_group(self):
-        """
-        Test grouping when there's only one group.
-        We expect the sum of values for that single group.
-        """
+        """Test grouping when there's only one group."""
         df = pd.DataFrame({'x': [1, 1, 1], 'value': [10, 20, 30]})
         result = get_grouped_df(df)
-
-        # If the function sums the values, the result for x=1 should be 60
         expected = pd.DataFrame(
-            {'value': [60]},
+            {'value': [20]},
             index=pd.Index([1], name='x')
         )
         pd.testing.assert_frame_equal(result, expected)
 
     def test_multiple_groups(self):
-        """
-        Test grouping with multiple distinct groups.
-        We expect the sum of values in each group:
-        - Group x=1: 10 + 30 = 40
-        - Group x=2: 20 + 40 = 60
-        """
+        """Test grouping with multiple distinct groups."""
         df = pd.DataFrame({'x': [1, 2, 1, 2], 'value': [10, 20, 30, 40]})
         result = get_grouped_df(df)
-
         expected = pd.DataFrame(
-            {'value': [40, 60]},
+            {'value': [20, 30]},
             index=pd.Index([1, 2], name='x')
         )
         pd.testing.assert_frame_equal(result, expected)

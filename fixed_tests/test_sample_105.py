@@ -1,16 +1,18 @@
-import unittest
+import os
+import sys
+
+# Instead of using unittest.TestCase, we use Django's TestCase so that
+# Django automatically creates (and destroys) the test database tables.
 from django.test import TestCase
+
+# Ensure we can import from the parent directory if needed
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Import the module to test
 from sample_105 import Square, create_square, display_side_and_area
 
+
 class TestSquareModel(TestCase):
-    """
-    A Django TestCase will automatically set up a test database
-    (including our Square model) and tear it down between tests,
-    so there's no need to manually create or drop tables.
-    """
-    
     def test_square_creation(self):
         """Test that a Square instance is created correctly with the right side value."""
         square = Square.objects.create(side=5)
@@ -37,6 +39,7 @@ class TestSquareModel(TestCase):
 
     def test_area_calculation(self):
         """Test that the area is calculated correctly when saving."""
+        # Test with different side values
         test_cases = [3, 10, 15, 100]
         for side in test_cases:
             square = create_square(side)
@@ -46,16 +49,12 @@ class TestSquareModel(TestCase):
         """Test that the area is updated when the side is changed."""
         square = create_square(5)
         self.assertEqual(square.area, 25)
-
+        
         # Update the side
         square.side = 8
         square.save()
-
+        
         # Refresh from database to ensure the change was saved
         square.refresh_from_db()
         self.assertEqual(square.side, 8)
         self.assertEqual(square.area, 64)  # 8*8 = 64
-
-
-if __name__ == '__main__':
-    unittest.main()

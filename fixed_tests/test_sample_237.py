@@ -1,12 +1,14 @@
+#!/usr/bin/env python
+
 import os
+# Add the directory containing sample_237.py to the Python path
 import sys
 import unittest
 from io import BytesIO
 
-# Add the directory containing sample_237.py to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 from sample_237 import DummyRequest, get_bounded_stream
+
 
 class TestSample237(unittest.TestCase):
     def test_dummy_request_initialization(self):
@@ -29,14 +31,17 @@ class TestSample237(unittest.TestCase):
         
         test_data = b"hello world"
         req = DummyRequest(test_data)
-        
+
         bounded_stream = get_bounded_stream(req)
         
-        # Check that the returned object is a BoundedStream
+        # Check that the returned object is indeed a BoundedStream
         self.assertIsInstance(bounded_stream, stream.BoundedStream)
         
-        # Check that the bounded stream has the correct content length
-        self.assertEqual(bounded_stream.content_length, len(test_data))
+        # Verify we can read from the stream and that it matches test_data
+        read_data = bounded_stream.read()
+        self.assertEqual(read_data, test_data)
+        # Reading again should yield no data
+        self.assertEqual(bounded_stream.read(), b"")
 
     def test_bounded_stream_read(self):
         """Test that the bounded stream can be read and contains the expected data."""

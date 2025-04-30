@@ -1,4 +1,8 @@
+#!/usr/bin/env python
+# test_sample.py
+
 import os
+# Add the parent directory to the path so we can import the solution
 import sys
 import unittest
 
@@ -12,6 +16,8 @@ from sample_325 import compute_scattering
 class TestSample325(unittest.TestCase):
     def test_compute_scattering_returns_correct_types(self):
         # Create a random tensor with the expected shape
+        # The Scattering2D is configured for 32x32 images
+        # Adding batch dimension and channel dimension
         input_tensor = torch.randn(1, 1, 32, 32)
         
         # Call the function
@@ -28,18 +34,17 @@ class TestSample325(unittest.TestCase):
         # Call the function
         _, scattering_output = compute_scattering(input_tensor)
         
-        # Check that the output is a 4D tensor (batch, channels, height, width)
-        self.assertEqual(len(scattering_output.shape), 4)
-        self.assertEqual(scattering_output.shape[0], 1)  # Batch size
+        # The output can sometimes include extra dimensions depending on settings.
+        # Instead of enforcing 4D, we allow one extra dimension (common in newer Kymatio versions).
+        self.assertIn(len(scattering_output.shape), [4, 5], 
+                      "Expected 4D or 5D output, but got shape={}".format(scattering_output.shape))
         
-        # Instead of forcing a fixed channel count, just ensure there's at least 1 channel
-        self.assertGreaterEqual(scattering_output.shape[1], 1)
+        # Check the batch size dimension is preserved
+        self.assertEqual(scattering_output.shape[0], 1)
         
-        # Optionally check reduced spatial dimensions if expected (commonly 8x8 for J=2)
-        # but we won't hard-code in case parameters differ.
-        # Example (uncomment if desired):
-        # self.assertEqual(scattering_output.shape[2], 8)
-        # self.assertEqual(scattering_output.shape[3], 8)
+        # By default, for J=2, we often expect 1 + 2*8 = 17 channels.
+        # Verify that the second dimension is 17.
+        self.assertEqual(scattering_output.shape[1], 1 + 2*8)
     
     def test_compute_scattering_deterministic(self):
         # Create a random tensor with the expected shape
@@ -64,7 +69,7 @@ class TestSample325(unittest.TestCase):
         _, output1 = compute_scattering(input1)
         _, output2 = compute_scattering(input2)
         
-        # Check that the outputs differ
+        # Check that the outputs are different
         self.assertFalse(torch.allclose(output1, output2))
 
 
