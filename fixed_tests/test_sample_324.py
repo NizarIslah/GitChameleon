@@ -2,15 +2,10 @@ import importlib.util
 import io
 import sys
 import unittest
-from unittest.mock import patch
 import os
 
-# Change here: only go up one directory if you truly need to, or stay in the same directory
-# if sample_324.py is located in the same folder as this test file.
-# For example, if sample_324.py is located in the same directory as this test, use:
-dir_path = os.path.dirname(os.path.abspath(__file__))
-
-# Import sample_324.py from the same directory:
+# Import the module from the solutions directory
+dir_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 spec = importlib.util.spec_from_file_location("sample_324", os.path.join(dir_path, "sample_324.py"))
 sample_324 = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(sample_324)
@@ -36,41 +31,43 @@ class TestSample324(unittest.TestCase):
     def test_sol_dict_total(self):
         """Test that sol_dict['total'] is set to infinity."""
         self.assertEqual(sample_324.sol_dict['total'], float('inf'))
-    
-    @patch('sys.stdout', new_callable=io.StringIO)
-    def test_progress_bar_creation(self, mock_stdout):
-        """Test that the progress bar is created with the correct total."""
-        from tqdm import tqdm
 
-        # Run a small portion of the progress bar to test its creation
-        with patch.object(sample_324, 'infinite', return_value=range(5)):
-            progress_bar = tqdm(sample_324.infinite(), total=sample_324.sol_dict['total'])
-            for progress in progress_bar:
-                progress_bar.set_description(f"Processing {progress}")
+    def test_progress_bar_creation(self):
+        """Test that the progress bar is created with the correct total and outputs 'Processing'."""
+        from tqdm import tqdm
         
-        # Check that the output contains expected progress bar elements
+        # Capture tqdm output in an io.StringIO, so we avoid monkey-patching
+        mock_stdout = io.StringIO()
+        
+        # Use a small range but keep total = infinity
+        progress_bar = tqdm(range(5), total=sample_324.sol_dict['total'], file=mock_stdout)
+        for progress in progress_bar:
+            progress_bar.set_description(f"Processing {progress}")
+        
         output = mock_stdout.getvalue()
-        self.assertIn("Processing", output)
+        self.assertIn("Processing", output, "Expected 'Processing' in tqdm's output")
         
-        # The progress bar should be created with infinity as its total
+        # The progress bar should be created with infinity as total
         self.assertEqual(progress_bar.total, float('inf'))
+        progress_bar.close()
     
     def test_progress_bar_description(self):
-        """Test that the progress bar description is set correctly."""
+        """Test that the progress bar description is set (and stored) correctly."""
         from tqdm import tqdm
-
-        # Create a progress bar with a small range
+        
+        # Again, capture output but we only need to check the progress_bar.desc
+        mock_stdout = io.StringIO()
         test_range = range(5)
-        progress_bar = tqdm(test_range, total=len(test_range))
+        progress_bar = tqdm(test_range, total=len(test_range), file=mock_stdout)
         
         # Set the description for a specific value
         test_value = 3
         progress_bar.set_description(f"Processing {test_value}")
         
-        # Check that the description was set correctly
-        self.assertEqual(progress_bar.desc, f"Processing {test_value}")
+        # TQDM typically appends a ": " after the desc, so just check the string starts correctly
+        self.assertTrue(progress_bar.desc.startswith(f"Processing {test_value}"),
+                        "Progress bar description does not match the expected format.")
         
-        # Clean up
         progress_bar.close()
 
 if __name__ == '__main__':
