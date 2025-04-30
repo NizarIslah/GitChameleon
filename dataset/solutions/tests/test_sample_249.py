@@ -33,9 +33,9 @@ class TestCustomLink(unittest.TestCase):
         result = custom_link(resp, link_rel, link_href)
         
         # Assert
-        # Check if the Link header was properly set
-        self.assertIn('Link', result.headers)
-        self.assertEqual(result.headers['Link'], f'<{link_href}>; rel="{link_rel}"')
+        # Falcon lowercases header names, and does not quote rel value
+        self.assertIn('link', result.headers)
+        self.assertEqual(result.headers['link'], f'<{link_href}>; rel={link_rel}')
         self.assertEqual(result, resp)
 
 if __name__ == '__main__':

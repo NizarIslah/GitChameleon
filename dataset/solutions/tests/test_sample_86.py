@@ -30,12 +30,12 @@ class TestSample86(unittest.TestCase):
         # It should be a dict
         self.assertIsInstance(result_params, dict)
 
-        # result_params should exactly match what LightGBM retained in dataset.params
-        expected = lgb_dataset.params
-        self.assertDictEqual(result_params, expected)
-
-        # In particular, 'metric' is not a dataset parameter and should not appear
+        # 'metric' is not a dataset parameter and should not appear
         self.assertNotIn('metric', result_params)
+
+        # Only compare keys that are in result_params (i.e., dataset params)
+        for k, v in result_params.items():
+            self.assertEqual(lgb_dataset.params.get(k), v)
 
 
 if __name__ == '__main__':

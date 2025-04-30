@@ -27,7 +27,8 @@ class TestCircularVariance(unittest.TestCase):
         # Angles evenly distributed around the circle
         angles = np.array([0, np.pi, 2*np.pi/3, 4*np.pi/3])
         result = compute_circular_variance(angles)
-        self.assertAlmostEqual(result, 1.0, places=10)
+        # The expected value is 0.75 for these four angles
+        self.assertAlmostEqual(result, 0.75, places=10)
         
         # Another example with uniform distribution
         angles = np.array([0, np.pi/2, np.pi, 3*np.pi/2])

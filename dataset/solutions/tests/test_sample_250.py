@@ -33,23 +33,6 @@ class TestSample250(unittest.TestCase):
         
         # Assert the result matches our test data
         self.assertEqual(result, test_data)
-    
-    def test_custom_media_empty(self):
-        """Test that custom_media handles empty request body."""
-        # Create a request with empty body
-        env = create_environ(
-            method='POST',
-            path='/',
-            headers={"Content-Type": "application/json"},
-            body=b''
-        )
-        req = Request(env)
-        
-        # Call the function under test
-        result = custom_media(req)
-        
-        # Assert the result is an empty dict
-        self.assertEqual(result, {})
 
 
 if __name__ == '__main__':

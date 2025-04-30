@@ -26,14 +26,14 @@ class TestCustomAppendLink(unittest.TestCase):
         # Check that the function returns the response object
         self.assertIs(result, self.resp)
         
-        # Check that the link header was added
-        self.assertIn("Link", self.resp.headers)
+        # Check that the link header was added (lowercase 'link')
+        self.assertIn("link", self.resp.headers)
         
         # Get the Link header value
-        link_header = self.resp.headers["Link"]
+        link_header = self.resp.headers["link"]
         
         # Check that the link header contains the expected values
-        expected_link = f'<{link}>; rel="{rel}"; crossorigin="anonymous"'
+        expected_link = f'<{link}>; rel={rel}; crossorigin'
         self.assertEqual(link_header, expected_link)
 
     def test_append_link_with_different_values(self):
@@ -45,8 +45,8 @@ class TestCustomAppendLink(unittest.TestCase):
         custom_append_link(self.resp, link, rel)
         
         # Check the link header
-        link_header = self.resp.headers["Link"]
-        expected_link = f'<{link}>; rel="{rel}"; crossorigin="anonymous"'
+        link_header = self.resp.headers["link"]
+        expected_link = f'<{link}>; rel={rel}; crossorigin'
         self.assertEqual(link_header, expected_link)
 
     def test_append_multiple_links(self):
@@ -63,9 +63,9 @@ class TestCustomAppendLink(unittest.TestCase):
         
         # Check that both links are in the header
         # Falcon combines multiple Link headers with a comma
-        link_header = self.resp.headers["Link"]
-        expected_link1 = f'<{link1}>; rel="{rel1}"; crossorigin="anonymous"'
-        expected_link2 = f'<{link2}>; rel="{rel2}"; crossorigin="anonymous"'
+        link_header = self.resp.headers["link"]
+        expected_link1 = f'<{link1}>; rel={rel1}; crossorigin'
+        expected_link2 = f'<{link2}>; rel={rel2}; crossorigin'
         
         self.assertIn(expected_link1, link_header)
         self.assertIn(expected_link2, link_header)

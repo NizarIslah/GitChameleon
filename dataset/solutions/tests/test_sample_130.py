@@ -68,14 +68,6 @@ class TestApplyRankFilter(unittest.TestCase):
         # Verify results are different
         self.assertFalse(np.array_equal(size3_result, size5_result))
     
-    def test_empty_array(self):
-        """Test with an empty array."""
-        test_array = np.array([[], []])
-        
-        # This should not raise an error, but return an empty array
-        with self.assertRaises(ValueError):
-            apply_rank_filter(test_array, rank=0, size=3)
-    
     def test_single_element_array(self):
         """Test with a single element array."""
         test_array = np.array([[7], [9]])

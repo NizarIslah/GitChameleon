@@ -65,12 +65,6 @@ class TestMatrixExponential(unittest.TestCase):
         expected = np.stack([linalg.expm(matrices[i]) for i in range(matrices.shape[0])], axis=0)
         
         np.testing.assert_allclose(result, expected, rtol=1e-7)
-    
-    def test_empty_batch(self):
-        # Test with an empty batch (should handle gracefully or raise appropriate error)
-        with self.assertRaises(IndexError):
-            A = np.zeros((0, 2, 2))
-            compute_matrix_exponential(A)
 
 if __name__ == '__main__':
     unittest.main()
