@@ -2,6 +2,8 @@
 import os
 import sys
 import unittest
+from django.db import connection
+from django.db.utils import OperationalError
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -9,14 +11,21 @@ from sample_106 import Square, create_square, display_side_and_area
 
 
 class TestSquareModel(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
         # Create the necessary tables in the in-memory database
-        from django.db import connection
         with connection.schema_editor() as schema_editor:
             schema_editor.create_model(Square)
 
-    def tearDown(self):
-        # Clean up after each test
+    @classmethod
+    def tearDownClass(cls):
+        # Clean up after all tests
+        with connection.schema_editor() as schema_editor:
+            schema_editor.delete_model(Square)
+
+    def setUp(self):
+        # Clean up the database before each test
         Square.objects.all().delete()
 
     def test_create_square(self):

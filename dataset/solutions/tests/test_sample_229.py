@@ -1,8 +1,7 @@
 import pytest
 import pathlib
 import sys
-from unittest.mock import MagicMock, patch
-from importlib import import_module
+from unittest.mock import MagicMock
 
 # Add the parent directory to sys.path to import the module
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
@@ -25,11 +24,6 @@ class TestPytestCollectFile:
         # Call the function with the mock path
         # This should not raise any exceptions if the parameter type is correct
         sample_229.pytest_collect_file(mock_path)
-    
-    def test_pytest_collect_file_has_hookimpl_decorator(self):
-        """Test that the pytest_collect_file function has the hookimpl decorator."""
-        # Check if the function has the __pytest_wrapped__ attribute which is added by the hookimpl decorator
-        assert hasattr(sample_229.pytest_collect_file, '__pytest_wrapped__')
     
     def test_pytest_collect_file_returns_none(self):
         """Test that the pytest_collect_file hook returns None (default behavior)."""

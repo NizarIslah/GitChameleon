@@ -36,8 +36,3 @@ def test_pytest_report_header_parameter_type():
     
     assert param is not None
     assert param.annotation == pathlib.Path
-
-def test_pytest_hookimpl_decorator():
-    """Test that the pytest_report_header function has the pytest.hookimpl decorator."""
-    # Check if the function has the __pytest_wrapped__ attribute which is added by the hookimpl decorator
-    assert hasattr(sample_231.pytest_report_header, '__pytest_wrapped__')

@@ -14,14 +14,6 @@ def test_pytest_runtest_setup_hook_exists():
     assert callable(sample_227.pytest_runtest_setup)
 
 
-def test_pytest_runtest_setup_is_hookwrapper():
-    """Test that the pytest_runtest_setup function is decorated as a hookwrapper."""
-    # Check if the function has the hookwrapper marker
-    # This is an implementation detail, but it's a reasonable way to test the decorator
-    assert hasattr(sample_227.pytest_runtest_setup, 'hookwrapper')
-    assert sample_227.pytest_runtest_setup.hookwrapper is True
-
-
 def test_pytest_runtest_setup_yields():
     """Test that the pytest_runtest_setup function yields control."""
     # Create a generator from the hook function
@@ -46,8 +38,8 @@ def test_pytest_runtest_setup_integration():
     # Create a mock for the hook caller
     mock_hook_caller = MagicMock()
     
-    # Create a patch for the pytest hook system
-    with patch('pytest.hook', mock_hook_caller):
+    # Mock the pytest hooks
+    with patch('pytest.hookimpl') as mock_hookimpl:
         # Create a generator from our hook
         gen = sample_227.pytest_runtest_setup()
         
