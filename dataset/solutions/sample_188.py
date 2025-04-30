@@ -5,4 +5,4 @@ from sympy import symbols, Poly
 import sympy
 
 def custom_generatePolyList(poly: sympy.Poly) -> list[int]:
-    return p.rep.to_list()
+    return poly.rep.to_list()
