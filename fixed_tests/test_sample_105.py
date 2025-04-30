@@ -1,15 +1,17 @@
-import unittest
+import sys
+import os
+
+# Use Django's TestCase instead of unittest.TestCase so that
+# Django automatically sets up the test database and runs migrations.
 from django.test import TestCase
 
-# Import the module to test
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# Import the model and functions to test
 from sample_105 import Square, create_square, display_side_and_area
 
 
 class TestSquareModel(TestCase):
-    """
-    Converted to Django's built-in TestCase so that the test database and tables
-    are set up automatically. This removes the need for manual schema editing.
-    """
 
     def test_square_creation(self):
         """Test that a Square instance is created correctly with the right side value."""
@@ -37,9 +39,7 @@ class TestSquareModel(TestCase):
 
     def test_area_calculation(self):
         """Test that the area is calculated correctly when saving."""
-        # Test with different side values
         test_cases = [3, 10, 15, 100]
-
         for side in test_cases:
             square = create_square(side)
             self.assertEqual(square.area, side * side)
@@ -60,4 +60,8 @@ class TestSquareModel(TestCase):
 
 
 if __name__ == '__main__':
+    # Normally, you would run these tests with Django's test runner (e.g., `python manage.py test`).
+    # If you really want to run them standalone, you'd have to set up Django settings manually,
+    # then call django.setup() before running. But typically, this file is discovered and run by Django.
+    import unittest
     unittest.main()

@@ -1,5 +1,3 @@
-# test_sample.py
-
 import os
 import socket
 import sys
@@ -37,13 +35,14 @@ class TestCustomWebSocketConnect(tornado.testing.AsyncHTTPTestCase):
             (r'/ws', TestWebSocketHandler),
         ])
     
+    @tornado.testing.gen_test
     async def test_custom_websocket_connect(self):
         """Test that custom_websocket_connect successfully connects to a WebSocket server."""
         # Get the port that the test server is running on
         port = self.get_http_port()
         
-        # Create a resolver using DefaultLoopResolver
-        resolver = tornado.netutil.DefaultLoopResolver()
+        # Create a resolver
+        resolver = tornado.netutil.DefaultResolver()
         
         # Connect to the WebSocket server
         ws_url = f"ws://localhost:{port}/ws"
@@ -60,10 +59,11 @@ class TestCustomWebSocketConnect(tornado.testing.AsyncHTTPTestCase):
         # Close the connection
         ws_conn.close()
     
+    @tornado.testing.gen_test
     async def test_connection_error(self):
         """Test that custom_websocket_connect handles connection errors properly."""
-        # Create a resolver using DefaultLoopResolver
-        resolver = tornado.netutil.DefaultLoopResolver()
+        # Create a resolver
+        resolver = tornado.netutil.DefaultResolver()
         
         # Try to connect to a non-existent server
         with self.assertRaises(tornado.httpclient.HTTPError):
