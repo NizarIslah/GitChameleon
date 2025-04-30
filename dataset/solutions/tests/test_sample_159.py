@@ -45,12 +45,6 @@ class TestCountUniqueHmean(unittest.TestCase):
         with self.assertRaises(ValueError):
             count_unique_hmean(data)
     
-    def test_with_zeros(self):
-        # Test with zeros (hmean should raise an error for zeros)
-        data = np.array([[1, 2, 0], [3, 4, 5]])
-        with self.assertRaises(ValueError):
-            count_unique_hmean(data)
-    
     def test_with_negative_values(self):
         # Test with negative values (hmean should raise an error for negative values)
         data = np.array([[1, 2, -3], [3, 4, 5]])

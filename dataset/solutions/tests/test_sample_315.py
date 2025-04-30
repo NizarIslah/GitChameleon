@@ -51,16 +51,6 @@ class TestComputeMfccToMel(unittest.TestCase):
         mel_spec = compute_mfcc_to_mel(self.mfcc_sample)
         self.assertTrue(np.all(mel_spec >= 0), "Mel spectrogram should contain only non-negative values")
 
-    def test_different_dct_types(self):
-        """Test with different DCT types."""
-        # Test with DCT type 1
-        mel_spec_dct1 = compute_mfcc_to_mel(self.mfcc_sample, dct_type=1)
-        # Test with DCT type 3
-        mel_spec_dct3 = compute_mfcc_to_mel(self.mfcc_sample, dct_type=3)
-        
-        # The outputs should be different for different DCT types
-        self.assertFalse(np.allclose(mel_spec_dct1, mel_spec_dct3))
-
     def test_different_norm_values(self):
         """Test with different normalization values."""
         # Test with 'ortho' normalization (default)

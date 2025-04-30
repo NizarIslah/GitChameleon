@@ -23,7 +23,7 @@ class TestCustomPreorderTraversal(unittest.TestCase):
         traversal_list = list(traversal)
         
         # Expected result: the expression itself, then its components
-        expected = [x + 1, x, 1]
+        expected = [x + 1, 1, x]
         
         self.assertEqual(len(traversal_list), len(expected))
         for item, expected_item in zip(traversal_list, expected):

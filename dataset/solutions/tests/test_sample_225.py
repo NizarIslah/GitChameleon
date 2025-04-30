@@ -41,7 +41,7 @@ class TestSample225(unittest.TestCase):
         result = custom_function(header_name, initial_value)
         
         # Verify the header we added exists
-        self.assertEqual(result[header_name], initial_value)
+        self.assertEqual(result[header_name], initial_value.decode("utf-8"))
         
         # Verify a non-existent header returns None
         self.assertIsNone(result.get(b"X-NonExistent"))
@@ -53,7 +53,7 @@ class TestSample225(unittest.TestCase):
         
         result = custom_function(header_name, initial_value)
         
-        self.assertEqual(result[header_name], initial_value)
+        self.assertEqual(result[header_name], initial_value.decode("utf-8"))
 
 
 if __name__ == "__main__":

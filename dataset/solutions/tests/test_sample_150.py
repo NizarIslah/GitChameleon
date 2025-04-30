@@ -45,7 +45,8 @@ class TestSafeJoinFail404(unittest.TestCase):
         
         # This should succeed and return the base path
         result = sample_150.safe_join_fail_404(base_path, sub_path)
-        self.assertEqual(result, base_path)
+        # Normalize both paths to avoid trailing slash issues
+        self.assertEqual(os.path.normpath(result), os.path.normpath(base_path))
     
     def tearDown(self):
         # Clean up the temporary directory

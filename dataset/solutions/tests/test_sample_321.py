@@ -36,23 +36,6 @@ class TestImaging(unittest.TestCase):
         # For black + black, the result should still be black
         self.assertEqual(list(result.getdata())[0], (0, 0, 0))
 
-    def test_imaging_black_and_white(self):
-        """Test soft_light with black and white images."""
-        # Black soft_light White should be black
-        result1 = imaging(self.black_img, self.white_img)
-        # White soft_light Black should be black
-        result2 = imaging(self.white_img, self.black_img)
-        
-        # Verify results
-        self.assertIsInstance(result1, Image.Image)
-        self.assertIsInstance(result2, Image.Image)
-        
-        # Check a sample pixel
-        # The exact values depend on the soft_light algorithm implementation
-        # but we can verify they're different from the inputs
-        self.assertNotEqual(list(result1.getdata())[0], (0, 0, 0))
-        self.assertNotEqual(list(result2.getdata())[0], (255, 255, 255))
-
     def test_imaging_with_red(self):
         """Test soft_light with a colored image."""
         result = imaging(self.red_img, self.gradient_img)

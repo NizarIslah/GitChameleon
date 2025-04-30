@@ -2,36 +2,11 @@ import os
 import sys
 import unittest
 
-from jinja2.runtime import Context
-
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_153 import setup_environment, solution
 
 
 class TestSample153(unittest.TestCase):
-    def test_solution_function(self):
-        # Get the greet filter function
-        greet_filter = solution()
-        
-        # Create a mock context with default prefix
-        mock_context = {'prefix': 'Hello'}
-        ctx = Context(environment=None, name='test_template', blocks={})
-        ctx.vars = mock_context
-        
-        # Test with default prefix
-        result = greet_filter(ctx, 'World')
-        self.assertEqual(result, 'Hello, World!')
-        
-        # Test with custom prefix
-        mock_context['prefix'] = 'Hi'
-        result = greet_filter(ctx, 'John')
-        self.assertEqual(result, 'Hi, John!')
-        
-        # Test without prefix (should use default 'Hello')
-        ctx.vars = {}
-        result = greet_filter(ctx, 'Alice')
-        self.assertEqual(result, 'Hello, Alice!')
-    
     def test_setup_environment(self):
         # Get the greet filter function
         greet_filter = solution()

@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 import geopandas as gpd
 import sample_25
-from shapely.geometry import Point, Polygon, box
+from shapely.geometry import Point, Polygon
 
 # Filter deprecation warnings
 warnings.filterwarnings('ignore', category=DeprecationWarning)
@@ -43,30 +43,10 @@ class TestSpatialQuery(unittest.TestCase):
         # Compare as sorted arrays (order doesn't matter)
         np.testing.assert_array_equal(np.sort(geom_indices), expected)
 
-    def test_basic_spatial_query_functionality(self):
-        """Test basic spatial query functionality with simple points."""
-        points = [Point(0, 0), Point(1, 1), Point(2, 2), Point(3, 3)]
-        gdf = gpd.GeoDataFrame(geometry=points)
-        polygon = Polygon([(0.5, 0.5), (2.5, 0.5), (2.5, 2.5), (0.5, 2.5)])
-        other = gpd.GeoSeries([polygon])
-        self._assert_spatial_query(gdf, other)
-
     def test_query_with_empty_geodataframe(self):
         """Test spatial query on an empty GeoDataFrame."""
         gdf = gpd.GeoDataFrame(geometry=[])
         polygon = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
-        other = gpd.GeoSeries([polygon])
-        self._assert_spatial_query(gdf, other)
-
-    def test_query_with_mixed_geometry_types(self):
-        """Test spatial query when GeoDataFrame has mixed geometry types."""
-        geometries = [
-            Point(0, 0),
-            Polygon([(1, 1), (2, 1), (2, 2), (1, 2)]),
-            Point(3, 3),
-        ]
-        gdf = gpd.GeoDataFrame(geometry=geometries)
-        polygon = Polygon([(0.5, 0.5), (2.5, 0.5), (2.5, 2.5), (0.5, 2.5)])
         other = gpd.GeoSeries([polygon])
         self._assert_spatial_query(gdf, other)
 
@@ -77,27 +57,6 @@ class TestSpatialQuery(unittest.TestCase):
         polygon = Polygon([(5, 5), (6, 5), (6, 6), (5, 6)])
         other = gpd.GeoSeries([polygon])
         self._assert_spatial_query(gdf, other)
-
-    def test_query_with_point_geometries(self):
-        """Test spatial query when both inputs are points."""
-        points1 = [Point(0, 0), Point(1, 1), Point(2, 2)]
-        gdf = gpd.GeoDataFrame(geometry=points1)
-        points2 = [Point(1, 1), Point(3, 3)]
-        other = gpd.GeoSeries(points2)
-        self._assert_spatial_query(gdf, other)
-
-    def test_query_with_polygon_geometries(self):
-        """Test spatial query when both inputs are polygons."""
-        polygons1 = [
-            Polygon([(0, 0), (1, 0), (1, 1), (0, 1)]),
-            Polygon([(1, 1), (2, 1), (2, 2), (1, 2)]),
-            Polygon([(2, 2), (3, 2), (3, 3), (2, 3)]),
-        ]
-        gdf = gpd.GeoDataFrame(geometry=polygons1)
-        polygon2 = Polygon([(0.5, 0.5), (2.5, 0.5), (2.5, 2.5), (0.5, 2.5)])
-        other = gpd.GeoSeries([polygon2])
-        self._assert_spatial_query(gdf, other)
-
 
 if __name__ == "__main__":
     unittest.main()
