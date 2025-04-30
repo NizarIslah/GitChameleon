@@ -50,6 +50,17 @@ class TestLPCCoefficients(unittest.TestCase):
             self.assertEqual(len(coeffs), order + 1)
             self.assertEqual(coeffs[0], 1.0)
             
+    def test_compute_lpc_coef_with_silence(self):
+        """Test the function with a silent signal."""
+        order = 10
+        silent_y = np.zeros_like(self.y)
+        coeffs = compute_lpc_coef(silent_y, self.sr, order)
+        
+        # For silence, all coefficients except the first should be close to zero
+        self.assertEqual(coeffs[0], 1.0)
+        for i in range(1, len(coeffs)):
+            self.assertAlmostEqual(coeffs[i], 0.0, places=5)
+            
     def test_compute_lpc_coef_with_real_audio(self):
         """Test the function with a more complex audio signal."""
         # Create a more complex signal with multiple frequencies

@@ -18,6 +18,13 @@ class TestSample144(unittest.TestCase):
         app_set_up(app)
         self.client = app.test_client()
         
+    def test_data_route(self):
+        """Test the /data route with a set of numbers"""
+        # Test with a direct request to the endpoint
+        response = self.client.get('/data')
+        # This should fail because the route expects a num_set parameter
+        self.assertEqual(response.status_code, 500)
+        
     def test_data_function(self):
         """Test the data function directly"""
         # Create a test set

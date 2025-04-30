@@ -29,7 +29,7 @@ class TestSample156(unittest.TestCase):
         template = env.from_string('{{ text|nl2br }}')
         result = template.render(text='Hello World')
         self.assertIn('<br>Hello</br>', result)
-        # Removed: self.assertIsInstance(result, Markup)
+        self.assertIsInstance(result, Markup)
         
         # Test with HTML in the input
         template = env.from_string('{{ text|nl2br }}')
@@ -54,6 +54,27 @@ class TestSample156(unittest.TestCase):
         result = template.render(text='<p>Hello</p>')
         # The HTML should not be escaped, and "Hello" should be replaced
         self.assertIn('<p><br>Hello</br></p>', result)
+
+    def test_nl2br_core_function(self):
+        """Test the core function directly"""
+        from jinja2.runtime import EvalContext
+
+        # Create eval contexts for testing
+        autoescape_ctx = EvalContext(self.env, None, None)
+        autoescape_ctx.autoescape = True
+        
+        no_autoescape_ctx = EvalContext(self.env, None, None)
+        no_autoescape_ctx.autoescape = False
+        
+        # Test with autoescaping
+        result = nl2br_core(autoescape_ctx, 'Hello World')
+        self.assertIn('<br>Hello</br>', result)
+        self.assertIsInstance(result, Markup)
+        
+        # Test without autoescaping
+        result = nl2br_core(no_autoescape_ctx, 'Hello World')
+        self.assertIn('<br>Hello</br>', result)
+        self.assertNotIsInstance(result, Markup)
 
     def test_get_output_function(self):
         """Test the get_output function"""

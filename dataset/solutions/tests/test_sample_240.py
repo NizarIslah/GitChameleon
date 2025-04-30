@@ -1,6 +1,7 @@
 import os
 import sys
 import unittest
+from unittest.mock import MagicMock
 
 from falcon import Response
 
@@ -20,7 +21,7 @@ class TestCustomBodyLength(unittest.TestCase):
         result = custom_body_length(mock_response, test_info)
         
         # Assert
-        self.assertEqual(int(result.content_length), expected_length)
+        self.assertEqual(result.content_length, expected_length)
         self.assertEqual(result, mock_response, "Function should return the same response object")
     
     def test_custom_body_length_with_empty_info(self):
@@ -33,7 +34,7 @@ class TestCustomBodyLength(unittest.TestCase):
         result = custom_body_length(mock_response, test_info)
         
         # Assert
-        self.assertEqual(int(result.content_length), expected_length)
+        self.assertEqual(result.content_length, expected_length)
         self.assertEqual(result, mock_response, "Function should return the same response object")
     
     def test_custom_body_length_with_non_string_info(self):
@@ -46,7 +47,7 @@ class TestCustomBodyLength(unittest.TestCase):
         result = custom_body_length(mock_response, test_info)
         
         # Assert
-        self.assertEqual(int(result.content_length), expected_length)
+        self.assertEqual(result.content_length, expected_length)
         self.assertEqual(result, mock_response, "Function should return the same response object")
 
 

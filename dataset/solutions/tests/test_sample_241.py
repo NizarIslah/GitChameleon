@@ -43,8 +43,8 @@ class TestSample241(unittest.TestCase):
         # Verify the response data was set correctly
         self.assertEqual(resp.data, test_info)
         
-        # Verify the function returns the rendered body (should be a string)
-        self.assertEqual(result, test_info)
+        # Verify the function returns the rendered body
+        self.assertEqual(result, test_info.encode('utf-8'))
 
 
 if __name__ == '__main__':

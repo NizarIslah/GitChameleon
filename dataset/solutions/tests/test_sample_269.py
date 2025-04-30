@@ -1,3 +1,4 @@
+# Add the parent directory to import sys
 import os
 import sys
 import unittest
@@ -19,12 +20,11 @@ class TestSample269(unittest.TestCase):
         # Check that the figure was returned
         self.assertIsInstance(result, go.Figure)
         
-        # Check that the scene camera settings were applied correctly
-        self.assertTrue(hasattr(result.layout, "scene"))
-        self.assertIsNotNone(result.layout.scene.camera)
-        self.assertEqual(result.layout.scene.camera.eye.x, 1.25)
-        self.assertEqual(result.layout.scene.camera.eye.y, 1.25)
-        self.assertEqual(result.layout.scene.camera.eye.z, 1.25)
+        # Check that the scene_camera settings were applied correctly
+        self.assertIn('scene_camera', result.layout)
+        self.assertEqual(result.layout.scene_camera.eye.x, 1.25)
+        self.assertEqual(result.layout.scene_camera.eye.y, 1.25)
+        self.assertEqual(result.layout.scene_camera.eye.z, 1.25)
     
     def test_custom_fig_preserves_other_settings(self):
         # Create a figure with some existing settings
@@ -40,11 +40,9 @@ class TestSample269(unittest.TestCase):
         self.assertEqual(result.layout.height, 600)
         
         # And the new camera settings are applied
-        self.assertTrue(hasattr(result.layout, "scene"))
-        self.assertIsNotNone(result.layout.scene.camera)
-        self.assertEqual(result.layout.scene.camera.eye.x, 1.25)
-        self.assertEqual(result.layout.scene.camera.eye.y, 1.25)
-        self.assertEqual(result.layout.scene.camera.eye.z, 1.25)
+        self.assertEqual(result.layout.scene_camera.eye.x, 1.25)
+        self.assertEqual(result.layout.scene_camera.eye.y, 1.25)
+        self.assertEqual(result.layout.scene_camera.eye.z, 1.25)
 
 if __name__ == '__main__':
     unittest.main()

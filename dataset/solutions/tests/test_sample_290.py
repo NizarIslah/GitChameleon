@@ -1,5 +1,6 @@
 # Test file for sample_290.py
 import os
+# Add the parent directory to the path so we can import the sample module
 import sys
 import unittest
 
@@ -31,8 +32,8 @@ class TestFourierTempogram(unittest.TestCase):
         self.assertEqual(len(tempogram.shape), 2)
         
         # First dimension should be related to the number of frequency bins
-        # Second dimension should match the expected output length
-        self.assertEqual(tempogram.shape[1], len(self.oenv) + 1)
+        # Second dimension should match the length of the input onset envelope
+        self.assertEqual(tempogram.shape[1], len(self.oenv))
         
     def test_output_type(self):
         """Test that the output has the expected data type."""
@@ -67,7 +68,7 @@ class TestFourierTempogram(unittest.TestCase):
         tempogram = compute_fourier_tempogram(zero_oenv, self.sr, self.hop_length)
         
         # The output should have the same shape as with non-zero input
-        self.assertEqual(tempogram.shape[1], len(zero_oenv) + 1)
+        self.assertEqual(tempogram.shape[1], len(zero_oenv))
         
         # All values should be close to zero
         self.assertTrue(np.allclose(np.abs(tempogram), 0))

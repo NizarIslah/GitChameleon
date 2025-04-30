@@ -39,6 +39,25 @@ class TestApplyMaximumFilter(unittest.TestCase):
         result = apply_maximum_filter(input_array, size)
         np.testing.assert_array_equal(result, expected_output)
     
+    def test_different_sizes(self):
+        """Test with different filter sizes."""
+        input_array = np.array([
+            [1, 2, 3, 4, 5],
+            [5, 4, 3, 2, 1]
+        ])
+        
+        # Test with size = 1 (should return the original array)
+        result_size_1 = apply_maximum_filter(input_array, 1)
+        np.testing.assert_array_equal(result_size_1, input_array)
+        
+        # Test with size = 5 (should return the max value for each row)
+        result_size_5 = apply_maximum_filter(input_array, 5)
+        expected_size_5 = np.array([
+            [5, 5, 5, 5, 5],
+            [5, 5, 5, 5, 5]
+        ])
+        np.testing.assert_array_equal(result_size_5, expected_size_5)
+    
     def test_with_zeros(self):
         """Test with an array containing zeros."""
         input_array = np.array([
@@ -50,6 +69,23 @@ class TestApplyMaximumFilter(unittest.TestCase):
         expected_output = np.array([
             [0, 0, 0, 0, 0],
             [1, 1, 1, 1, 1]
+        ])
+        
+        result = apply_maximum_filter(input_array, size)
+        np.testing.assert_array_equal(result, expected_output)
+    
+    def test_3d_array(self):
+        """Test with a 3D array (multiple 2D arrays)."""
+        input_array = np.array([
+            [[1, 2], [3, 4]],
+            [[5, 6], [7, 8]]
+        ])
+        size = 2
+        
+        # Expected output: maximum_filter with size=2 applied to each 2D array
+        expected_output = np.array([
+            [[4, 4], [4, 4]],
+            [[8, 8], [8, 8]]
         ])
         
         result = apply_maximum_filter(input_array, size)

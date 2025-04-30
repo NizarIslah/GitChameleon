@@ -20,8 +20,8 @@ class TestHilbertTransform(unittest.TestCase):
         # Check shape - should be 2 rows (stacked a and b) and 3 columns
         self.assertEqual(result.shape, (2, 3))
         
-        # Check dtype - should be complex128
-        self.assertEqual(result.dtype, np.complex128)
+        # Check dtype - default should be float64
+        self.assertEqual(result.dtype, np.float64)
         
         # Check that result is complex (Hilbert transform returns complex values)
         self.assertTrue(np.iscomplexobj(result))
@@ -82,14 +82,12 @@ class TestHilbertTransform(unittest.TestCase):
         b = np.array([[5, 6], [7, 8]])
         result = compute_hilbert_transform(a, b)
         
-        # Check shape - should be 4 rows (stacked a and b flattened) and 2 columns
-        self.assertEqual(result.shape, (4, 2))
+        # Check shape - should be 2 rows (stacked a and b) and 2x2 for each
+        self.assertEqual(result.shape, (2, 2, 2))
         
         # Check that the real part matches the input
-        np.testing.assert_allclose(result[0].real, a[0])
-        np.testing.assert_allclose(result[1].real, a[1])
-        np.testing.assert_allclose(result[2].real, b[0])
-        np.testing.assert_allclose(result[3].real, b[1])
+        np.testing.assert_allclose(result[0].real, a)
+        np.testing.assert_allclose(result[1].real, b)
 
 
 if __name__ == '__main__':

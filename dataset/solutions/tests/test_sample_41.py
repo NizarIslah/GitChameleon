@@ -1,8 +1,9 @@
+# Add the parent directory to import sys
 import os
 import sys
 import unittest
 import warnings
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -54,6 +55,51 @@ class TestImageProcessing(unittest.TestCase):
             self.assertEqual(len(sample_41.iface.output_components), 1)
             # Check that the output is a Label component
             self.assertIsInstance(sample_41.iface.output_components[0], gr.components.Label)
+
+    @patch('gradio.Interface.launch')
+    def test_interface_launch(self, mock_launch):
+        """Test that the interface can be launched."""
+        # Set up the mock to return a simple object
+        mock_launch.return_value = MagicMock()
+        
+        # Launch the interface
+        result = sample_41.iface.launch()
+        
+        # Check that launch was called
+        mock_launch.assert_called_once()
+        
+        # Check that a result was returned
+        self.assertIsNotNone(result)
+
+    @patch('gradio.Interface.launch')
+    def test_interface_launch_with_share(self, mock_launch):
+        """Test that the interface can be launched with sharing enabled."""
+        # Set up the mock to return a simple object
+        mock_launch.return_value = MagicMock()
+        
+        # Launch the interface with share=True
+        result = sample_41.iface.launch(share=True)
+        
+        # Check that launch was called with share=True
+        mock_launch.assert_called_once_with(share=True)
+        
+        # Check that a result was returned
+        self.assertIsNotNone(result)
+
+    @patch('gradio.Interface.launch')
+    def test_interface_with_custom_server_name(self, mock_launch):
+        """Test that the interface can be launched with a custom server name."""
+        # Set up the mock to return a simple object
+        mock_launch.return_value = MagicMock()
+        
+        # Launch the interface with a custom server name
+        result = sample_41.iface.launch(server_name="0.0.0.0")
+        
+        # Check that launch was called with server_name="0.0.0.0"
+        mock_launch.assert_called_once_with(server_name="0.0.0.0")
+        
+        # Check that a result was returned
+        self.assertIsNotNone(result)
 
     def test_process_image_with_different_inputs(self):
         """Test that process_image returns 'Processed' for different types of inputs."""

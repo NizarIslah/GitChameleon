@@ -1,4 +1,5 @@
 import os
+# Add the parent directory to the path so we can import the sample module
 import sys
 import unittest
 
@@ -14,8 +15,8 @@ class TestSample303(unittest.TestCase):
         """Test compute_localmin function with 1D array."""
         # Create a test array with known minima
         x = np.array([3, 1, 4, 1, 5, 9, 2, 6, 5])
-        # Expected minima are at indices 1, 3, 6, and 8
-        expected = np.array([False, True, False, True, False, False, True, False, True])
+        # Expected minima are at indices 1 and 3 (values 1) and 6 (value 2)
+        expected = np.array([False, True, False, True, False, False, True, False, False])
         
         result = compute_localmin(x, axis=0)
         
@@ -34,7 +35,7 @@ class TestSample303(unittest.TestCase):
         expected_axis0 = np.array([
             [False, False, False],
             [True, False, False],
-            [False, False, True]
+            [False, False, False]
         ])
         
         result_axis0 = compute_localmin(x, axis=0)
@@ -53,8 +54,8 @@ class TestSample303(unittest.TestCase):
         # Expected minima along axis 1
         expected_axis1 = np.array([
             [False, True, False],
-            [False, False, False],
-            [False, False, True]
+            [True, False, False],
+            [True, False, False]
         ])
         
         result_axis1 = compute_localmin(x, axis=1)

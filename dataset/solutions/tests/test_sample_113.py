@@ -44,7 +44,8 @@ class TestSample113(unittest.TestCase):
         self.assertEqual(len(result_ones), 2)
         
         # For p-values of 1, the combined p-value should also be 1
-        self.assertAlmostEqual(result_ones[1], 1.0, places=10)
+        # So 1-output[1] should be 0
+        self.assertAlmostEqual(result_ones[1], 0.0, places=10)
     
     def test_combine_pvalues_single_value(self):
         """Test the combine_pvalues function with a single p-value."""

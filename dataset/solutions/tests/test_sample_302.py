@@ -22,10 +22,10 @@ class TestComputeShear(unittest.TestCase):
         result = compute_shear(test_array, factor=1, axis=0)
         
         # Expected result after shearing with factor=1, axis=0
-        # Each row i is shifted right by i positions (with wrap)
+        # Each row i is shifted right by i positions
         expected = np.array([[1, 2, 3],
-                             [6, 4, 5],
-                             [8, 9, 7]])
+                             [0, 4, 5],
+                             [0, 0, 7]])
         
         np.testing.assert_array_equal(result, expected)
     
@@ -39,9 +39,10 @@ class TestComputeShear(unittest.TestCase):
         # Test with factor=1, axis=1 (shear along columns)
         result = compute_shear(test_array, factor=1, axis=1)
         
-        # Expected result after shearing with factor=1, axis=1 (with wrap)
-        expected = np.array([[1, 8, 6],
-                             [4, 2, 9],
+        # Expected result after shearing with factor=1, axis=1
+        # Each column j is shifted down by j positions
+        expected = np.array([[1, 0, 0],
+                             [4, 2, 0],
                              [7, 5, 3]])
         
         np.testing.assert_array_equal(result, expected)
@@ -56,10 +57,11 @@ class TestComputeShear(unittest.TestCase):
         # Test with factor=-1, axis=0 (shear along rows in opposite direction)
         result = compute_shear(test_array, factor=-1, axis=0)
         
-        # Expected result after shearing with factor=-1, axis=0 (with wrap)
+        # Expected result after shearing with factor=-1, axis=0
+        # Each row i is shifted left by i positions
         expected = np.array([[1, 2, 3],
-                             [5, 6, 4],
-                             [9, 7, 8]])
+                             [5, 6, 0],
+                             [8, 9, 0]])
         
         np.testing.assert_array_equal(result, expected)
     

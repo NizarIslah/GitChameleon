@@ -44,8 +44,8 @@ class TestCustomScatter(unittest.TestCase):
         self.assertIsInstance(fig.data[0], go.Scatter)
         
         # Check that x and y coordinates are as expected
-        self.assertEqual(list(fig.data[0].x), [0])
-        self.assertEqual(list(fig.data[0].y), [0])
+        self.assertEqual(fig.data[0].x, [0])
+        self.assertEqual(fig.data[0].y, [0])
 
 if __name__ == "__main__":
     unittest.main()

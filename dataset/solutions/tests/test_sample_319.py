@@ -66,8 +66,8 @@ class TestImaging(unittest.TestCase):
     def test_imaging_with_same_size_images(self):
         """Test that the imaging function works with same-sized images."""
         result = imaging(self.img1_small, self.img2_small)
-        self.assertIsInstance(result, np.ndarray)
-        self.assertEqual(result.shape, (2, 2, 3))
+        self.assertIsInstance(result, Image.Image)
+        self.assertEqual(result.size, self.img1_small.size)
 
     def test_imaging_with_different_size_images(self):
         """Test that the imaging function returns None for different-sized images."""
@@ -77,14 +77,18 @@ class TestImaging(unittest.TestCase):
     def test_hardlight_calculation(self):
         """Test that the hardlight calculation produces the expected results."""
         result = imaging(self.img_test1, self.img_test2)
-        self.assertIsInstance(result, np.ndarray)
+        self.assertIsInstance(result, Image.Image)
+        
+        # Convert result to numpy array for comparison
+        result_array = np.array(result)
+        
         # Compare with expected values
-        np.testing.assert_array_equal(result, self.expected_result)
+        np.testing.assert_array_equal(result_array, self.expected_result)
 
     def test_imaging_preserves_image_dimensions(self):
         """Test that the output image has the same dimensions as the input."""
         result = imaging(self.img_test1, self.img_test2)
-        self.assertEqual(result.shape, (2, 2, 3))
+        self.assertEqual(result.size, self.img_test1.size)
 
 
 if __name__ == '__main__':

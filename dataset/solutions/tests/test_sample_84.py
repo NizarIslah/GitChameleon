@@ -23,7 +23,6 @@ class TestSample84(unittest.TestCase):
         
         # Create LightGBM dataset
         train_data = lgb.Dataset(X, label=y)
-        train_data.construct()  # Ensure dataset is constructed before querying
         
         # Verify dataset properties
         self.assertEqual(train_data.num_data(), 100)
@@ -62,21 +61,19 @@ class TestSample84(unittest.TestCase):
         )
         
         # Verify CV results structure
-        self.assertIn('valid binary_logloss-mean', cv_results)
-        self.assertIn('valid binary_logloss-stdv', cv_results)
-        self.assertIn('train binary_logloss-mean', cv_results)
-        self.assertIn('train binary_logloss-stdv', cv_results)
+        self.assertIn('binary_logloss-mean', cv_results)
+        self.assertIn('binary_logloss-stdv', cv_results)
+        self.assertIn('training_binary_logloss-mean', cv_results)
+        self.assertIn('training_binary_logloss-stdv', cv_results)
         
         # Check that we have results for each iteration
-        self.assertLessEqual(len(cv_results['valid binary_logloss-mean']), 10)
+        self.assertLessEqual(len(cv_results['binary_logloss-mean']), 10)
 
     def test_cv_early_stopping(self):
         """Test that early stopping works in LightGBM cross-validation."""
         # Create a dataset where early stopping is likely to occur
-        # n_informative must be >= log2(n_classes * n_clusters_per_class)
-        # For n_classes=2, n_clusters_per_class=2, n_informative >= 2
         X, y = make_classification(n_samples=100, n_features=5, 
-                                  n_informative=2, n_redundant=2, 
+                                  n_informative=1, n_redundant=3, 
                                   random_state=42)
         
         # Create LightGBM dataset
@@ -101,7 +98,7 @@ class TestSample84(unittest.TestCase):
         )
         
         # Verify that early stopping occurred (number of iterations less than max)
-        self.assertLess(len(cv_results['valid binary_logloss-mean']), 50)
+        self.assertLess(len(cv_results['binary_logloss-mean']), 50)
 
     def test_parameter_effects(self):
         """Test that changing parameters affects the cross-validation results."""
@@ -150,8 +147,8 @@ class TestSample84(unittest.TestCase):
         # Verify that the faster learning rate converges more quickly
         # by comparing the final loss values
         self.assertNotEqual(
-            cv_results_slow['valid binary_logloss-mean'][-1],
-            cv_results_fast['valid binary_logloss-mean'][-1]
+            cv_results_slow['binary_logloss-mean'][-1],
+            cv_results_fast['binary_logloss-mean'][-1]
         )
 
 

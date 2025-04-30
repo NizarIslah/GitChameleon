@@ -27,10 +27,34 @@ class TestFindCommonType(unittest.TestCase):
         expected = np.find_common_type([arr1.dtype], [arr2.dtype])
         self.assertEqual(result, expected)
 
+    def test_different_dtypes(self):
+        """Test with integer and float arrays."""
+        arr1 = np.array([1, 2, 3], dtype=np.int32)
+        arr2 = np.array([4.0, 5.0, 6.0], dtype=np.float64)
+        result = self._call(arr1, arr2)
+        expected = np.find_common_type([arr1.dtype], [arr2.dtype])
+        self.assertEqual(result, expected)
+
+    def test_complex_dtype(self):
+        """Test with integer and complex arrays."""
+        arr1 = np.array([1, 2, 3], dtype=np.int32)
+        arr2 = np.array([1+2j, 3+4j], dtype=np.complex128)
+        result = self._call(arr1, arr2)
+        expected = np.find_common_type([arr1.dtype], [arr2.dtype])
+        self.assertEqual(result, expected)
+
     def test_bool_and_int(self):
         """Test with boolean and integer arrays."""
         arr1 = np.array([True, False, True], dtype=np.bool_)
         arr2 = np.array([1, 2, 3], dtype=np.int32)
+        result = self._call(arr1, arr2)
+        expected = np.find_common_type([arr1.dtype], [arr2.dtype])
+        self.assertEqual(result, expected)
+
+    def test_uint_and_int(self):
+        """Test with unsigned and signed integer arrays."""
+        arr1 = np.array([1, 2, 3], dtype=np.uint8)
+        arr2 = np.array([4, 5, 6], dtype=np.int8)
         result = self._call(arr1, arr2)
         expected = np.find_common_type([arr1.dtype], [arr2.dtype])
         self.assertEqual(result, expected)

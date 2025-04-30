@@ -44,6 +44,20 @@ class TestComputeChirp(unittest.TestCase):
         expected_length = duration * sr
         self.assertEqual(len(chirp_signal), expected_length)
     
+    def test_compute_chirp_linear_vs_exponential(self):
+        """Test that linear and exponential chirps produce different signals."""
+        fmin = 100
+        fmax = 1000
+        duration = 2
+        sr = 22050
+        
+        linear_chirp = compute_chirp(fmin, fmax, duration, sr, True)
+        exponential_chirp = compute_chirp(fmin, fmax, duration, sr, False)
+        
+        # The signals should be different if the linear parameter is properly implemented
+        # Note: This test might fail if the linear parameter is not properly passed to librosa.chirp
+        self.assertFalse(np.array_equal(linear_chirp, exponential_chirp))
+    
     def test_compute_chirp_frequency_range(self):
         """Test that the chirp signal contains frequencies in the expected range."""
         fmin = 100

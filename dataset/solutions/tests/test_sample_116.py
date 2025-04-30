@@ -72,6 +72,16 @@ class TestMatrixExponential(unittest.TestCase):
         # Compare results
         self.assertTrue(np.allclose(result.toarray(), expected.toarray()))
     
+    def test_return_type(self):
+        """Test that the return type is a sparse LIL matrix."""
+        n = 2
+        A = sparse.lil_matrix((n, n))
+        A[0, 0] = 1
+        
+        result = compute_matrix_exponential(A)
+        
+        # Check that the result is a LIL matrix
+        self.assertIsInstance(result, sparse.lil_matrix)
 
 if __name__ == '__main__':
     unittest.main()

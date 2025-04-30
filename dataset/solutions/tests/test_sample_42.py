@@ -1,7 +1,9 @@
+# Add the parent directory to import sys
 import os
 import sys
 import unittest
 import warnings
+from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -48,9 +50,9 @@ class TestDropdownSelection(unittest.TestCase):
         result = sample_42.get_selected_options([])
         self.assertEqual(result, "Selected options: []")
         
-        # The following test is dropped because get_selected_options(None) is not guaranteed to be supported
-        # result = sample_42.get_selected_options(None)
-        # self.assertEqual(result, "Selected options: None")
+        # Test with None (though this shouldn't happen in practice)
+        result = sample_42.get_selected_options(None)
+        self.assertEqual(result, "Selected options: None")
 
     def test_selection_options_list(self):
         """Test that the selection_options list contains the expected values."""
@@ -71,28 +73,67 @@ class TestDropdownSelection(unittest.TestCase):
         # Check that the interface has the correct function
         self.assertEqual(sample_42.iface.fn, sample_42.get_selected_options)
         
-        # Try to check the input and output components in a version-agnostic way
-        iface = sample_42.iface
-        # Gradio >=3.17.0: input_components/output_components
-        if hasattr(iface, 'input_components') and hasattr(iface, 'output_components'):
-            self.assertEqual(len(iface.input_components), 1)
-            dropdown = iface.input_components[0]
-            # Accept both gr.Dropdown and gr.components.Dropdown
-            dropdown_types = (getattr(gr, "Dropdown", None), getattr(getattr(gr, "components", None), "Dropdown", None))
-            self.assertTrue(isinstance(dropdown, tuple(t for t in dropdown_types if t)))
-            # Check choices/options
-            choices = getattr(dropdown, "choices", None) or getattr(dropdown, "options", None)
-            self.assertEqual(choices, sample_42.selection_options)
-            # Check multiselect
-            self.assertTrue(getattr(dropdown, "multiselect", False))
-            # Output
-            self.assertEqual(len(iface.output_components), 1)
-            textbox = iface.output_components[0]
-            textbox_types = (getattr(gr, "Textbox", None), getattr(getattr(gr, "components", None), "Textbox", None))
-            self.assertTrue(isinstance(textbox, tuple(t for t in textbox_types if t)))
-        # For older Gradio, skip component checks
+        # For Gradio 3.17.0, we can check the components
+        if hasattr(sample_42.iface, 'input_components'):
+            # Check that there is one input component
+            self.assertEqual(len(sample_42.iface.input_components), 1)
+            # Check that the input is a Dropdown component
+            self.assertIsInstance(sample_42.iface.input_components[0], gr.components.Dropdown)
+            # Check that the dropdown has the correct options
+            self.assertEqual(sample_42.iface.input_components[0].choices, sample_42.selection_options)
+            # Check that multiselect is enabled
+            self.assertTrue(sample_42.iface.input_components[0].multiselect)
+            
+        if hasattr(sample_42.iface, 'output_components'):
+            # Check that there is one output component
+            self.assertEqual(len(sample_42.iface.output_components), 1)
+            # Check that the output is a Textbox component
+            self.assertIsInstance(sample_42.iface.output_components[0], gr.components.Textbox)
 
-    # All tests that patch or monkey-patch gradio.Interface.launch are dropped.
+    @patch('gradio.Interface.launch')
+    def test_interface_launch(self, mock_launch):
+        """Test that the interface can be launched."""
+        # Set up the mock to return a simple object
+        mock_launch.return_value = MagicMock()
+        
+        # Launch the interface
+        result = sample_42.iface.launch()
+        
+        # Check that launch was called
+        mock_launch.assert_called_once()
+        
+        # Check that a result was returned
+        self.assertIsNotNone(result)
+
+    @patch('gradio.Interface.launch')
+    def test_interface_launch_with_share(self, mock_launch):
+        """Test that the interface can be launched with sharing enabled."""
+        # Set up the mock to return a simple object
+        mock_launch.return_value = MagicMock()
+        
+        # Launch the interface with share=True
+        result = sample_42.iface.launch(share=True)
+        
+        # Check that launch was called with share=True
+        mock_launch.assert_called_once_with(share=True)
+        
+        # Check that a result was returned
+        self.assertIsNotNone(result)
+
+    @patch('gradio.Interface.launch')
+    def test_interface_with_custom_server_name(self, mock_launch):
+        """Test that the interface can be launched with a custom server name."""
+        # Set up the mock to return a simple object
+        mock_launch.return_value = MagicMock()
+        
+        # Launch the interface with a custom server name
+        result = sample_42.iface.launch(server_name="0.0.0.0")
+        
+        # Check that launch was called with server_name="0.0.0.0"
+        mock_launch.assert_called_once_with(server_name="0.0.0.0")
+        
+        # Check that a result was returned
+        self.assertIsNotNone(result)
 
 
 if __name__ == '__main__':

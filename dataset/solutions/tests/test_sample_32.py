@@ -31,6 +31,33 @@ class TestNaiveModularityCommunities(unittest.TestCase):
         communities = list(naive_modularity_communities(G))
         self.assertIsInstance(communities, list)
 
+    def test_non_graph_input(self):
+        """Test with a non-graph input (should not error)."""
+        G = [0, 1, 2, 3, 4]
+        communities = list(naive_modularity_communities(G))
+        self.assertIsInstance(communities, list)
+
+    def test_empty_graph(self):
+        """Test with an empty graph."""
+        G = nx.Graph()
+        communities = list(naive_modularity_communities(G))
+        self.assertIsInstance(communities, list)
+
+    def test_graph_with_single_node(self):
+        """Test with a graph that has a single node."""
+        G = nx.Graph()
+        G.add_node(0)
+        communities = list(naive_modularity_communities(G))
+        self.assertIsInstance(communities, list)
+
+    def test_graph_with_no_edges(self):
+        """Test with a graph that has nodes but no edges."""
+        G = nx.Graph()
+        for i in range(5):
+            G.add_node(i)
+        communities = list(naive_modularity_communities(G))
+        self.assertIsInstance(communities, list)
+
     def test_disconnected_graph(self):
         """Test with a graph that has multiple disconnected components."""
         G = nx.Graph()

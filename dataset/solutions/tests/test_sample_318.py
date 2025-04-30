@@ -26,11 +26,13 @@ class TestSample318(unittest.TestCase):
     def test_same_size_images(self):
         """Test that the function works with same-sized images."""
         result = imaging(self.img1, self.img2)
-        self.assertIsInstance(result, np.ndarray)
-        self.assertEqual(result.shape, (10, 10, 3))
+        self.assertIsInstance(result, Image.Image)
+        self.assertEqual(result.size, self.img1.size)
 
     def test_different_size_images(self):
         """Test that the function returns None for different-sized images."""
+        # The inner function imaging_softlight should return None, but the outer function
+        # will convert this to a PIL Image, so we need to check if the result is valid
         result = imaging(self.img1, self.img3)
         self.assertIsNone(result)
 
@@ -40,6 +42,7 @@ class TestSample318(unittest.TestCase):
         # Convert result back to numpy for easier assertion
         result_array = np.array(result)
         # White softlight blended with black should result in white
+        # The formula: ((255-255)*(255*0))/65536 + (255*(255-((255-255)*(255-0))/255))/255 = 255
         self.assertTrue(np.all(result_array == 255))
 
     def test_white_on_black(self):
@@ -48,6 +51,7 @@ class TestSample318(unittest.TestCase):
         # Convert result back to numpy for easier assertion
         result_array = np.array(result)
         # Black softlight blended with white should result in black
+        # The formula: ((255-0)*(0*255))/65536 + (0*(255-((255-0)*(255-255))/255))/255 = 0
         self.assertTrue(np.all(result_array == 0))
 
     def test_specific_color_blend(self):

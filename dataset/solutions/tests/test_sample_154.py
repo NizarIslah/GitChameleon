@@ -33,7 +33,6 @@ class TestSample154(unittest.TestCase):
         
         # Create a mock context
         env = jinja2.Environment()
-        env.filters['greet'] = greet_filter  # Register the filter
         template = env.from_string("{{ name|greet }}")
         
         # Test with default prefix

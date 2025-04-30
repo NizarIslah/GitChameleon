@@ -26,7 +26,9 @@ class TestCustomLaplaceTransform(unittest.TestCase):
         
         # Check the convergence condition
         self.assertIsInstance(convergence, sympy.Expr)
-        # Removed: self.assertIsInstance(conditions, bool)
+        
+        # Check that conditions is a boolean
+        self.assertIsInstance(conditions, bool)
 
     def test_with_different_symbols(self):
         # Test with different symbol names

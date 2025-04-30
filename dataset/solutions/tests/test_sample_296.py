@@ -43,6 +43,24 @@ class TestComputeSamplesLike(unittest.TestCase):
         # Verify that the samples are evenly spaced by hop_length
         self.assertTrue(np.all(np.diff(result) == self.hop_length))
 
+    def test_with_different_hop_length(self):
+        """Test with a different hop_length value."""
+        # Create a new spectrogram with a different hop_length
+        new_hop_length = 256
+        D_new = librosa.stft(self.y, n_fft=self.n_fft, hop_length=new_hop_length)
+        
+        # Call the function under test
+        result = compute_samples_like(self.y, self.sr, D_new, new_hop_length)
+        
+        # Call the librosa function directly for comparison
+        expected = librosa.samples_like(D_new)
+        
+        # Check that the results are the same
+        np.testing.assert_array_equal(result, expected)
+        
+        # Verify that the samples are evenly spaced by the new hop_length
+        self.assertTrue(np.all(np.diff(result) == new_hop_length))
+
     def test_empty_spectrogram(self):
         """Test with an empty spectrogram."""
         # Create an empty spectrogram

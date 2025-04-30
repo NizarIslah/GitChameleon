@@ -1,6 +1,10 @@
+# Import the function to test
 import os
 import sys
 import unittest
+from typing import Any, Dict
+
+import falcon.testing
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_246 import custom_environ
@@ -24,7 +28,21 @@ class TestCustomEnviron(unittest.TestCase):
 
         # Test with HTTP 2.0
         result_2_0 = custom_environ("2.0")
-        self.assertEqual(result_2_0.get("SERVER_PROTOCOL"), "HTTP/2")
+        self.assertEqual(result_2_0.get("SERVER_PROTOCOL"), "HTTP/2.0")
+
+    def test_custom_environ_matches_falcon_testing(self):
+        """Test that custom_environ produces the same result as falcon.testing.create_environ."""
+        http_version = "1.1"
+        result = custom_environ(http_version)
+        expected = falcon.testing.create_environ(http_version=http_version)
+        
+        # Check that all keys in expected are in result with the same values
+        for key, value in expected.items():
+            self.assertEqual(result.get(key), value)
+        
+        # Check that all keys in result are in expected
+        for key in result:
+            self.assertIn(key, expected)
 
 
 if __name__ == "__main__":

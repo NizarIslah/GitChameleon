@@ -47,6 +47,14 @@ class TestCheckInvertibility(unittest.TestCase):
         result = check_invertibility(matrices)
         self.assertFalse(result)
     
+    def test_empty_array(self):
+        # Test with an empty array
+        # This is a special case and depends on how np.all behaves with empty arrays
+        # By default, np.all returns True for empty arrays
+        matrices = np.array([])
+        result = check_invertibility(matrices)
+        self.assertTrue(result)
+    
     def test_3d_matrices(self):
         # Test with 3x3 matrices
         matrices = np.array([
