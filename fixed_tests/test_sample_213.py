@@ -43,24 +43,41 @@ class TestCustomBoxenplot(unittest.TestCase):
         
     def test_width_method_parameter(self):
         # Test that the width_method parameter is correctly applied
+        # We'll compare the custom plot (exponential) with seaborn's default (area).
         plt.figure(figsize=(10, 5))
         
-        # Create a subplot with our custom function (using exponential width_method)
+        # Subplot with our custom function using exponential width_method
         plt.subplot(1, 2, 1)
-        ax1 = custom_boxenplot(self.data)
+        ax1 = custom_boxenplot(self.data, width_method='exponential')
         
-        # Create a subplot with default boxenplot (using area width_method)
+        # Subplot with default boxenplot (using area width_method)
         plt.subplot(1, 2, 2)
-        ax2 = sns.boxenplot(x='x', y='y', data=self.data)
+        ax2 = sns.boxenplot(x='x', y='y', data=self.data, width_method='area')
         
-        # Check that the number of boxes is the same
-        self.assertEqual(len(ax1.collections), len(ax2.collections), "The number of boxen elements should be the same")
+        # Ensure both have the same number of boxen elements
+        self.assertEqual(
+            len(ax1.collections),
+            len(ax2.collections),
+            "The number of boxen elements should be the same"
+        )
         
-        # Check that the plots are not identical by comparing the number of unique vertices
-        unique_vertices_ax1 = {tuple(vertex) for collection in ax1.collections for vertex in collection.get_paths()[0].vertices}
-        unique_vertices_ax2 = {tuple(vertex) for collection in ax2.collections for vertex in collection.get_paths()[0].vertices}
+        # Check that the geometry of the boxes differs
+        unique_vertices_ax1 = {
+            tuple(vertex)
+            for collection in ax1.collections
+            for vertex in collection.get_paths()[0].vertices
+        }
+        unique_vertices_ax2 = {
+            tuple(vertex)
+            for collection in ax2.collections
+            for vertex in collection.get_paths()[0].vertices
+        }
         
-        self.assertNotEqual(unique_vertices_ax1, unique_vertices_ax2, "The width_method parameter doesn't seem to have an effect")
+        self.assertNotEqual(
+            unique_vertices_ax1,
+            unique_vertices_ax2,
+            "The width_method parameter doesn't seem to have an effect"
+        )
         
         plt.close()
         

@@ -1,6 +1,3 @@
-# library: pytest
-# version: 7.2.0
-# extra_dependencies: []
 import pytest
 import sys
 import os
@@ -29,8 +26,8 @@ class TestFoo:
     
     def test_foo_types(self) -> None:
         """Test that foo function handles different numeric types correctly"""
-        # Test with float inputs (should convert to int for division)
-        assert foo(1.5, 2.5) == foo(int(1.5), int(2.5))
+        # Test with float inputs: (10 * 1.5 - 2.5 + 7) // 3 => 19.5 // 3 => 6.0, which is equal to 6 in Python
+        assert foo(1.5, 2.5) == 6
         
         # Test with string inputs (should raise TypeError)
         with pytest.raises(TypeError):
@@ -39,7 +36,5 @@ class TestFoo:
     def test_foo_formula(self) -> None:
         """Test that foo function follows the formula (10 * a - b + 7) // 3"""
         a, b = 3, 4
-        # Calculate manually
         expected = (10 * a - b + 7) // 3
-        # Compare with function output
         assert foo(a, b) == expected

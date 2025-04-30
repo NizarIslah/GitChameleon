@@ -3,20 +3,22 @@ import sys
 import unittest
 
 import falcon
-from falcon.testing import TestingClient
+from falcon.testing import TestClient
 
+# Ensure we can import from one directory above (where sample_254 might sit)
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_254 import handle_error
 
 
 class TestHandleError(unittest.TestCase):
     def setUp(self):
-        # Create a Falcon API instance with our error handler
-        self.app = falcon.API()
+        # For Falcon 3.x, use falcon.App(); for older Falcon (2.x and below), falcon.API() can be used if needed.
+        # Adjust here if your Falcon version differs.
+        self.app = falcon.App()
         self.app.add_error_handler(Exception, handle_error)
         
         # Create a test client
-        self.client = TestingClient(self.app)
+        self.client = TestClient(self.app)
         
         # Add a test route that raises an exception
         self.app.add_route('/test_error', TestResource())

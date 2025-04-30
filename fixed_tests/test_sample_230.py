@@ -27,20 +27,18 @@ def test_pytest_pycollect_makemodule_signature():
     param = sig.parameters['module_path']
     assert param.annotation == pathlib.Path
 
-def test_pytest_pycollect_makemodule_is_registered():
-    """Test that the hook is properly registered with pytest."""
-    # Get the pytest hooks manager
-    from _pytest.config import _get_config
-    from _pytest.main import _pytest_main
-
-    # Create a pytest config object
-    config = _get_config()
-    
-    # Get all registered hooks
-    hooks = config.hook._get_hook_impls()
-    
-    # Check if our hook is in the registered hooks
-    assert 'pytest_pycollect_makemodule' in hooks
+def test_pytest_pycollect_makemodule_is_registered(pytestconfig):
+    """
+    Test that the hook is properly registered with pytest by verifying
+    it appears in pytest's plugin manager.
+    """
+    plugin_manager = pytestconfig.pluginmanager
+    found_hook = False
+    for plugin in plugin_manager.get_plugins():
+        if hasattr(plugin, 'pytest_pycollect_makemodule'):
+            found_hook = True
+            break
+    assert found_hook, "pytest_pycollect_makemodule hook is not registered"
 
 def test_pytest_pycollect_makemodule_execution():
     """Test that the hook can be called without errors."""

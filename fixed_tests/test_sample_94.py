@@ -22,14 +22,11 @@ class TestAlignWordsFunc(unittest.TestCase):
             nltk.download('wordnet')
     
     def test_exact_match(self):
-        """Test with identical hypothesis and reference."""
+        """Test with identical hypothesis and reference, expecting all matches."""
         hypothesis = ['this', 'is', 'a', 'test']
         reference = ['this', 'is', 'a', 'test']
         
-        result = align_words_func(hypothesis, reference)
-        
-        # Unpack the result tuple
-        matches, h_unmatched, r_unmatched = result
+        matches, h_unmatched, r_unmatched = align_words_func(hypothesis, reference)
         
         # All words should match
         self.assertEqual(len(matches), 4)
@@ -37,8 +34,8 @@ class TestAlignWordsFunc(unittest.TestCase):
         self.assertEqual(len(h_unmatched), 0)
         self.assertEqual(len(r_unmatched), 0)
         
-        # Check that each match is correct
-        for i, ((h_idx, r_idx), _) in enumerate(matches):
+        # Each matched index pair should align identical words
+        for (h_idx, r_idx) in matches:
             self.assertEqual(hypothesis[h_idx], reference[r_idx])
     
     def test_partial_match(self):
@@ -46,44 +43,35 @@ class TestAlignWordsFunc(unittest.TestCase):
         hypothesis = ['the', 'cat', 'sat', 'on', 'the', 'mat']
         reference = ['the', 'cat', 'is', 'sitting', 'on', 'the', 'mat']
         
-        result = align_words_func(hypothesis, reference)
+        matches, h_unmatched, r_unmatched = align_words_func(hypothesis, reference)
         
-        # Unpack the result tuple
-        matches, h_unmatched, r_unmatched = result
-        
-        # Check that we have some matches
+        # There should be at least some matches
         self.assertTrue(len(matches) > 0)
         
-        # Verify that matched words are actually matching
-        for (h_idx, r_idx), _ in matches:
+        # Verify the matched words are actually matching in text
+        for (h_idx, r_idx) in matches:
             self.assertEqual(hypothesis[h_idx], reference[r_idx])
     
     def test_no_match(self):
-        """Test with completely different hypothesis and reference."""
+        """Test with completely different hypothesis and reference, expecting no matches."""
         hypothesis = ['apple', 'banana', 'cherry']
         reference = ['dog', 'cat', 'mouse']
         
-        result = align_words_func(hypothesis, reference)
+        matches, h_unmatched, r_unmatched = align_words_func(hypothesis, reference)
         
-        # Unpack the result tuple
-        matches, h_unmatched, r_unmatched = result
-        
-        # There should be no exact matches
-        self.assertEqual(len([m for m in matches if m[1] == 'exact']), 0)
-        
-        # All words should be unmatched or have stem/synonym matches
-        self.assertEqual(len(h_unmatched) + len([m for m in matches if m[1] != 'exact']), 
-                         len(hypothesis))
+        # Expect no matched pairs
+        self.assertEqual(len(matches), 0)
+        # All hypothesis words should be unmatched
+        self.assertEqual(len(h_unmatched), len(hypothesis))
+        # All reference words should be unmatched
+        self.assertEqual(len(r_unmatched), len(reference))
     
     def test_empty_inputs(self):
-        """Test with empty hypothesis and reference."""
+        """Test with both hypothesis and reference empty."""
         hypothesis = []
         reference = []
         
-        result = align_words_func(hypothesis, reference)
-        
-        # Unpack the result tuple
-        matches, h_unmatched, r_unmatched = result
+        matches, h_unmatched, r_unmatched = align_words_func(hypothesis, reference)
         
         # No matches or unmatched words
         self.assertEqual(len(matches), 0)
@@ -91,36 +79,30 @@ class TestAlignWordsFunc(unittest.TestCase):
         self.assertEqual(len(r_unmatched), 0)
     
     def test_one_empty_input(self):
-        """Test with one empty input."""
+        """Test with one empty input; then reverse the scenario."""
         hypothesis = ['this', 'is', 'a', 'test']
         reference = []
         
-        result = align_words_func(hypothesis, reference)
-        
-        # Unpack the result tuple
-        matches, h_unmatched, r_unmatched = result
+        matches, h_unmatched, r_unmatched = align_words_func(hypothesis, reference)
         
         # No matches
         self.assertEqual(len(matches), 0)
         # All hypothesis words should be unmatched
         self.assertEqual(len(h_unmatched), len(hypothesis))
-        # No reference words to be unmatched
+        # No reference words
         self.assertEqual(len(r_unmatched), 0)
         
-        # Test the reverse case
+        # Reverse
         hypothesis = []
         reference = ['this', 'is', 'a', 'test']
         
-        result = align_words_func(hypothesis, reference)
-        
-        # Unpack the result tuple
-        matches, h_unmatched, r_unmatched = result
+        matches, h_unmatched, r_unmatched = align_words_func(hypothesis, reference)
         
         # No matches
         self.assertEqual(len(matches), 0)
-        # No hypothesis words to be unmatched
+        # No hypothesis words
         self.assertEqual(len(h_unmatched), 0)
-        # All reference words should be unmatched
+        # All reference words unmatched
         self.assertEqual(len(r_unmatched), len(reference))
 
 if __name__ == '__main__':

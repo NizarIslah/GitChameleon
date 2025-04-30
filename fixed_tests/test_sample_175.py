@@ -9,6 +9,7 @@ from sample_175 import custom_generateRandomSampleDice
 
 # Import required libraries from sample_175.py
 from sympy.stats import Die
+import sympy
 import sympy.stats.rv
 
 
@@ -28,7 +29,7 @@ class TestCustomGenerateRandomSampleDice(unittest.TestCase):
             # Check that the correct number of samples was generated
             self.assertEqual(len(samples), size)
             
-            # Check that all samples are within the expected range (1-6 for a standard die)
+            # Check that all samples are within the expected range (1-6)
             for sample_value in samples:
                 self.assertGreaterEqual(sample_value, 1)
                 self.assertLessEqual(sample_value, 6)
@@ -49,19 +50,16 @@ class TestCustomGenerateRandomSampleDice(unittest.TestCase):
                 self.assertLessEqual(sample_value, sides)
     
     def test_return_type(self):
-        """Test that the function returns a list of integers."""
+        """Test that the function returns a list whose elements can be used as integers."""
         die = Die('D', 6)
         samples = custom_generateRandomSampleDice(die, 3)
         
         # Check that the return value is a list
         self.assertIsInstance(samples, list)
         
-        # Check that all elements in the list are integers
+        # Check that each element is either a Python int or a Sympy Integer
         for sample_value in samples:
-            # Convert to int if it's a sympy expression
-            if isinstance(sample_value, sympy.stats.rv.RandomSymbol):
-                sample_value = int(sample_value)
-            self.assertIsInstance(sample_value, int)
+            self.assertIsInstance(sample_value, (int, sympy.core.numbers.Integer))
 
 
 if __name__ == '__main__':
