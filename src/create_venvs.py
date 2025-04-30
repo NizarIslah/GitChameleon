@@ -148,7 +148,7 @@ def install_packages(env_path, library, version, additional_dependencies, python
             numpy_versions = {
                 "3.7": "numpy==1.21.6",
                 "3.9": "numpy==1.21.6",
-                "3.10": "numpy==1.22.4",
+                "3.10": "numpy==1.23",
             }
             install_pinpointed_package("numpy", python_version, python_executable, deps_lower, numpy_versions, env_path)
         if library.lower() != "scipy":
