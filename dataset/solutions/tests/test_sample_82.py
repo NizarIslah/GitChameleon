@@ -1,9 +1,9 @@
 import sys
 import os
+import unittest
 import numpy as np
 import pytest
 import lightgbm as lgb
-from unittest.mock import patch, MagicMock
 
 # Add the parent directory to sys.path to import the module
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -23,20 +23,15 @@ class TestLightGBMCV(unittest.TestCase):
         train_data = sample_82.train_data
         self.assertIsInstance(train_data, lgb.Dataset)
 
-        # Retrieve data and labels from the Dataset
-        X_data = train_data.get_data()
-        y_data = train_data.get_label()
+        # Instead of calling `train_data.get_data()` (which fails if the data was freed),
+        # we use `num_data()` & `num_feature()` to check data dimensions.
+        self.assertEqual(train_data.num_data(), X.shape[0])
+        self.assertEqual(train_data.num_feature(), X.shape[1])
 
-        # Assert that they match the original arrays
-        self.assertEqual(X_data.shape, X.shape)
-        self.assertEqual(y_data.shape, y.shape)
+        # Check that the labels match in length
+        y_data = train_data.get_label()
+        self.assertEqual(len(y_data), len(y))
 
 
 if __name__ == "__main__":
     unittest.main()
-
-
-
-
-
-
