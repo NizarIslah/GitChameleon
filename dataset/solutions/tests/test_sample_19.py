@@ -14,30 +14,13 @@ import importlib.util
 import geopandas as gpd
 from shapely.geometry import Point, Polygon
 
-# Check if we need to create a compatibility wrapper for spatial_join
-try:
-    # Try to import the function directly
-    from sample_19 import spatial_join
 
-    # Test if it works with the installed geopandas version
-    test_gdf1 = gpd.GeoDataFrame(geometry=[Point(0, 0)], crs="EPSG:4326")
-    test_gdf2 = gpd.GeoDataFrame(geometry=[Polygon([(0, 0), (0, 1), (1, 1), (1, 0)])], crs="EPSG:4326")
-    spatial_join(test_gdf1, test_gdf2)
-except TypeError:
-    # If there's a TypeError (due to 'op' vs 'predicate' parameter),
-    # create a wrapper function that uses the correct parameter name
-    def spatial_join(gdf1, gdf2):
-        """Wrapper for sample_19.spatial_join that works with the installed geopandas version."""
-        # Get the geopandas version
-        gpd_version = gpd.__version__
-        
-        # For geopandas >= 0.10.0, use 'predicate' instead of 'op'
-        if gpd_version >= '0.10.0':
-            return gpd.sjoin(gdf1, gdf2, predicate='within')
-        else:
-            # For older versions, use 'op'
-            return gpd.sjoin(gdf1, gdf2, op='within')
+from sample_19 import spatial_join
 
+# Test if it works with the installed geopandas version
+test_gdf1 = gpd.GeoDataFrame(geometry=[Point(0, 0)], crs="EPSG:4326")
+test_gdf2 = gpd.GeoDataFrame(geometry=[Polygon([(0, 0), (0, 1), (1, 1), (1, 0)])], crs="EPSG:4326")
+spatial_join(test_gdf1, test_gdf2)
 
 class TestSpatialJoin(unittest.TestCase):
     """Test cases for the spatial_join function in sample_19.py."""

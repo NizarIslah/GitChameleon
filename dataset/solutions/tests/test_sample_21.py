@@ -18,23 +18,6 @@ from shapely.ops import unary_union
 # Check geopandas version
 gpd_version = gpd.__version__
 
-# Create a compatibility wrapper for perform_union
-# In newer versions of geopandas, cascaded_union has been removed from GeoSeries
-# We'll create a wrapper that uses the appropriate method based on the version
-original_perform_union = sample_21.perform_union
-
-def perform_union_wrapper(gdf):
-    """Wrapper for sample_21.perform_union that works with newer geopandas versions."""
-    try:
-        # Try the original function first
-        return original_perform_union(gdf)
-    except AttributeError:
-        # If cascaded_union is not available, use unary_union instead
-        return gdf.geometry.unary_union
-
-# Replace the original function with our wrapper for testing
-sample_21.perform_union = perform_union_wrapper
-
 # Filter deprecation warnings
 warnings.filterwarnings('ignore', category=DeprecationWarning, 
                        message='.*cascaded_union.*')
