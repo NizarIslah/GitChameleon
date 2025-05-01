@@ -1,8 +1,11 @@
 import unittest
 from unittest import mock
-
+import os 
+import sys
 import mitmproxy.connection as conn
-from dataset.solutions.sample_217 import custom_server
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_217 import custom_server
 
 
 class TestCustomServer(unittest.TestCase):
