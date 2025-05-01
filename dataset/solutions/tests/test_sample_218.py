@@ -6,7 +6,7 @@ from unittest.mock import patch
 import os 
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from sample_217 import custom_server
+
 from sample_218 import DummyServerConn, ConnectionLogger, solution
 
 class TestSample218(unittest.TestCase):
