@@ -3,7 +3,7 @@ import subprocess
 import tempfile
 
 
-def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest") -> dict:
+def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest", coverage=False) -> dict:
     """
     Evaluate sample code using the specified strategy in the provided virtual environment.
 
@@ -108,6 +108,41 @@ def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest") -
                 except Exception as e:
                     sample_result["output"] = f"Error: {str(e)}"
                     sample_result["pass"] = False
+
+                # get coverage optionally
+                if coverage:
+                    # pip install pytest-cov
+                    cmd = [
+                        python_executable,
+                        "-m",
+                        "pip",
+                        "install",
+                        "pytest-cov",
+                    ]
+                    proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                    cov_file = os.path.join(temp_dir, f"coverage_{example_id}.json")
+                    cmd = [
+                        python_executable,
+                        "-m",
+                        "pytest",
+                        "--disable-warnings",
+                        "-q",
+                        f"--cov={code_filepath}",
+                        f"--cov-report=json:{cov_file}",
+                        temp_dir,
+                    ]
+                    try:
+                        proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=30)
+                        print(proc.stdout)
+                        print(proc.stderr)
+                        import json
+                        with open(cov_file, "r") as f:
+                            coverage_data = json.load(f)
+                            sample_result["coverage"] = coverage_data["totals"]["percent_covered"]
+                    except Exception as e:
+                        print(f"Error while getting coverage: {e}")
+                        pass
+
         else:
             sample_result["output"] = "Unsupported evaluation strategy."
             sample_result["pass"] = False

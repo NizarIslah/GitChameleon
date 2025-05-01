@@ -56,7 +56,7 @@ def main():
                 "test_file": test_file_content,
                 "codes": {"solution_code": {"code": code + solution}},
             }
-            eval_res = eval_sample(example_id, env_path, code_dict)["codes"]["solution_code"]
+            eval_res = eval_sample(example_id, env_path, code_dict, coverage=True)["codes"]["solution_code"]
 
             # Append row for this example
             results.append({
@@ -65,6 +65,7 @@ def main():
                 "output": eval_res.get("output", "").strip(),
                 "passed": eval_res.get("pass", False),
                 "compiled": eval_res.get("compile", True),
+                "coverage": eval_res.get("coverage", -1),
             })
 
         except Exception as e:
@@ -75,6 +76,7 @@ def main():
                 "output": f"Error: {e}",
                 "passed": False,
                 "compiled": False,
+                "coverage": 0,
             })
             print(f"[!] Error processing record {idx} (example_id={example_id}): {e}")
             continue
