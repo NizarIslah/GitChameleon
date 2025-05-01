@@ -128,7 +128,7 @@ def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest", c
                         "--disable-warnings",
                         "-q",
                         f"--cov={code_filepath}",
-                        f"--cov-report=json:{cov_file}",
+                        f"--cov-report=term-missing",
                         temp_dir,
                     ]
                     try:
