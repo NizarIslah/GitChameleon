@@ -91,13 +91,13 @@ def main():
     args = parser.parse_args()
 
    # Load JSONL records
-    starting_codes = []
+    starting_codes = {}
     with open(args.data_file, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if line:
                 data = json.loads(line)
-                starting_codes.append({int(data["example_id"]): data["starting_code"]})
+                starting_codes[int(data["example_id"])] = data["starting_code"]
 
     # Load JSONL records
     outputs = []
