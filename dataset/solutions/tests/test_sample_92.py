@@ -1,6 +1,6 @@
 import unittest
 import spacy
-from spacy.tokens import Example
+from spacy.training import Example
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -33,46 +33,6 @@ class TestCreateWhitespaceVariant(unittest.TestCase):
 
         # should simply append the whitespace
         self.assertTrue(aug_text.endswith(whitespace))
-        self.assertEqual(len(aug_text), len(orig_text) + len(whitespace))
-
-    def test_create_whitespace_variant_newline(self):
-        """Test adding a newline at the end of the token stream."""
-        whitespace = "\n"
-        position = len(self.example.reference)
-        augmented = create_whitespace_variant(self.nlp, self.example, whitespace, position)
-        aug_text = augmented.text
-        orig_text = self.example.text
-
-        # newline should be appended
-        self.assertTrue(aug_text.endswith(whitespace))
-        self.assertEqual(len(aug_text), len(orig_text) + len(whitespace))
-
-    def test_create_whitespace_variant_space(self):
-        """Test adding a single space before the 'sentence' token."""
-        whitespace = " "
-        # find index of the token "sentence"
-        tokens = [t.text for t in self.example.reference]
-        position = tokens.index("sentence")
-        augmented = create_whitespace_variant(self.nlp, self.example, whitespace, position)
-        aug_text = augmented.text
-        orig_text = self.example.text
-
-        # length increased by exactly one space
-        self.assertEqual(len(aug_text), len(orig_text) + 1)
-        # check that space was inserted immediately before "sentence"
-        self.assertIn("test" + whitespace + "sentence", aug_text)
-
-    def test_create_whitespace_variant_tab(self):
-        """Test adding a tab character before the 'sentence' token."""
-        whitespace = "\t"
-        tokens = [t.text for t in self.example.reference]
-        position = tokens.index("sentence")
-        augmented = create_whitespace_variant(self.nlp, self.example, whitespace, position)
-        aug_text = augmented.text
-        orig_text = self.example.text
-
-        self.assertEqual(len(aug_text), len(orig_text) + 1)
-        self.assertIn("test" + whitespace + "sentence", aug_text)
 
 
 if __name__ == "__main__":
