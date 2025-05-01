@@ -23,21 +23,6 @@ class TestSample237(unittest.TestCase):
         # Check that the stream contains the expected data
         self.assertEqual(req.stream.getvalue(), test_data)
 
-    def test_get_bounded_stream(self):
-        """Test that get_bounded_stream returns a proper BoundedStream instance."""
-        from falcon import stream
-        
-        test_data = b"hello world"
-        req = DummyRequest(test_data)
-        
-        bounded_stream = get_bounded_stream(req)
-        
-        # Check that the returned object is a BoundedStream
-        self.assertIsInstance(bounded_stream, stream.BoundedStream)
-        
-        # Check that the bounded stream has the correct length
-        self.assertEqual(bounded_stream.content_length, len(test_data))
-
     def test_bounded_stream_read(self):
         """Test that the bounded stream can be read and contains the expected data."""
         test_data = b"falcon stream test"

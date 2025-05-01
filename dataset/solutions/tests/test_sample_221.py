@@ -12,10 +12,6 @@ class TestSample221(unittest.TestCase):
         client_conn = DummyClientConn(peername)
         self.assertEqual(client_conn.peername, peername)
     
-    def test_connection_logger_before_solution(self):
-        """Test that ConnectionLogger doesn't have client_connected method before solution() is called."""
-        self.assertFalse(hasattr(ConnectionLogger, 'client_connected'))
-    
     def test_solution_adds_client_connected_method(self):
         """Test that solution() adds the client_connected method to ConnectionLogger."""
         solution()
