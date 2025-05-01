@@ -119,6 +119,7 @@ def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest", c
                         "install",
                         "pytest-cov",
                     ]
+                    proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                     cov_file = os.path.join(temp_dir, f"coverage_{example_id}.json")
                     cmd = [
                         python_executable,
