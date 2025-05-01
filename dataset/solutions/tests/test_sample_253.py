@@ -1,9 +1,12 @@
 import unittest
 from unittest.mock import MagicMock
 from falcon import Request
+import sys
+import os
 
-# Import the function to test
-from dataset.solutions.sample_253 import custom_get_param
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from sample_253 import custom_get_param
 
 
 class TestSample253(unittest.TestCase):
