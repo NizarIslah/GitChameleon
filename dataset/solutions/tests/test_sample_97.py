@@ -1,6 +1,10 @@
 import unittest
 import operator
-from dataset.solutions.sample_97 import accumulate_functional
+import sys
+import os
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_97 import accumulate_functional
 
 class TestAccumulateFunctional(unittest.TestCase):
     
