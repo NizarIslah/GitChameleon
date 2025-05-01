@@ -27,7 +27,7 @@ def get_solution(record):
     if solution == "":
         solution = record.get("output", "")
     if solution == "":
-        print("Could not find solution in record")
+        raise ValueError("No solution found in record")
     return extract_code(solution)
 
 
