@@ -5,25 +5,22 @@ import sys
 import unittest
 from unittest.mock import patch
 
-# Resolve the path to sample_324.py
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-PARENT_DIR = os.path.dirname(CURRENT_DIR)
-SAMPLE_324_PATH = os.path.join(PARENT_DIR, "sample_324.py")
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import sample_324
 
-# Check if sample_324.py actually exists
-def sample_module_available():
-    return os.path.isfile(SAMPLE_324_PATH)
-
-# Only define and run tests if sample_324.py is found
-@unittest.skipUnless(sample_module_available(), "sample_324.py not found, skipping these tests.")
 class TestSample324(unittest.TestCase):
 
     # Load sample_324 module
     @classmethod
     def setUpClass(cls):
-        spec = importlib.util.spec_from_file_location("sample_324", SAMPLE_324_PATH)
-        cls.sample_324 = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(cls.sample_324)
+        self.sample_324 = importlib.import_module('sample_324')
+        # Ensure the module is loaded correctly
+        assert self.sample_324 is not None, "Failed to load sample_324 module"
+        # Check if the infinite function exists
+        assert hasattr(self.sample_324, 'infinite'), "infinite function not found in sample_324 module"
+        # Check if sol_dict is defined
+        assert hasattr(self.sample_324, 'sol_dict'), "sol_dict not found in sample_324 module"
 
     def test_infinite_generator(self):
         """Test that the infinite generator yields values from 0 to 999 and then stops."""
