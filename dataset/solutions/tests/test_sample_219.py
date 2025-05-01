@@ -2,7 +2,10 @@ import unittest
 import io
 import sys
 from contextlib import redirect_stdout
-from dataset.solutions.sample_219 import DummyServerConn, ConnectionLogger, solution
+import os
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_219 import DummyServerConn, ConnectionLogger, solution
 
 
 class TestSample219(unittest.TestCase):
