@@ -11,16 +11,8 @@ import sample_324
 
 class TestSample324(unittest.TestCase):
 
-    # Load sample_324 module
-    @classmethod
-    def setUpClass(cls):
-        self.sample_324 = importlib.import_module('sample_324')
-        # Ensure the module is loaded correctly
-        assert self.sample_324 is not None, "Failed to load sample_324 module"
-        # Check if the infinite function exists
-        assert hasattr(self.sample_324, 'infinite'), "infinite function not found in sample_324 module"
-        # Check if sol_dict is defined
-        assert hasattr(self.sample_324, 'sol_dict'), "sol_dict not found in sample_324 module"
+    def setUp(self):
+        self.sample_324 = sample_324
 
     def test_infinite_generator(self):
         """Test that the infinite generator yields values from 0 to 999 and then stops."""
