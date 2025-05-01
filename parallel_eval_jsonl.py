@@ -50,7 +50,7 @@ def process_record(idx, record, starting_codes, env_dir, test_dir):
 
         code_dict = {
             "test_file": test_file_content,
-            "codes": {"solution_code": {"code": code + solution}},
+            "codes": {"solution_code": {"code": solution}},
         }
         eval_res = eval_sample(example_id, env_path, code_dict)["codes"]["solution_code"]
 
@@ -130,6 +130,8 @@ def main():
     passed = df["passed"].sum()
     total = len(df)
     print(f"[✓] {passed}/{total} tests passed ({passed/total:.2%})")
+    compiled = df["compiled"].sum()
+    print(f"[✓] {compiled}/{total} tests compiled ({compiled/total:.2%})")
 
 
 if __name__ == "__main__":
