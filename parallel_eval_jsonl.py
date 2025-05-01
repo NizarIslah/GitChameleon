@@ -97,7 +97,7 @@ def main():
             line = line.strip()
             if line:
                 data = json.loads(line)
-                starting_codes.append({data["example_id"]: data["starting_code"]})
+                starting_codes.append({int(data["example_id"]): data["starting_code"]})
 
     # Load JSONL records
     outputs = []
