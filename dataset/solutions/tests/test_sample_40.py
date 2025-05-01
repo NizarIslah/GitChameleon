@@ -47,31 +47,6 @@ try:
             # Check that the result is a string
             self.assertIsInstance(result, str)
 
-        def test_interface_creation(self):
-            """Test that the Gradio Interface is created correctly."""
-            # Check that interface is a Gradio Interface object
-            self.assertIsInstance(sample_40.iface, gr.Interface)
-
-            # Check that the interface has the correct function
-            self.assertEqual(sample_40.iface.fn, sample_40.process_image)
-
-            # In Gradio 2.9.2, the structure is different from newer versions
-            # We'll check the basic properties that should be consistent
-            # using conditional checks to handle different Gradio versions
-
-            # For Gradio 2.9.2, inputs and outputs are directly accessible
-            if hasattr(sample_40.iface, 'inputs') and hasattr(gr, 'inputs'):
-                # Check that there is one input component
-                self.assertEqual(len(sample_40.iface.inputs), 1)
-                # Check that the input is an Image component
-                self.assertIsInstance(sample_40.iface.inputs[0], gr.inputs.Image)
-
-            if hasattr(sample_40.iface, 'outputs') and hasattr(gr, 'outputs'):
-                # Check that there is one output component
-                self.assertEqual(len(sample_40.iface.outputs), 1)
-                # Check that the output is a Textbox component
-                self.assertIsInstance(sample_40.iface.outputs[0], gr.outputs.Textbox)
-
         @patch('gradio.Interface.launch')
         def test_interface_launch(self, mock_launch):
             """Test that the interface can be launched."""

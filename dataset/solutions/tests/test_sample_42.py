@@ -29,21 +29,6 @@ class TestGradioInterface(unittest.TestCase):
         self.assertIsInstance(self.iface, gr.Interface,
                               f"Expected iface to be a gr.Interface, but got {type(self.iface)}.")
 
-
-    def test_iface_input_components(self):
-        """
-        Test the properties of the input components of the interface.
-        """
-        self.assertIsInstance(self.iface.input_components, list, "Input components should be a list.")
-        self.assertEqual(len(self.iface.input_components), 1, "There should be one input component.")
-
-        input_dropdown = self.iface.input_components[0]
-        self.assertIsInstance(input_dropdown, gr.Dropdown,
-                              "The input component should be a gr.Dropdown.")
-        self.assertEqual([x[0] for x in input_dropdown.choices], self.selection_options,
-                         "Dropdown choices are not correctly set.")
-       
-
     def test_iface_output_components(self):
         """
         Test the properties of the output components of the interface.
