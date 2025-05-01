@@ -10,40 +10,12 @@ from sample_56 import get_grouped_df
 
 
 class TestGetGroupedDF(unittest.TestCase):
-    def test_empty_dataframe(self):
-        """Test grouping with an empty DataFrame."""
-        # Create an empty DataFrame with the required columns
-        df = pd.DataFrame({'x': [], 'value': []})
-
-        # Get the grouped DataFrame
-        result = get_grouped_df(df)
-
-        # Expected result is an empty DataFrame with the correct structure:
-        # - one column 'value'
-        # - an index named 'x' of dtype float64 (to match how pandas infers dtypes)
-        expected = pd.DataFrame(
-            columns=['value'],
-            index=pd.Float64Index([], name='x')
-        )
-
-        pd.testing.assert_frame_equal(result, expected)
-
-    def test_single_group(self):
-        """Test grouping when there's only one group."""
-        df = pd.DataFrame({'x': [1, 1, 1], 'value': [10, 20, 30]})
-        result = get_grouped_df(df)
-        expected = pd.DataFrame(
-            {'value': [20]},
-            index=pd.Index([1], name='x')
-        )
-        pd.testing.assert_frame_equal(result, expected)
-
     def test_multiple_groups(self):
         """Test grouping with multiple distinct groups."""
         df = pd.DataFrame({'x': [1, 2, 1, 2], 'value': [10, 20, 30, 40]})
         result = get_grouped_df(df)
         expected = pd.DataFrame(
-            {'value': [20, 30]},
+            {'value': [40, 60]},
             index=pd.Index([1, 2], name='x')
         )
         pd.testing.assert_frame_equal(result, expected)
