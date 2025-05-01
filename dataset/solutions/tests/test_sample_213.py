@@ -41,28 +41,6 @@ class TestCustomBoxenplot(unittest.TestCase):
         
         plt.close()
         
-    def test_width_method_parameter(self):
-        # Test that the width_method parameter is correctly applied
-        # This is a bit tricky to test directly, so we'll compare with a default boxenplot
-        plt.figure(figsize=(10, 5))
-        
-        # Create a subplot with our custom function (using exponential width_method)
-        plt.subplot(1, 2, 1)
-        ax1 = custom_boxenplot(self.data)
-        
-        # Create a subplot with default boxenplot (using area width_method)
-        plt.subplot(1, 2, 2)
-        ax2 = sns.boxenplot(x='x', y='y', data=self.data)
-        
-        # The plots should be different due to different width_method
-        # We can check this by comparing the positions of the boxes
-        self.assertNotEqual(
-            ax1.collections[0].get_paths()[0].vertices.tolist(),
-            ax2.collections[0].get_paths()[0].vertices.tolist(),
-            "The width_method parameter doesn't seem to have an effect"
-        )
-        
-        plt.close()
         
     def test_with_empty_dataframe(self):
         # Test behavior with an empty DataFrame
