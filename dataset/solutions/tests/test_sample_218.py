@@ -3,9 +3,11 @@ import sys
 import io
 from contextlib import redirect_stdout
 from unittest.mock import patch
+import os 
 
-# Import the classes and functions from sample_218
-from dataset.solutions.sample_218 import DummyServerConn, ConnectionLogger, solution
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_217 import custom_server
+from sample_218 import DummyServerConn, ConnectionLogger, solution
 
 class TestSample218(unittest.TestCase):
     def setUp(self):
