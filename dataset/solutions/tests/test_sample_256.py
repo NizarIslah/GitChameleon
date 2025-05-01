@@ -1,22 +1,28 @@
+import os
+import sys
 import unittest
-from falcon import Request
-from falcon.util.structures import Context
+import io
 
-# Import the function to test
-from dataset.solutions.sample_256 import custom_set_context
+from falcon import Request
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_256 import custom_set_context
 
 
 class TestCustomSetContext(unittest.TestCase):
     def setUp(self):
-        # Create a new request object for each test
-        self.req = Request(
-            env={
-                'REQUEST_METHOD': 'GET',
-                'PATH_INFO': '/',
-                'QUERY_STRING': '',
-                'wsgi.input': None,
-            }
-        )
+        # Create a minimal valid WSGI environment for Falcon
+        self.env = {
+            'REQUEST_METHOD': 'GET',
+            'PATH_INFO': '/',
+            'QUERY_STRING': '',
+            'wsgi.input': io.BytesIO(b''),
+            'wsgi.errors': io.StringIO(),
+            'SERVER_NAME': 'localhost',
+            'SERVER_PORT': '80',
+            'SERVER_PROTOCOL': 'HTTP/1.1',
+        }
+        self.req = Request(self.env)
 
     def test_custom_set_context_sets_values(self):
         # Test that the function sets the role and user correctly

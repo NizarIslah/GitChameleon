@@ -1,13 +1,21 @@
 import unittest
+
 import matplotlib
+
 matplotlib.use('Agg')  # Use non-interactive backend for testing
+import os
+import sys
+
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.figure import Figure
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
 # Import the function to test
-from dataset.solutions.sample_326 import modify
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_326 import modify
+
 
 class TestSample326(unittest.TestCase):
     def setUp(self):

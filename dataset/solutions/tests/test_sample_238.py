@@ -1,19 +1,18 @@
-import unittest
-import falcon
-from falcon.testing import SimpleTestClient
-import sys
 import os
+import sys
+import unittest
 
-# Add the parent directory to sys.path to import the module
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.solutions.sample_238 import custom_body
+import falcon
+from falcon import testing
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_238 import custom_body
 
 
 class TestCustomBody(unittest.TestCase):
     def setUp(self):
         # Create a Falcon app for testing
         self.app = falcon.App()
-        self.client = SimpleTestClient(self.app)
         
         # Create a test resource that uses the custom_body function
         class TestResource:
@@ -21,6 +20,7 @@ class TestCustomBody(unittest.TestCase):
                 custom_body(resp, "Test message")
                 
         self.app.add_route('/test', TestResource())
+        self.client = testing.TestClient(self.app)
 
     def test_custom_body_sets_text(self):
         # Test that the function sets the response text correctly
@@ -32,7 +32,7 @@ class TestCustomBody(unittest.TestCase):
         self.assertEqual(resp.text, test_message)
         
         # Check that the function returns the response object
-        self.assertEqual(result, resp)
+        self.assertIs(result, resp)
         
     def test_custom_body_in_request_context(self):
         # Test the function in a real request context

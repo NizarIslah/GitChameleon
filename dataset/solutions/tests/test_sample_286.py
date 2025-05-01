@@ -1,13 +1,14 @@
-import unittest
-import numpy as np
-import librosa
-import sys
 import os
+# Add the parent directory to the path so we can import the sample module
+import sys
+import unittest
 from unittest.mock import patch
 
-# Add the parent directory to the path so we can import the sample module
+import librosa
+import numpy as np
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from dataset.samples.sample_286 import compute_griffinlim
+from sample_286 import compute_griffinlim
 
 
 class TestComputeGriffinLim(unittest.TestCase):
@@ -24,7 +25,7 @@ class TestComputeGriffinLim(unittest.TestCase):
         # Compute the magnitude spectrogram
         self.S = np.abs(librosa.stft(self.y, n_fft=self.n_fft, hop_length=self.hop_length))
 
-    @patch('dataset.samples.sample_286.librosa.griffinlim')
+    @patch('sample_286.librosa.griffinlim')
     def test_compute_griffinlim_calls_librosa_correctly(self, mock_griffinlim):
         # Set up the mock to return a known value
         expected_output = np.array([1.0, 2.0, 3.0])

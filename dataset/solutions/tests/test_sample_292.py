@@ -1,14 +1,15 @@
 # Test file for sample_292.py
-import unittest
-import numpy as np
-import librosa
-import sys
 import os
-from unittest.mock import patch, MagicMock
-
 # Add the parent directory to the path so we can import the sample
+import sys
+import unittest
+from unittest.mock import MagicMock, patch
+
+import librosa
+import numpy as np
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from dataset.samples.sample_292 import compute_plp
+from sample_292 import compute_plp
 
 
 class TestComputePLP(unittest.TestCase):

@@ -1,11 +1,13 @@
-import unittest
-import numpy as np
-import sys
 import os
-
 # Add the parent directory to the path so we can import the sample module
+import sys
+import unittest
+
+import numpy as np
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from dataset.samples.sample_277 import compute_rms
+from sample_277 import compute_rms
+
 
 class TestComputeRMS(unittest.TestCase):
     def test_compute_rms_with_zeros(self):

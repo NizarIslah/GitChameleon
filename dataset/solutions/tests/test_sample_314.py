@@ -1,12 +1,13 @@
-import unittest
-import numpy as np
-import librosa
-import sys
+# Add the parent directory to import sys
 import os
+import sys
+import unittest
 
-# Add the parent directory to sys.path to import the module
+import librosa
+import numpy as np
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from dataset.samples.sample_314 import compute_mel_to_audio
+from sample_314 import compute_mel_to_audio
 
 
 class TestSample314(unittest.TestCase):

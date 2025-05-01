@@ -1,14 +1,15 @@
-import unittest
-import torch
-import numpy as np
-import sys
+# Add the parent directory to import sys
 import os
+import sys
+import unittest
 
-# Add the parent directory to sys.path to allow importing from the parent directory
+import numpy as np
+import torch
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from scipy.special import i1 as scipy_i1
 from sample_10 import bessel_i1
+from scipy.special import i1 as scipy_i1
 
 
 class TestBesselI1(unittest.TestCase):
@@ -133,7 +134,7 @@ class TestBesselI1(unittest.TestCase):
     def test_relationship_with_i0(self):
         """Test the relationship between I₁ and I₀."""
         from scipy.special import i0 as bessel_i0
-        
+
         # Test across a range of values, avoiding x close to 0 (division by zero)
         input_tensor = torch.linspace(0.1, 5.0, 100, dtype=torch.float64)
         

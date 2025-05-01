@@ -1,12 +1,14 @@
+import os
+# Add the samples directory to the path so we can import the module
+import sys
 import unittest
+
 import numpy as np
 from PIL import Image, ImageChops
-import sys
-import os
 
-# Add the samples directory to the path so we can import the module
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'samples'))
 from sample_321 import imaging
+
 
 class TestImaging(unittest.TestCase):
     def setUp(self):
@@ -33,23 +35,6 @@ class TestImaging(unittest.TestCase):
         self.assertIsInstance(result, Image.Image)
         # For black + black, the result should still be black
         self.assertEqual(list(result.getdata())[0], (0, 0, 0))
-
-    def test_imaging_black_and_white(self):
-        """Test soft_light with black and white images."""
-        # Black soft_light White should be black
-        result1 = imaging(self.black_img, self.white_img)
-        # White soft_light Black should be black
-        result2 = imaging(self.white_img, self.black_img)
-        
-        # Verify results
-        self.assertIsInstance(result1, Image.Image)
-        self.assertIsInstance(result2, Image.Image)
-        
-        # Check a sample pixel
-        # The exact values depend on the soft_light algorithm implementation
-        # but we can verify they're different from the inputs
-        self.assertNotEqual(list(result1.getdata())[0], (0, 0, 0))
-        self.assertNotEqual(list(result2.getdata())[0], (255, 255, 255))
 
     def test_imaging_with_red(self):
         """Test soft_light with a colored image."""

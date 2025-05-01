@@ -1,14 +1,15 @@
-import unittest
-import torch
-import numpy as np
-import sys
+# Add the parent directory to import sys
 import os
+import sys
+import unittest
 
-# Add the parent directory to sys.path to allow importing from the parent directory
+import numpy as np
+import torch
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from scipy.special import erfc as scipy_erfc
 from sample_8 import erfc
+from scipy.special import erfc as scipy_erfc
 
 
 class TestErfc(unittest.TestCase):
@@ -131,7 +132,7 @@ class TestErfc(unittest.TestCase):
     def test_relationship_with_erf(self):
         """Test the relationship between erfc and erf: erfc(x) = 1 - erf(x)."""
         from scipy.special import erf
-        
+
         # Test across a range of values
         input_tensor = torch.linspace(-3.0, 3.0, 100, dtype=torch.float64)
         

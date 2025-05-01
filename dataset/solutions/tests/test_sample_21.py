@@ -1,18 +1,19 @@
-import unittest
-import sys
-import os
-import pandas as pd
-import numpy as np
-import warnings
 import importlib
+# Add the parent directory to import sys
+import os
+import sys
+import unittest
+import warnings
 
-# Add the parent directory to sys.path to allow importing from the parent directory
+import numpy as np
+import pandas as pd
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import geopandas as gpd
-from shapely.geometry import Point, Polygon, LineString, box, MultiPolygon
-from shapely.ops import unary_union
 import sample_21
+from shapely.geometry import LineString, MultiPolygon, Point, Polygon, box
+from shapely.ops import unary_union
 
 # Check geopandas version
 gpd_version = gpd.__version__

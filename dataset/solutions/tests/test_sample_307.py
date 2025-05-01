@@ -1,15 +1,17 @@
-# Test file for sample_307.py
-import sys
+# test_sample.py
+
 import os
+import sys
 import unittest
-import numpy as np
-import librosa
-import scipy
 from typing import Tuple
 
-# Add the parent directory to sys.path to import the module
+import librosa
+import numpy as np
+import scipy
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from dataset.samples.sample_307 import compute_pyin
+from sample_307 import compute_pyin
+
 
 class TestComputePYIN(unittest.TestCase):
     """Test cases for the compute_pyin function."""
@@ -67,12 +69,11 @@ class TestComputePYIN(unittest.TestCase):
         
         # Check that output is a numpy array
         self.assertIsInstance(f0, np.ndarray)
-        
-        # Check that the shape is as expected
-        expected_frames = 1 + (len(self.y) - self.frame_length) // self.hop_length
-        if self.center:
-            # When centering, we pad by frame_length//2 on both sides
-            expected_frames = 1 + (len(self.y) + self.frame_length - 1) // self.hop_length
+
+        # Compute expected number of frames using standard centered framing logic:
+        # n_frames = floor((len(y) + 2*pad - frame_length) / hop_length) + 1, where pad = frame_length//2 if center=True
+        pad = self.frame_length // 2 if self.center else 0
+        expected_frames = ((len(self.y) + 2 * pad - self.frame_length) // self.hop_length) + 1
         
         self.assertEqual(len(f0), expected_frames)
 
@@ -187,9 +188,12 @@ class TestComputePYIN(unittest.TestCase):
         # Check that output is a numpy array
         self.assertIsInstance(f0, np.ndarray)
         
-        # Expected frames with default hop_length (frame_length // 4)
+        # Expected hop length with default = frame_length // 4
         expected_hop_length = self.frame_length // 4
-        expected_frames = 1 + (len(self.y) + self.frame_length - 1) // expected_hop_length
+        
+        # Again, use the centered framing logic
+        pad = self.frame_length // 2 if self.center else 0
+        expected_frames = ((len(self.y) + 2 * pad - self.frame_length) // expected_hop_length) + 1
         
         self.assertEqual(len(f0), expected_frames)
 

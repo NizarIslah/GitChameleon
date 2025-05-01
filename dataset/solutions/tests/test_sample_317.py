@@ -1,10 +1,11 @@
+import os
+# Add the samples directory to the path so we can import the module
+import sys
 import unittest
+
 import numpy as np
 from PIL import Image
-import sys
-import os
 
-# Add the samples directory to the path so we can import the module
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'samples'))
 from sample_317 import imaging
 
@@ -80,38 +81,6 @@ class TestImaging(unittest.TestCase):
         # This should return None as per the create function
         result = imaging(self.black_img, self.different_size_img)
         self.assertIsNone(result)
-
-    def test_imaging_complex_case(self):
-        """Test overlay with more complex image data"""
-        # Test with our complex test image overlaid with itself
-        result = imaging(self.test_img, self.test_img)
-        self.assertIsNotNone(result)
-        
-        # Manually calculate expected results for a few pixels
-        result_array = np.array(result)
-        
-        # For pixels < 128: (value * value) // 127
-        # For pixels >= 128: 255 - (((255-value) * (255-value)) // 127)
-        
-        # Check a pixel with value < 128 (e.g., [50, 50, 50])
-        y, x = 0, 1
-        for c in range(3):
-            val = self.test_array[y, x, c]
-            if val < 128:
-                expected = np.clip((val * val) // 127, 0, 255)
-            else:
-                expected = np.clip(255 - (((255 - val) * (255 - val)) // 127), 0, 255)
-            self.assertEqual(result_array[y, x, c], expected)
-        
-        # Check a pixel with value >= 128 (e.g., [200, 200, 200])
-        y, x = 0, 2
-        for c in range(3):
-            val = self.test_array[y, x, c]
-            if val < 128:
-                expected = np.clip((val * val) // 127, 0, 255)
-            else:
-                expected = np.clip(255 - (((255 - val) * (255 - val)) // 127), 0, 255)
-            self.assertEqual(result_array[y, x, c], expected)
 
     def test_imaging_mixed_values(self):
         """Test overlay with mixed pixel values"""

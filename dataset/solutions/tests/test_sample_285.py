@@ -1,12 +1,14 @@
-import unittest
-import numpy as np
-import sys
 import os
+# Add the parent directory to the path so we can import the sample module
+import sys
+import unittest
 from typing import Optional
 
-# Add the parent directory to the path so we can import the sample module
+import numpy as np
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from dataset.samples.sample_285 import compute_griffinlim
+from sample_285 import compute_griffinlim
+
 
 class TestGriffinLim(unittest.TestCase):
     def setUp(self):
@@ -43,8 +45,8 @@ class TestGriffinLim(unittest.TestCase):
                                              pad_mode, n_fft)
         
         # Replace the original function with our patched version
-        import dataset.samples.sample_285
-        dataset.samples.sample_285.compute_griffinlim = patched_compute_griffinlim
+        import sample_285
+        sample_285.compute_griffinlim = patched_compute_griffinlim
         
         # Now run the test
         result = compute_griffinlim(
@@ -83,8 +85,8 @@ class TestGriffinLim(unittest.TestCase):
                                              pad_mode, n_fft)
         
         # Replace the original function with our patched version
-        import dataset.samples.sample_285
-        dataset.samples.sample_285.compute_griffinlim = patched_compute_griffinlim
+        import sample_285
+        sample_285.compute_griffinlim = patched_compute_griffinlim
         
         # Test with different window function and center=False
         result = compute_griffinlim(
@@ -121,8 +123,8 @@ class TestGriffinLim(unittest.TestCase):
                                              pad_mode, n_fft)
         
         # Replace the original function with our patched version
-        import dataset.samples.sample_285
-        dataset.samples.sample_285.compute_griffinlim = patched_compute_griffinlim
+        import sample_285
+        sample_285.compute_griffinlim = patched_compute_griffinlim
         
         # Run the function twice with the same random_state
         result1 = compute_griffinlim(

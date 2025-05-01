@@ -1,13 +1,17 @@
+# Add the parent directory to import sys
+import os
+import sys
 import unittest
 from unittest.mock import Mock
-import sys
-import os
 
-# Add the parent directory to sys.path to import the module
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from dataset.solutions.sample_244 import custom_writable
+
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from falcon.stream import BoundedStream
+from sample_244 import custom_writable
 
 
 class TestCustomWritable(unittest.TestCase):

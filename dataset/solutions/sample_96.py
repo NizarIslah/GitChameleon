@@ -16,4 +16,4 @@ def parse_sinica_treebank_sentence(sentence: str) -> Tree:
     Returns:
         Tree: The parsed tree.
     """
-    return Tree.fromstring(tree_string)
+    return Tree.fromstring(sentence)

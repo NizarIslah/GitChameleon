@@ -1,14 +1,16 @@
-import unittest
+# Add the parent directory to import sys
 import os
-import numpy as np
-import librosa
 import sys
 import tempfile
+import unittest
+
+import librosa
+import numpy as np
 import soundfile as sf
 
-# Add the parent directory to sys.path to import the module
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.samples.sample_284 import compute_stream
+from sample_284 import compute_stream
+
 
 class TestSample284(unittest.TestCase):
     

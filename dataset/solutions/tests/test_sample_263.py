@@ -1,7 +1,11 @@
+import os
+import sys
 import unittest
-import asyncio
+
 import tornado.testing
-from dataset.solutions.sample_263 import DummyAuth
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_263 import DummyAuth
 
 
 class TestDummyAuth(tornado.testing.AsyncTestCase):
@@ -12,6 +16,7 @@ class TestDummyAuth(tornado.testing.AsyncTestCase):
         super().setUp()
         self.auth = DummyAuth()
 
+    @tornado.testing.gen_test
     async def test_async_get_user_info(self):
         """Test that async_get_user_info returns the expected dictionary."""
         # Test with a sample access token
@@ -24,6 +29,7 @@ class TestDummyAuth(tornado.testing.AsyncTestCase):
         self.assertEqual(result["user"], "test")
         self.assertEqual(result["token"], access_token)
 
+    @tornado.testing.gen_test
     async def test_async_get_user_info_empty_token(self):
         """Test that async_get_user_info works with an empty token."""
         # Test with an empty access token

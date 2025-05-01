@@ -1,9 +1,9 @@
-import unittest
-import sys
+# Add the parent directory to import sys
 import os
+import sys
+import unittest
 import warnings
 
-# Add the parent directory to sys.path to allow importing from the parent directory
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import networkx as nx

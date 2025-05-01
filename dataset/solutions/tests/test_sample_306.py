@@ -1,12 +1,13 @@
-import sys
+# Add the parent directory to import sys
 import os
+import sys
 import unittest
-import numpy as np
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-# Add the parent directory to sys.path to import the module
+import numpy as np
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from dataset.samples.sample_306 import compute_yin
+from sample_306 import compute_yin
 
 
 class TestComputeYin(unittest.TestCase):

@@ -1,7 +1,11 @@
+import sys
 import unittest
+
 import falcon
 from falcon.testing import SimpleTestClient
-from dataset.solutions.sample_254 import handle_error
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_254 import handle_error
 
 
 class TestHandleError(unittest.TestCase):

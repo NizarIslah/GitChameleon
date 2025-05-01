@@ -1,21 +1,24 @@
-import unittest
-import sys
+# Add the parent directory to import sys
 import os
-import pandas as pd
-import numpy as np
+import sys
 import time
+import unittest
 
-# Add the parent directory to sys.path to allow importing from the parent directory
+import numpy as np
+import pandas as pd
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+import importlib.util
 
 import geopandas as gpd
 from shapely.geometry import Point, Polygon
-import importlib.util
 
 # Check if we need to create a compatibility wrapper for spatial_join
 try:
     # Try to import the function directly
     from sample_19 import spatial_join
+
     # Test if it works with the installed geopandas version
     test_gdf1 = gpd.GeoDataFrame(geometry=[Point(0, 0)], crs="EPSG:4326")
     test_gdf2 = gpd.GeoDataFrame(geometry=[Polygon([(0, 0), (0, 1), (1, 1), (1, 0)])], crs="EPSG:4326")

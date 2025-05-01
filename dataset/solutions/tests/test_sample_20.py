@@ -1,16 +1,17 @@
-import unittest
-import sys
+# Add the parent directory to import sys
 import os
-import pandas as pd
-import numpy as np
+import sys
+import unittest
 
-# Add the parent directory to sys.path to allow importing from the parent directory
+import numpy as np
+import pandas as pd
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import geopandas as gpd
-from shapely.geometry import Point, Polygon, LineString, box, MultiPolygon
-from shapely.ops import unary_union
 from sample_20 import perform_union
+from shapely.geometry import LineString, MultiPolygon, Point, Polygon, box
+from shapely.ops import unary_union
 
 
 class TestPerformUnion(unittest.TestCase):

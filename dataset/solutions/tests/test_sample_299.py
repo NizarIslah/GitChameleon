@@ -1,12 +1,14 @@
 # Test file for sample_299.py
-import sys
 import os
+# Add the samples directory to the path so we can import the module
+import sys
 import unittest
+
 import numpy as np
 
-# Add the samples directory to the path so we can import the module
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'samples'))
 from sample_299 import compute_chirp
+
 
 class TestComputeChirp(unittest.TestCase):
     """Test cases for the compute_chirp function."""

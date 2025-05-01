@@ -6,9 +6,10 @@ from django.conf import settings
 from django.db import models, connection
 from django.db.models import F
 
-settings.configure(
-    DATABASES={'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': ':memory:'}},
-)
+if not settings.configured:
+    settings.configure(
+        DATABASES={'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': ':memory:'}},
+    )
 django.setup()
 
 

@@ -1,11 +1,15 @@
-import unittest
-import sys
+# Add the parent directory to import sys
 import os
+import sys
+import unittest
 
-# Add the parent directory to sys.path to import the module to test
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from dataset.solutions.sample_273 import custom_api_usage
+
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_273 import custom_api_usage
 
 
 class TestSample273(unittest.TestCase):

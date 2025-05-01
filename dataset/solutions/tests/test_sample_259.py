@@ -1,16 +1,18 @@
-import unittest
 import concurrent.futures
+import os
 import socket
-import tornado.wsgi
+# Add the parent directory to import sys
+import sys
+import unittest
+
+import tornado.httpclient
 import tornado.httpserver
 import tornado.ioloop
-import tornado.httpclient
-import sys
-import os
+import tornado.wsgi
 
-# Add the parent directory to sys.path to import sample_259
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.solutions.sample_259 import simple_wsgi_app, find_free_port, custom_wsgi_container
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_259 import custom_wsgi_container, find_free_port, simple_wsgi_app
+
 
 class TestSample259(unittest.TestCase):
     

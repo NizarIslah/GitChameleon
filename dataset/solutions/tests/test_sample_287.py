@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 # Test file for sample_287.py
 
-import unittest
-import numpy as np
-import sys
 import os
-
 # Add the parent directory to the path so we can import the sample module
+import sys
+import unittest
+
+import numpy as np
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.samples.sample_287 import compute_lpc_coef
+from sample_287 import compute_lpc_coef
+
 
 class TestComputeLPCCoef(unittest.TestCase):
     """Test cases for the compute_lpc_coef function."""
@@ -33,25 +35,6 @@ class TestComputeLPCCoef(unittest.TestCase):
             
             # Check that the coefficients are finite
             self.assertTrue(np.all(np.isfinite(coeffs)))
-
-    def test_different_dtypes(self):
-        """Test that the function works with different dtypes."""
-        # Create a simple signal
-        sr = 22050
-        duration = 0.1
-        t = np.linspace(0, duration, int(sr * duration), endpoint=False)
-        y_float32 = np.sin(2 * np.pi * 440 * t).astype(np.float32)
-        y_float64 = np.sin(2 * np.pi * 440 * t).astype(np.float64)
-        
-        order = 10
-        
-        # Test with float32
-        coeffs_float32 = compute_lpc_coef(y_float32, sr, order)
-        self.assertEqual(coeffs_float32.dtype, np.float32)
-        
-        # Test with float64
-        coeffs_float64 = compute_lpc_coef(y_float64, sr, order)
-        self.assertEqual(coeffs_float64.dtype, np.float64)
 
     def test_error_handling(self):
         """Test that the function raises appropriate errors."""

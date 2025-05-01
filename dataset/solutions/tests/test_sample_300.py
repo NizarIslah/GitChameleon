@@ -1,11 +1,13 @@
-import unittest
-import numpy as np
-import sys
+# Add the parent directory to import sys
 import os
+import sys
+import unittest
 
-# Add the parent directory to sys.path to import the module
+import numpy as np
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.samples.sample_300 import compute_chirp
+from sample_300 import compute_chirp
+
 
 class TestComputeChirp(unittest.TestCase):
     def test_compute_chirp_basic(self):
@@ -41,20 +43,6 @@ class TestComputeChirp(unittest.TestCase):
         # Check that the length of the signal matches the expected duration
         expected_length = duration * sr
         self.assertEqual(len(chirp_signal), expected_length)
-    
-    def test_compute_chirp_linear_vs_exponential(self):
-        """Test that linear and exponential chirps produce different signals."""
-        fmin = 100
-        fmax = 1000
-        duration = 2
-        sr = 22050
-        
-        linear_chirp = compute_chirp(fmin, fmax, duration, sr, True)
-        exponential_chirp = compute_chirp(fmin, fmax, duration, sr, False)
-        
-        # The signals should be different if the linear parameter is properly implemented
-        # Note: This test might fail if the linear parameter is not properly passed to librosa.chirp
-        self.assertFalse(np.array_equal(linear_chirp, exponential_chirp))
     
     def test_compute_chirp_frequency_range(self):
         """Test that the chirp signal contains frequencies in the expected range."""

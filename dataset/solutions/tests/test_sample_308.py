@@ -1,13 +1,14 @@
-import unittest
-import numpy as np
-import librosa
-import sys
+# Add the parent directory to import sys
 import os
-from unittest.mock import patch, MagicMock
+import sys
+import unittest
+from unittest.mock import MagicMock, patch
 
-# Add the parent directory to sys.path to import the module
+import librosa
+import numpy as np
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from dataset.samples.sample_308 import compute_pyin
+from sample_308 import compute_pyin
 
 
 class TestComputePyin(unittest.TestCase):

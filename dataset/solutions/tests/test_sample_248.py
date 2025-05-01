@@ -1,10 +1,10 @@
-import unittest
-import sys
+# Add the parent directory to import sys
 import os
+import sys
+import unittest
 
-# Add the parent directory to sys.path to import the module
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.solutions.sample_248 import custom_falcons
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_248 import custom_falcons
 
 
 class TestSample248(unittest.TestCase):

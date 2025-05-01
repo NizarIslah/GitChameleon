@@ -1,11 +1,11 @@
-import unittest
-import sys
 import os
-
 # Add the parent directory to the path so we can import the sample module
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.solutions.sample_225 import custom_function
+import sys
+import unittest
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from mitmproxy.http import Headers
+from sample_225 import custom_function
 
 
 class TestSample225(unittest.TestCase):
@@ -20,7 +20,7 @@ class TestSample225(unittest.TestCase):
         self.assertIsInstance(result, Headers)
         
         # Verify the header was set correctly
-        self.assertEqual(result[header_name], initial_value)
+        self.assertEqual(result[header_name], initial_value.decode("utf-8"))
         
     def test_custom_function_with_empty_values(self):
         # Test with empty header value
@@ -30,7 +30,7 @@ class TestSample225(unittest.TestCase):
         result = custom_function(header_name, initial_value)
         
         self.assertIsInstance(result, Headers)
-        self.assertEqual(result[header_name], initial_value)
+        self.assertEqual(result[header_name], initial_value.decode("utf-8"))
     
     def test_custom_function_with_multiple_headers(self):
         # The function only adds one header, but we can verify the Headers object
@@ -41,7 +41,7 @@ class TestSample225(unittest.TestCase):
         result = custom_function(header_name, initial_value)
         
         # Verify the header we added exists
-        self.assertEqual(result[header_name], initial_value)
+        self.assertEqual(result[header_name], initial_value.decode("utf-8"))
         
         # Verify a non-existent header returns None
         self.assertIsNone(result.get(b"X-NonExistent"))
@@ -53,7 +53,7 @@ class TestSample225(unittest.TestCase):
         
         result = custom_function(header_name, initial_value)
         
-        self.assertEqual(result[header_name], initial_value)
+        self.assertEqual(result[header_name], initial_value.decode("utf-8"))
 
 
 if __name__ == "__main__":

@@ -1,12 +1,16 @@
-import unittest
-import sys
+# Add the parent directory to import sys
 import os
+import sys
+import unittest
 
-# Add the parent directory to sys.path to import the module
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from dataset.solutions.sample_180 import custom_parse_mathematica
-from sympy import symbols, Integer, Max, Min
+
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_180 import custom_parse_mathematica
+from sympy import Integer, Max, Min, symbols
 
 
 class TestCustomParseMathematica(unittest.TestCase):

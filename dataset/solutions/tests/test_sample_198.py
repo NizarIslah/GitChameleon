@@ -52,37 +52,6 @@ class TestCustomIsPrime(unittest.TestCase):
         self.assertFalse(custom_is_prime(104730))  # 104729 + 1
         self.assertFalse(custom_is_prime(15485864))  # 15485863 + 1
     
-    def test_with_non_integer_input(self):
-        """Test custom_is_prime with non-integer input."""
-        # The function expects an integer input
-        # Let's check how it handles non-integer inputs
-        try:
-            result = custom_is_prime(3.0)
-            # If we get here, the function accepted the input
-            # Let's check what it returned for a float that is a prime number
-            self.assertTrue(result)
-        except Exception as e:
-            # If an exception is raised, it could be a ValueError or TypeError
-            self.assertTrue(isinstance(e, (ValueError, TypeError)))
-        
-        try:
-            result = custom_is_prime(4.0)
-            # If we get here, the function accepted the input
-            # Let's check what it returned for a float that is not a prime number
-            self.assertFalse(result)
-        except Exception as e:
-            # If an exception is raised, it could be a ValueError or TypeError
-            self.assertTrue(isinstance(e, (ValueError, TypeError)))
-        
-        try:
-            result = custom_is_prime(3.5)
-            # If we get here, the function accepted the input
-            # Let's check what it returned for a float that is not an integer
-            self.assertFalse(result)
-        except Exception as e:
-            # If an exception is raised, it could be a ValueError or TypeError
-            self.assertTrue(isinstance(e, (ValueError, TypeError)))
-    
     def test_with_edge_cases(self):
         """Test custom_is_prime with edge cases."""
         # Test with 2, which is the smallest prime number

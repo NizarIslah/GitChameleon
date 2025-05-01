@@ -5,14 +5,15 @@
 Unit tests for sample_293.py
 """
 
-import unittest
-import sys
 import os
+# Add the parent directory to the path so we can import the sample module
+import sys
+import unittest
+
 import numpy as np
 
-# Add the parent directory to the path so we can import the sample module
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from dataset.samples.sample_293 import compute_times_like
+from sample_293 import compute_times_like
 
 
 class TestComputeTimesLike(unittest.TestCase):

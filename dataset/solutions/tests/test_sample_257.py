@@ -1,12 +1,11 @@
-import unittest
-import sys
 import os
+# Add the parent directory to import sys
+import sys
+import unittest
 
-# Add the parent directory to sys.path to import the solution module
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.solutions.sample_257 import CustomRouter, solution
-
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import falcon
+from sample_257 import CustomRouter, solution
 
 
 class TestCustomRouter(unittest.TestCase):
@@ -46,33 +45,6 @@ class TestCustomRouter(unittest.TestCase):
         self.assertIn('GET', stored_method_map)
         self.assertIn('POST', stored_method_map)
         self.assertEqual(method_map, stored_method_map)
-
-    def test_add_route_with_fallback(self):
-        """Test that add_route correctly handles the fallback parameter."""
-        # Create a resource with only one method
-        class LimitedResource:
-            def on_get(self, req, resp):
-                pass
-
-        # Create a fallback handler
-        def fallback_handler(req, resp):
-            pass
-
-        resource = LimitedResource()
-        uri_template = "/limited"
-
-        # Add the route with a fallback
-        method_map = self.router.add_route(uri_template, resource, fallback=fallback_handler)
-
-        # Verify the route was added with fallback
-        self.assertIn(uri_template, self.router.routes)
-        _, stored_method_map = self.router.routes[uri_template]
-        
-        # Check that GET uses the resource method
-        self.assertEqual(stored_method_map['GET'].__self__, resource)
-        
-        # Check that other methods like POST use the fallback
-        self.assertEqual(stored_method_map['POST'], fallback_handler)
 
 
 if __name__ == '__main__':

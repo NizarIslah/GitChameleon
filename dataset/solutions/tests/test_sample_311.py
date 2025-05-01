@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 # Test file for sample_311.py
 
-import unittest
-import numpy as np
-import librosa
-import sys
 import os
-
 # Add the parent directory to the path so we can import the sample
+import sys
+import unittest
+
+import librosa
+import numpy as np
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-from dataset.samples.sample_311 import compute_griffinlim_cqt
+from sample_311 import compute_griffinlim_cqt
+
 
 class TestGriffinLimCQT(unittest.TestCase):
     def setUp(self):

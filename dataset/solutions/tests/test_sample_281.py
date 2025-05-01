@@ -1,11 +1,13 @@
-import unittest
-import numpy as np
-import sys
 import os
-
 # Add the parent directory to the path so we can import the sample module
+import sys
+import unittest
+
+import numpy as np
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from dataset.samples.sample_281 import compute_extraction
+from sample_281 import compute_extraction
+
 
 class TestSample281(unittest.TestCase):
     

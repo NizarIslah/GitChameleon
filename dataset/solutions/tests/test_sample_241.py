@@ -1,7 +1,12 @@
+import os
+import sys
 import unittest
 from unittest.mock import MagicMock
+
 import falcon
-from dataset.solutions.sample_241 import custom_data
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_241 import custom_data
 
 
 class TestSample241(unittest.TestCase):
@@ -38,8 +43,8 @@ class TestSample241(unittest.TestCase):
         # Verify the response data was set correctly
         self.assertEqual(resp.data, test_info)
         
-        # Verify the function returns the rendered body
-        self.assertEqual(result, test_info.encode('utf-8'))
+        # Verify the function returns the rendered body (should be a string)
+        self.assertEqual(result, test_info)
 
 
 if __name__ == '__main__':

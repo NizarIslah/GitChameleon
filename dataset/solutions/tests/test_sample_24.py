@@ -1,15 +1,16 @@
-import unittest
-import sys
+# Add the parent directory to import sys
 import os
+import sys
+import unittest
 import warnings
+
 import numpy as np
 
-# Add the parent directory to sys.path to allow importing from the parent directory
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import geopandas as gpd
-from shapely.geometry import Point, Polygon, box
 import sample_24
+from shapely.geometry import Point, Polygon, box
 
 # Filter deprecation warnings
 warnings.filterwarnings('ignore', category=DeprecationWarning)

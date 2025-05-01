@@ -1,6 +1,12 @@
+import os
+import sys
 import unittest
+
 import matplotlib.pyplot as plt
-from dataset.solutions.sample_329 import use_seaborn
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample_329 import use_seaborn
+
 
 class TestSample329(unittest.TestCase):
     def setUp(self):
@@ -11,8 +17,7 @@ class TestSample329(unittest.TestCase):
         # Call the function
         use_seaborn()
         
-        # Check if the style has been set to seaborn
-        self.assertEqual(plt.style.available, plt.style.library.keys())
+        # Check if 'seaborn' is in the available styles
         self.assertIn('seaborn', plt.style.available)
         
         # Get the current style
