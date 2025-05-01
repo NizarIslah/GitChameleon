@@ -7,7 +7,7 @@ import soundfile as sf
 
 
 # Save the stream in variable stream. Save each stream block with the array stream_blocks
-def compute_stream(y, sr, n_fft, hop_length):
+def compute_stream(filename, y, sr, n_fft, hop_length):
     stream_blocks = []
 
     stream = sf.blocks(filename, blocksize=n_fft + 15 * hop_length, overlap=n_fft - hop_length,  fill_value=0)
