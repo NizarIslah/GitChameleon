@@ -2,7 +2,7 @@ import sys
 import unittest
 
 import falcon
-from falcon.testing import SimpleTestClient
+from falcon.testing import TestClient
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sample_254 import handle_error
@@ -15,7 +15,7 @@ class TestHandleError(unittest.TestCase):
         self.app.add_error_handler(Exception, handle_error)
         
         # Create a test client
-        self.client = SimpleTestClient(self.app)
+        self.client = TestClient(self.app)
         
         # Add a test route that raises an exception
         self.app.add_route('/test_error', TestResource())
