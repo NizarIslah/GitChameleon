@@ -111,6 +111,7 @@ def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest", c
 
                 # get coverage optionally
                 if coverage:
+                    cov_file = os.path.join(temp_dir, f"coverage_{example_id}.json")
                     cmd = [
                         python_executable,
                         "-m",
@@ -119,12 +120,12 @@ def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest", c
                         "-q",
                         temp_dir,
                         f"--cov={code_filepath}",
-                        f"--cov-report=json:{temp_dir}/coverage_{example_id}.json",
+                        f"--cov-report=json:{cov_file}",
                     ]
                     try:
                         proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=30)
                         import json
-                        with open(os.path.join(temp_dir, f"coverage_{example_id}.json"), "r") as f:
+                        with open(cov_file, "r") as f:
                             coverage_data = json.load(f)
                             sample_result["coverage"] = coverage_data["totals"]["percent_covered"]
                     except Exception as e:
