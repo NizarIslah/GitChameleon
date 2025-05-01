@@ -32,7 +32,7 @@ def get_solution(record):
     return extract_code(solution)
 
 
-def process_record(idx, record, env_dir, test_dir):
+def process_record(idx, record, starting_codes, env_dir, test_dir):
     """
     Process one JSON record: run eval_sample() and return a dict
     with example_id, code_id, output, passed, compiled, and idx.
@@ -40,7 +40,7 @@ def process_record(idx, record, env_dir, test_dir):
     example_id = record.get("example_id")
     try:
         example_id = int(example_id)
-        code = record.get("starting_code", "")
+        code = starting_codes[example_id]
         solution = get_solution(record)
         env_path = os.path.join(env_dir, f"gcham_venv_{example_id}")
 
@@ -78,7 +78,8 @@ def main():
     parser = argparse.ArgumentParser(
         description="Process a JSONL file in parallel with eval_sample and save results."
     )
-    parser.add_argument("jsonl_file", help="Path to the JSONL file to process")
+    parser.add_argument("data_file", help="Path to the dataset JSONL file to process")
+    parser.add_argument("jsonl_file", help="Path to the model outputs JSONL file to process")
     parser.add_argument("env_dir", help="Path to the dir where environments live")
     parser.add_argument("test_dir", help="Path to the dir where test files are stored")
     parser.add_argument(
@@ -89,20 +90,29 @@ def main():
     )
     args = parser.parse_args()
 
+   # Load JSONL records
+    starting_codes = []
+    with open(args.data_file, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                data = json.loads(line)
+                starting_codes.append({data["example_id"]: data["starting_code"]})
+
     # Load JSONL records
-    data = []
+    outputs = []
     with open(args.jsonl_file, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if line:
-                data.append(json.loads(line))
+                outputs.append(json.loads(line))
 
     results = []
     # Kick off parallel tasks
     with ThreadPoolExecutor(max_workers=args.workers) as exe:
         futures = [
-            exe.submit(process_record, idx, rec, args.env_dir, args.test_dir)
-            for idx, rec in enumerate(data)
+            exe.submit(process_record, idx, rec, starting_codes, args.env_dir, args.test_dir)
+            for idx, rec in enumerate(outputs)
         ]
         for fut in tqdm(as_completed(futures), total=len(futures), desc="Evaluating"):
             results.append(fut.result())
