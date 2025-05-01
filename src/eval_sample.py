@@ -127,9 +127,9 @@ def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest", c
                         "pytest",
                         "--disable-warnings",
                         "-q",
-                        temp_dir,
                         f"--cov={code_filepath}",
                         f"--cov-report=json:{cov_file}",
+                        temp_dir,
                     ]
                     try:
                         proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=30)
