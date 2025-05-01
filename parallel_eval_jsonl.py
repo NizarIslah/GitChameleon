@@ -2,6 +2,7 @@
 import json
 import os
 import argparse
+import re
 from tqdm import tqdm
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor, as_completed
