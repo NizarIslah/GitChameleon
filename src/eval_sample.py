@@ -111,6 +111,14 @@ def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest", c
 
                 # get coverage optionally
                 if coverage:
+                    # pip install pytest-cov
+                    cmd = [
+                        python_executable,
+                        "-m",
+                        "pip",
+                        "install",
+                        "pytest-cov",
+                    ]
                     cov_file = os.path.join(temp_dir, f"coverage_{example_id}.json")
                     cmd = [
                         python_executable,
