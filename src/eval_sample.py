@@ -3,7 +3,7 @@ import subprocess
 import tempfile
 
 
-def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest") -> dict:
+def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest", coverage=False) -> dict:
     """
     Evaluate sample code using the specified strategy in the provided virtual environment.
 
@@ -108,6 +108,29 @@ def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest") -
                 except Exception as e:
                     sample_result["output"] = f"Error: {str(e)}"
                     sample_result["pass"] = False
+
+                # get coverage optionally
+                if coverage:
+                    cmd = [
+                        python_executable,
+                        "-m",
+                        "pytest",
+                        "--disable-warnings",
+                        "-q",
+                        temp_dir,
+                        f"--cov={code_filepath}",
+                        f"--cov-report=json:{temp_dir}/coverage_{example_id}.json",
+                    ]
+                    try:
+                        proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=30)
+                        import json
+                        with open(os.path.join(temp_dir, f"coverage_{example_id}.json"), "r") as f:
+                            coverage_data = json.load(f)
+                            sample_result["coverage"] = coverage_data["totals"]["percent_covered"]
+                    except Exception as e:
+                        print(f"Error while getting coverage: {e}")
+                        pass
+
         else:
             sample_result["output"] = "Unsupported evaluation strategy."
             sample_result["pass"] = False
