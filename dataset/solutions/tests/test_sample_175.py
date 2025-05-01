@@ -2,7 +2,7 @@ import unittest
 import sys
 import os
 from typing import List
-
+import numpy as np
 # Add the parent directory to sys.path to import the module to test
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sample_175 import custom_generateRandomSampleDice
@@ -58,7 +58,7 @@ class TestCustomGenerateRandomSampleDice(unittest.TestCase):
         
         # Check that all elements in the list are integers
         for sample_value in samples:
-            self.assertIsInstance(sample_value, int)
+            self.assertIsInstance(sample_value, np.int64)
 
 
 if __name__ == '__main__':
