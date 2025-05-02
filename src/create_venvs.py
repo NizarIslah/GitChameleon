@@ -171,17 +171,16 @@ def main(args):
     base_path = args.base_path
     create_anyway = args.create_anyway
     start_line = args.start
-    end_line = args.end
+    end_id = args.end
 
     # Ensure the base path exists
     os.makedirs(base_path, exist_ok=True)
     failed_count = []
 
-    # Read the JSONL file and process only lines between start_line and end_line (inclusive)
+    # Read the JSONL file and process only lines between start_id and end_id (inclusive)
     with open(jsonl_file, "r") as file:
         for line_number, line in enumerate(file, start=1):
-            if line_number < start_line or line_number > end_line:
-                continue
+
 
             sample = json.loads(line)
             python_version = sample.get("python_version")
@@ -189,7 +188,8 @@ def main(args):
             library = sample.get("library")
             version = sample.get("version")
             additional_dependencies = sample.get("additional_dependencies", "")
-
+            if example_id < start_id or example_id > end_id:
+                continue
             if python_version and example_id:
                 pyenv_version = python_versions.get(python_version)
                 if not pyenv_version:

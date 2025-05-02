@@ -1,13 +1,15 @@
 #!/bin/bash
 #SBATCH --job-name=make_venvs
-#SBATCH --array=0-340:10             
+#SBATCH --array=1-340:10             
 #SBATCH --time=2:59:00
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=12G
-#SBATCH --output=slurm-%A_%a.out
-SLURM_ARRAY_TASK_ID=100
+#SBATCH --output=output_venv/slurm-%A_%a.out
 module load apptainer
 
+rm -r $HOME/.apptainer/cache
+mkdir -p $SLURM_TMPDIR/.apptainer
+export APPTAINER_CACHEDIR=$SLURM_TMPDIR/.apptainer
 # ────────────────
 # 0) Config
 # ────────────────
@@ -46,8 +48,8 @@ apptainer exec \
   "$WORKDIR/gc_1.0.sif" \
   bash -lc "\
     cd /app/repo && \
-    python -m venv bootstrap_venv && \
-    source bootstrap_venv/bin/activate && \
+    python -m venv eval_main_venv && \
+    source eval_main_venv/bin/activate && \
     pip install -r requirements.txt && \
     python src/create_venvs.py \
       --dataset dataset/final_fix_dataset.jsonl \
@@ -59,11 +61,14 @@ apptainer exec \
 # ────────────────────────────────────
 # 4) Tar up each env and copy it back
 # ────────────────────────────────────
-for ID in $(seq $START $END); do
-  # 1) Tar the env directory into one big file
-  tar -czf "$WORKDIR/gcham_venv_${ID}.tar.gz" \
-      -C "$WORKDIR/eval_venvs" "gcham_venv_${ID}"
-  # 2) Copy the tarball back
-  cp "$WORKDIR/gcham_venv_${ID}.tar.gz" \
-     "$ENV_STORAGE_PATH/"
+for envdir in "$WORKDIR"/eval_venvs/gcham_venv_*; do
+  name=$(basename "$envdir")
+  tarball="$WORKDIR/${name}.tar.gz"
+
+  # 1) create the tarball
+  tar -czf "$tarball" \
+      -C "$WORKDIR/eval_venvs" "$name"
+
+  # 2) copy it back to your storage area
+  cp "$tarball" "$ENV_STORAGE_PATH/"
 done
