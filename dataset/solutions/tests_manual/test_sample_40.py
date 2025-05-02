@@ -21,7 +21,5 @@ try:
     # Only insert parent directory after we confirm imports won't fail
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-    import sample_40
-
-
+    from sample_40 import iface
 assert type(iface.input_components[0])==type(gr.inputs.Image()) and type(iface.output_components[0])==type(gr.outputs.Textbox()) or type(iface.input_components[0])==type(gr.components.Image()) and type(iface.output_components[0])==type(gr.components.Textbox())

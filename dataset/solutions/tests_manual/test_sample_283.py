@@ -10,10 +10,7 @@ from unittest.mock import patch, MagicMock
 
 # Add the parent directory to the path so we can import the module
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-import sample_283
-
-
-
+from sample_283 import compute_stream
 filename = librosa.util.example_audio_file()
 y, sr = librosa.load(filename)
 

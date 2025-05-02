@@ -13,7 +13,5 @@ except ImportError:
     GRADIO_AVAILABLE = False
 
 try:
-    import sample_38
-
-
+    from sample_38 import iface
 assert iface.output_components[0].show_share_button==False

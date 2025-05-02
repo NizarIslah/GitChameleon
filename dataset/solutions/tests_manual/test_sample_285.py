@@ -7,7 +7,6 @@ import numpy as np
 
 # Make sure we import our solution module
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-import sample_285
 from sample_285 import compute_griffinlim
 
 

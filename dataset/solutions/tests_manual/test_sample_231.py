@@ -5,12 +5,11 @@ import os
 
 # Add the parent directory to sys.path to import the module
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-import sample_231
-
+from sample_231 import pytest_report_header
 def test_pytest_report_header_exists():
     """Test that the pytest_report_header function exists."""
     assert hasattr(sample_231, 'pytest_report_header')
-    assert callable(sample_231.pytest_report_header)
+    assert callable(pytest_report_header)
 
 def test_pytest_report_header_accepts_path_parameter():
     """Test that pytest_report_header accepts a pathlib.Path parameter."""
@@ -20,7 +19,7 @@ def test_pytest_report_header_accepts_path_parameter():
     # Call the function with the path
     # Since the function returns None (pass), we just verify it doesn't raise an exception
     try:
-        result = sample_231.pytest_report_header(temp_path)
+        result = pytest_report_header(temp_path)
         # Function should return None since it just has 'pass'
         assert result is None
     except Exception as e:
