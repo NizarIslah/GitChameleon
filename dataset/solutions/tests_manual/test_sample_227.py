@@ -5,8 +5,7 @@ from unittest.mock import patch, MagicMock
 
 # Add the parent directory to sys.path to import the module
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-import sample_227
-
+from sample_227 import pytest_runtest_setup
 import pluggy
 
 def test_hookwrapper_configuration_with_plugin_manager():

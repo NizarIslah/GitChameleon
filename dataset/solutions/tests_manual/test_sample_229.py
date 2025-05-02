@@ -7,9 +7,7 @@ from unittest.mock import MagicMock
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 
 # Import the module to test
-import sample_229
-
-
+from sample_229 import pytest_collect_file
 import inspect
 def test_pytest_collect_file_signature():
     sig = inspect.signature(pytest_collect_file)
