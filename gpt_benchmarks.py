@@ -195,5 +195,8 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
         Path(args.output_data)
         / f"responses_{args.temperature}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{seed}.json"
     )
-    with output_file.open("w") as f:
-        json.dump(r_final, f, indent=4)
+
+    with output_file.open("w", encoding="utf-8") as out:
+        for record in r_final:
+            line = json.dumps(record, ensure_ascii=False)
+            out.write(line + "\n")
