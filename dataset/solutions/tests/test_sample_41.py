@@ -5,25 +5,15 @@ import sys
 import unittest
 import warnings
 
-# We attempt to import sample_41 and gradio. If the user environment is missing
-# the correct numpy version or gradio cannot be imported, we'll skip the tests
-# rather than failing at import time.
-try:
-    import gradio as gr
-    import sample_41
-    GRADIO_AVAILABLE = True
-except ImportError:
-    GRADIO_AVAILABLE = False
-    sample_41 = None
-    gr = None
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-# Filter deprecation warnings
-warnings.filterwarnings('ignore', category=DeprecationWarning)
+import gradio as gr
+import sample_41
+
 
 class TestImageProcessing(unittest.TestCase):
     """Test cases for the process_image function and Gradio Interface in sample_41.py."""
 
-    @unittest.skipUnless(GRADIO_AVAILABLE, "Skipping because Gradio or dependencies are not available.")
     def test_process_image_returns_processed_text(self):
         """Test that process_image returns 'Processed' regardless of input."""
         from unittest.mock import MagicMock
@@ -39,7 +29,6 @@ class TestImageProcessing(unittest.TestCase):
         # Check that the result is a string
         self.assertIsInstance(result, str)
 
-    @unittest.skipUnless(GRADIO_AVAILABLE, "Skipping because Gradio or dependencies are not available.")
     def test_interface_creation(self):
         """Test that the Gradio Interface is created correctly."""
         self.assertIsInstance(sample_41.iface, gr.Interface)
@@ -53,7 +42,6 @@ class TestImageProcessing(unittest.TestCase):
             self.assertEqual(len(sample_41.iface.output_components), 1)
             self.assertIsInstance(sample_41.iface.output_components[0], gr.components.Label)
 
-    @unittest.skipUnless(GRADIO_AVAILABLE, "Skipping because Gradio or dependencies are not available.")
     def test_interface_launch(self):
         """Test that the interface can be launched."""
         from unittest.mock import MagicMock, patch
@@ -63,7 +51,6 @@ class TestImageProcessing(unittest.TestCase):
             mock_launch.assert_called_once()
             self.assertIsNotNone(result)
 
-    @unittest.skipUnless(GRADIO_AVAILABLE, "Skipping because Gradio or dependencies are not available.")
     def test_interface_launch_with_share(self):
         """Test that the interface can be launched with sharing enabled."""
         from unittest.mock import MagicMock, patch
@@ -73,7 +60,6 @@ class TestImageProcessing(unittest.TestCase):
             mock_launch.assert_called_once_with(share=True)
             self.assertIsNotNone(result)
 
-    @unittest.skipUnless(GRADIO_AVAILABLE, "Skipping because Gradio or dependencies are not available.")
     def test_interface_with_custom_server_name(self):
         """Test that the interface can be launched with a custom server name."""
         from unittest.mock import MagicMock, patch
@@ -83,7 +69,6 @@ class TestImageProcessing(unittest.TestCase):
             mock_launch.assert_called_once_with(server_name="0.0.0.0")
             self.assertIsNotNone(result)
 
-    @unittest.skipUnless(GRADIO_AVAILABLE, "Skipping because Gradio or dependencies are not available.")
     def test_process_image_with_different_inputs(self):
         """Test that process_image returns 'Processed' for different types of inputs."""
         result = sample_41.process_image("")
