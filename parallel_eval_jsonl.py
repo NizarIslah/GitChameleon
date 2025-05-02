@@ -18,7 +18,7 @@ def extract_code(text: str) -> str:
         except Exception as e:
             print("Error: ", e)
             match = None
-    return match.group(1) if match else None
+    return match.group(1) if match else text
 
 
 def get_solution(record):
