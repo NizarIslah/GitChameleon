@@ -30,6 +30,14 @@ def get_solution(record):
     if solution == "":
         raise ValueError("No solution found in record")
     return extract_code(solution)
+    
+def get_example_id(record):
+    id = record.get("example_id", "")
+    if id == "":
+        id = record.get("sample_idx", "")
+    if id == "":
+        raise ValueError("No example_id found in record")
+    return id
 
 
 def process_record(idx, record, starting_codes, env_dir, test_dir):
@@ -37,7 +45,7 @@ def process_record(idx, record, starting_codes, env_dir, test_dir):
     Process one JSON record: run eval_sample() and return a dict
     with example_id, code_id, output, passed, compiled, and idx.
     """
-    example_id = record.get("example_id")
+    example_id = get_example_id(record)
     try:
         example_id = int(example_id)
         code = starting_codes[example_id]
