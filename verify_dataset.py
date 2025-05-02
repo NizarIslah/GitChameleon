@@ -56,7 +56,7 @@ def main():
                 "test_file": test_file_content,
                 "codes": {"solution_code": {"code": code + solution}},
             }
-            eval_res = eval_sample(example_id, env_path, code_dict, coverage=True)["codes"]["solution_code"]
+            eval_res = eval_sample(example_id, env_path, code_dict, coverage=False)["codes"]["solution_code"]
 
             # Append row for this example
             results.append({
