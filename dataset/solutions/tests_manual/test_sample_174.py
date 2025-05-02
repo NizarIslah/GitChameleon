@@ -8,9 +8,7 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-import sample_174
-
-
+from sample_174 import save_exponential
 base_path = '/var/www/myapp'
 sub_path = '../secret.txt'
 import numpy as np

@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import sample_150
+from sample_150 import safe_join_fail_404
 from werkzeug.exceptions import NotFound
 
 
@@ -23,7 +23,7 @@ class TestSafeJoinFail404(unittest.TestCase):
         os.makedirs(os.path.join(base_path, sub_path), exist_ok=True)
         
         # This should succeed
-        result = sample_150.safe_join_fail_404(base_path, sub_path)
+        result = safe_join_fail_404(base_path, sub_path)
         
         # Check that the result is the joined path
         expected_path = os.path.join(base_path, sub_path)
@@ -36,7 +36,7 @@ class TestSafeJoinFail404(unittest.TestCase):
         
         # This should raise a NotFound exception
         with self.assertRaises(NotFound):
-            sample_150.safe_join_fail_404(base_path, sub_path)
+            safe_join_fail_404(base_path, sub_path)
     
     def test_safe_join_with_empty_subpath(self):
         # Test with an empty sub path
@@ -44,7 +44,7 @@ class TestSafeJoinFail404(unittest.TestCase):
         sub_path = ""
         
         # This should succeed and return the base path
-        result = sample_150.safe_join_fail_404(base_path, sub_path)
+        result = safe_join_fail_404(base_path, sub_path)
         # Normalize both paths to avoid trailing slash issues
         self.assertEqual(os.path.normpath(result), os.path.normpath(base_path))
     

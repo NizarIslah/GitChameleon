@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import numpy as np
-import sample_49
+from sample_49 import apply_fast_ica
 from sklearn.datasets import load_digits
 from sklearn.decomposition import FastICA
 from sklearn.utils import Bunch

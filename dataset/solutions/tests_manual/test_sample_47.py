@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import numpy as np
-import sample_47
+from sample_47 import get_signal
 from sklearn.datasets import make_sparse_coded_signal
 
 n_samples=100

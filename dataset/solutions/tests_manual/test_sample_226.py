@@ -4,8 +4,7 @@ import os
 
 # Add the parent directory to sys.path to import the module
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-import sample_226
-
+from sample_226 import pytest_runtest_call
 import pluggy
 
 def test_hookimpl_configuration_with_plugin_manager():

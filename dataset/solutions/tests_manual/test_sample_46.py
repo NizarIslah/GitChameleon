@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import numpy as np
-import sample_46
+from sample_46 import get_coef_shape
 from sklearn.cross_decomposition import CCA
 
 X = np.random.rand(100, 10)

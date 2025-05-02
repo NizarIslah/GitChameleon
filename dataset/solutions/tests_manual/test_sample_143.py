@@ -4,9 +4,7 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-import sample_143
-
-
+from sample_143 import eval
 import json
 app_set_up(app)
 app2 = flask.Flask('test2')
