@@ -10,7 +10,5 @@ import contextlib
 import io
 
 import nltk
-import sample_26
-
-
+from sample_26 import show_usage
 assert "LazyModule supports the following operations" in show_usage(nltk.corpus)

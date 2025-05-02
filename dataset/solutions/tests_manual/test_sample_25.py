@@ -9,7 +9,7 @@ import numpy as np
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import geopandas as gpd
-import sample_25
+from sample_25 import spatial_query
 from shapely.geometry import Point, Polygon
 
 

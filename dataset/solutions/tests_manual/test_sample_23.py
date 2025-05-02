@@ -7,7 +7,7 @@ import warnings
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import geopandas as gpd
-import sample_23
+from sample_23 import create_geoseries
 from shapely.geometry import Point
 
 
