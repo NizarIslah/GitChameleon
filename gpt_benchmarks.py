@@ -55,6 +55,7 @@ parser.add_argument(
     default=4096,
     help="Maximum tokens for the model. (4096 for baseline, 6000 for CoT)",
 )
+parser.add_argument("--struct_output", type=bool, default=False, help="Use structured output")
 parser.add_argument("--api_key", type=str, required=True, help="OpenAI API key")
 parser.add_argument("--azure_endpoint", type=str, required=True, help="Azure endpoint")
 parser.add_argument(
@@ -62,6 +63,16 @@ parser.add_argument(
     type=str,
     default="2024-05-01-preview",
     help="Azure API version",
+)
+parser.add_argument("--wandb", type=bool, default=False, help="Use WandB for logging")
+parser.add_argument(
+    "--wandb_entity", type=str, help="WandB entity name"
+)
+parser.add_argument(
+    "--wandb_project", type=str, help="WandB project name"
+)
+parser.add_argument(
+    "--wandb_run_name", type=str, help="WandB run name"
 )
 parser.add_argument(
     "--logprobs", type=bool, default=True, help="Whether to include logprobs"
@@ -114,21 +125,41 @@ def get_completion_with_retry(prompt, seed, args, max_retries=5, delay=10):
         ]
     while retries < max_retries:
         try:
-            if args.model in ["o1", "o1-mini", "o3-mini"]:
-                response = client.beta.chat.completions.parse(
-                    model=args.model, messages=prompt, seed=seed, response_format=MyResponse
-                )
+            if args.struct_output:
+                if args.model in ["o1", "o1-mini", "o3-mini"]:
+                    response = client.beta.chat.completions.parse(
+                        model=args.model, messages=prompt, seed=seed, response_format=MyResponse
+                    )
+                else:
+                    response = client.beta.chat.completions.parse(
+                        model=args.model,
+                        messages=prompt,
+                        seed=seed,
+                        max_tokens=args.max_tokens,
+                        top_p=args.top_p,
+                        temperature=args.temperature,
+                        logprobs=args.logprobs,
+                        response_format=MyResponse,
+                    )
             else:
-                response = client.beta.chat.completions.parse(
-                    model=args.model,
-                    messages=prompt,
-                    seed=seed,
-                    max_tokens=args.max_tokens,
-                    top_p=args.top_p,
-                    temperature=args.temperature,
-                    logprobs=args.logprobs,
-                    response_format=MyResponse,
-                )
+                if args.model in ["o1", "o1-mini", "o3-mini"]:
+                    response = client.chat.completions.create(
+                        model=args.model, messages=prompt, seed=seed
+                    )
+                else:
+                    response = client.chat.completions.create(
+                        model=args.model,
+                        messages=prompt,
+                        seed=seed,
+                        max_tokens=args.max_tokens,
+                        top_p=args.top_p,
+                        temperature=args.temperature,
+                        logprobs=args.logprobs,
+                    )
+            # Check if the response is empty or None
+            if response is None or not hasattr(response, "choices"):
+                raise ValueError("Empty response received from the model.")
+
             return response
         except openai.RateLimitError as e:
             retries += 1
@@ -168,17 +199,22 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
         )
         explanation = content.explanation if hasattr(content, "explanation") else ""
         answer = content.answer if hasattr(content, "answer") else ""
+
+        log_prob_mean = None
+        log_prob_sum = None
         
-        # i think this threw an error which is why i commented it out but feel free to uncomment
-        # log_probs = (
-        #     response.choices[0].logprobs.get("content", [])
-        #     if args.logprobs
-        #     and args.model in ["gpt-4o", "gpt-4o-mini"]
-        #     and not isinstance(response, str)
-        #     else []
-        # )
-        # log_prob_mean = statistics.mean(log_probs) if log_probs else None
-        # log_prob_sum = sum(log_probs) if log_probs else None
+        if not args.struct_output:
+            answer = content
+            explanation = ""
+            log_probs = (
+                response.choices[0].logprobs.get("content", [])
+                if args.logprobs
+                and args.model in ["gpt-4o", "gpt-4o-mini"]
+                and not isinstance(response, str)
+                else []
+            )
+            log_prob_mean = statistics.mean(log_probs) if log_probs else None
+            log_prob_sum = sum(log_probs) if log_probs else None
 
         r_final.append(
             {
@@ -186,17 +222,56 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
                 "prompt": prompt["prompt"],
                 "answer": answer,
                 "explanation": explanation,
-                # "log_prob_mean": log_prob_mean,
-                # "log_prob_sum": log_prob_sum,
+                "log_prob_mean": log_prob_mean,
+                "log_prob_sum": log_prob_sum,
             }
         )
 
     output_file = (
         Path(args.output_data)
-        / f"responses_{args.temperature}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{seed}.json"
+        / f"responses_{args.temperature}_{args.struct_output}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{seed}.json"
     )
 
-    with output_file.open("w", encoding="utf-8") as out:
+    with Path(output_file).open("w", encoding="utf-8") as out:
         for record in r_final:
             line = json.dumps(record, ensure_ascii=False)
             out.write(line + "\n")
+
+    if args.wandb:
+        import wandb
+
+        wandb.init(
+            project=args.wandb_project,
+            entity=args.wandb_entity,
+            name=args.wandb_run_name,
+            config={
+                "model": args.model,
+                "temperature": args.temperature,
+                "top_p": args.top_p,
+                "max_tokens": args.max_tokens,
+                "seed": seed,
+            },
+        )
+        for arg in vars(args):
+            wandb.config[arg] = getattr(args, arg)
+
+        # Log the JSONL file as a WandB artifact
+        artifact = wandb.Artifact(
+            name=f"responses_{args.temperature}_{args.struct_output}_{args.model}_{seed}",
+            type="responses",
+        )
+        artifact.add_file(str(output_file))
+        wandb.log_artifact(artifact)
+
+        # Log the records as a WandB table
+        table = wandb.Table(columns=["example_id", "prompt", "answer", "explanation", "log_prob_mean", "log_prob_sum"])
+        for record in r_final:
+            table.add_data(
+                record["example_id"],
+                record["prompt"],
+                record["answer"],
+                record["explanation"],
+                record["log_prob_mean"],
+                record["log_prob_sum"],
+            )
+        wandb.log({"responses_table": table})
