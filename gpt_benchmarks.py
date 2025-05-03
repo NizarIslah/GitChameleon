@@ -55,6 +55,7 @@ parser.add_argument(
     default=4096,
     help="Maximum tokens for the model. (4096 for baseline, 6000 for CoT)",
 )
+parser.add_argument("--struct_output", type=bool, default=False, help="Use structured output")
 parser.add_argument("--api_key", type=str, required=True, help="OpenAI API key")
 parser.add_argument("--azure_endpoint", type=str, required=True, help="Azure endpoint")
 parser.add_argument(
@@ -114,21 +115,41 @@ def get_completion_with_retry(prompt, seed, args, max_retries=5, delay=10):
         ]
     while retries < max_retries:
         try:
-            if args.model in ["o1", "o1-mini", "o3-mini"]:
-                response = client.beta.chat.completions.parse(
-                    model=args.model, messages=prompt, seed=seed, response_format=MyResponse
-                )
+            if args.struct_output:
+                if args.model in ["o1", "o1-mini", "o3-mini"]:
+                    response = client.beta.chat.completions.parse(
+                        model=args.model, messages=prompt, seed=seed, response_format=MyResponse
+                    )
+                else:
+                    response = client.beta.chat.completions.parse(
+                        model=args.model,
+                        messages=prompt,
+                        seed=seed,
+                        max_tokens=args.max_tokens,
+                        top_p=args.top_p,
+                        temperature=args.temperature,
+                        logprobs=args.logprobs,
+                        response_format=MyResponse,
+                    )
             else:
-                response = client.beta.chat.completions.parse(
-                    model=args.model,
-                    messages=prompt,
-                    seed=seed,
-                    max_tokens=args.max_tokens,
-                    top_p=args.top_p,
-                    temperature=args.temperature,
-                    logprobs=args.logprobs,
-                    response_format=MyResponse,
-                )
+                if args.model in ["o1", "o1-mini", "o3-mini"]:
+                    response = client.chat.completions.create(
+                        model=args.model, messages=prompt, seed=seed
+                    )
+                else:
+                    response = client.chat.completions.create(
+                        model=args.model,
+                        messages=prompt,
+                        seed=seed,
+                        max_tokens=args.max_tokens,
+                        top_p=args.top_p,
+                        temperature=args.temperature,
+                        logprobs=args.logprobs,
+                    )
+            # Check if the response is empty or None
+            if response is None or not hasattr(response, "choices"):
+                raise ValueError("Empty response received from the model.")
+
             return response
         except openai.RateLimitError as e:
             retries += 1
@@ -168,17 +189,22 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
         )
         explanation = content.explanation if hasattr(content, "explanation") else ""
         answer = content.answer if hasattr(content, "answer") else ""
+
+        log_prob_mean = None
+        log_prob_sum = None
         
-        # i think this threw an error which is why i commented it out but feel free to uncomment
-        # log_probs = (
-        #     response.choices[0].logprobs.get("content", [])
-        #     if args.logprobs
-        #     and args.model in ["gpt-4o", "gpt-4o-mini"]
-        #     and not isinstance(response, str)
-        #     else []
-        # )
-        # log_prob_mean = statistics.mean(log_probs) if log_probs else None
-        # log_prob_sum = sum(log_probs) if log_probs else None
+        if not args.struct_output:
+            answer = content
+            explanation = ""
+            log_probs = (
+                response.choices[0].logprobs.get("content", [])
+                if args.logprobs
+                and args.model in ["gpt-4o", "gpt-4o-mini"]
+                and not isinstance(response, str)
+                else []
+            )
+            log_prob_mean = statistics.mean(log_probs) if log_probs else None
+            log_prob_sum = sum(log_probs) if log_probs else None
 
         r_final.append(
             {
@@ -186,14 +212,14 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
                 "prompt": prompt["prompt"],
                 "answer": answer,
                 "explanation": explanation,
-                # "log_prob_mean": log_prob_mean,
-                # "log_prob_sum": log_prob_sum,
+                "log_prob_mean": log_prob_mean,
+                "log_prob_sum": log_prob_sum,
             }
         )
 
     output_file = (
         Path(args.output_data)
-        / f"responses_{args.temperature}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{seed}.json"
+        / f"responses_{args.temperature}_{args.struct_output}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{seed}.json"
     )
 
     with output_file.open("w", encoding="utf-8") as out:
