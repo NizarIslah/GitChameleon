@@ -126,8 +126,8 @@ def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest", c
                         ]
                         
                         proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=30)
-                        print(proc.stdout)
-                        print(proc.stderr)
+                        # print(proc.stdout)
+                        # print(proc.stderr)
                                                 
 
                         import json
