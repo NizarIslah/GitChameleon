@@ -111,23 +111,18 @@ def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest", c
 
                 # get coverage optionally
                 if coverage:
-                    # pip install pytest-cov
                     cov_file = os.path.join(temp_dir, f"coverage_{example_id}.json")
-                    current_dir = os.getcwd()
+                    # current_dir = os.getcwd()
                     try : 
-                        pytest_executable = os.path.join(env_path, "bin", "pytest")
-                        # Check if pytest_executable is a relative path
-                        if not os.path.isabs(pytest_executable):
-                            # Convert the relative path to an absolute path
-                            pytest_executable = os.path.abspath(pytest_executable)
-                        os.chdir(temp_dir)
-
+                        # os.chdir(temp_dir)
                         # Run pytest with coverage
                         cmd = [
-                            pytest_executable,
-                            f"--cov=sample_{example_id}.py",
-                            f"--cov-report=term",
-                            "test_sample.py"
+                            python_executable,
+                            "-m",
+                            "pytest",
+                            f"--cov=sample_{example_id}",
+                            f"--cov-report=json:{cov_file}",
+                            test_filepath
                         ]
                         
                         proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=30)
