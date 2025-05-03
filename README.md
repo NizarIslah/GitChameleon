@@ -138,9 +138,9 @@ then you can run the eval env creation
 ```
 cd repo 
 pyenv shell 3.10.14
-python -m venv eval_main_venv
+python -m venv --clear --copies eval_main_venv
 source eval_main_venv/bin/activate
-pip install vllm -r requirements.txt
+pip install -r requirements.txt
 
 # create the virtual env
 python src/create_venvs.py --dataset dataset/final_fix_dataset.jsonl --base_path eval_venvs
@@ -150,3 +150,41 @@ To run dataset verification with pytest, eval_venvs must have been created first
 ```
 python verify_dataset.py dataset/final_fix_dataset.jsonl eval_venvs dataset/solutions/tests
 ```
+
+# running on computecanada 
+1. we need to export the docker container  : 
+```
+  docker save gc:1.0 | gzip > gc_1.0.tar.gz 
+```
+2. copy the tar file to compute canada
+```
+scp gc_1.0.tar.gz username@cedar.computecanada.ca:path
+```
+3. within a interactive job, build the container from the tar file by loading the apptainer module:
+```
+module load apptainer
+apptainer build gc_1.0.sif docker-archive://gc_1.0.tar.gz
+```
+4. run the container to create the venvs :
+apptainer exec \
+  --bind "$PWD:/app/repo" \
+  --env PYENV_VERSION=3.10.14 \
+  --env REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt \
+  gc_1.0.sif \
+  bash -lc "\
+    cd /app/repo && \
+    python -m venv --clear --copies eval_main_venv && \
+    source eval_main_venv/bin/activate && \
+    pip install -r requirements.txt && \
+    python src/create_venvs.py --dataset dataset/final_fix_dataset.jsonl --base_path eval_venvs"
+
+5. run the container to verify the dataset :
+apptainer exec \
+  --bind "$PWD:/app/repo" \
+  --env PYENV_VERSION=3.10.14 \
+  gc_1.0.sif \
+  bash -lc "\
+    cd /app/repo  && \
+    source eval_main_venv/bin/activate
+    python verify_dataset.py dataset/final_fix_dataset.jsonl eval_venvs dataset/solutions/tests"
+

@@ -50,14 +50,14 @@ def create_virtual_environment(env_path, python_version, create_anyway=False, li
 
     if not os.path.exists(env_path):
         os.makedirs(env_path, exist_ok=True)
-        subprocess.run([python_executable, "-m", "venv", env_path], check=True)
+        subprocess.run([python_executable, "-m", "venv", "--copies", env_path], check=True)
         print(f"Virtual environment created: {env_path}")
     else:
         print(f"Virtual environment already exists: {env_path}")
         if create_anyway:
             subprocess.run(["rm", "-rf", env_path])
             os.makedirs(env_path, exist_ok=True)
-            subprocess.run([python_executable, "-m", "venv", env_path], check=True)
+            subprocess.run([python_executable, "-m", "venv", "--copies", "--clear", env_path], check=True)
             print(f"Virtual environment recreated: {env_path}")
 
     if library_to_check:
@@ -143,7 +143,12 @@ def install_packages(env_path, library, version, additional_dependencies, python
                 "3.10": "pytest==7.2.0",
             }
             install_pinpointed_package("pytest", python_version, python_executable, deps_lower, pytest_versions, env_path)
-        
+            pytest_versions = {
+                "3.7": "pytest-cov==4.1.0",
+                "3.9": "pytest-cov==4.1.0",
+                "3.10": "pytest-cov==4.1.0",
+            }
+            install_pinpointed_package("pytest-cov", python_version, python_executable, deps_lower, pytest_versions, env_path)
         if library.lower() != "numpy":
             numpy_versions = {
                 "3.7": "numpy==1.21.6",
@@ -170,21 +175,26 @@ def main(args):
     jsonl_file = args.dataset
     base_path = args.base_path
     create_anyway = args.create_anyway
+    start_id = args.start
+    end_id = args.end
+
     # Ensure the base path exists
     os.makedirs(base_path, exist_ok=True)
-
     failed_count = []
 
-    # Read the JSONL file
+    # Read the JSONL file and process only lines between start_id and end_id (inclusive)
     with open(jsonl_file, "r") as file:
-        for line in file:
+        for line_number, line in enumerate(file, start=1):
+
+
             sample = json.loads(line)
             python_version = sample.get("python_version")
             example_id = sample.get("example_id")
             library = sample.get("library")
             version = sample.get("version")
             additional_dependencies = sample.get("additional_dependencies", "")
-
+            if int(example_id) < start_id or int(example_id) > end_id:
+                continue
             if python_version and example_id:
                 pyenv_version = python_versions.get(python_version)
                 if not pyenv_version:
@@ -215,5 +225,7 @@ if __name__ == "__main__":
     parser.add_argument("--dataset", type=str, required=True, help="Path to the JSONL dataset file.")
     parser.add_argument("--base_path", type=str, default="eval_venvs", help="Base path for virtual environments.")
     parser.add_argument("--create_anyway", action="store_true", default=False, help="Recreate environments if they already exist.")
+    parser.add_argument("--start", type=int, default=0, help="Start line number (inclusive) from which to create the environments.")
+    parser.add_argument("--end", type=int, default=sys.maxsize, help="End line number (inclusive) until which to create the environments.")
     args = parser.parse_args()
     main(args)

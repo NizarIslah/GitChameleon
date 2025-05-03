@@ -112,35 +112,38 @@ def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest", c
                 # get coverage optionally
                 if coverage:
                     # pip install pytest-cov
-                    cmd = [
-                        python_executable,
-                        "-m",
-                        "pip",
-                        "install",
-                        "pytest-cov",
-                    ]
-                    proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                     cov_file = os.path.join(temp_dir, f"coverage_{example_id}.json")
-                    cmd = [
-                        python_executable,
-                        "-m",
-                        "pytest",
-                        "--disable-warnings",
-                        "-q",
-                        f"--cov={code_filepath}",
-                        f"--cov-report=json:{cov_file}",
-                        temp_dir,
-                    ]
-                    try:
+                    current_dir = os.getcwd()
+                    try : 
+                        pytest_executable = os.path.join(env_path, "bin", "pytest")
+                        # Check if pytest_executable is a relative path
+                        if not os.path.isabs(pytest_executable):
+                            # Convert the relative path to an absolute path
+                            pytest_executable = os.path.abspath(pytest_executable)
+                        os.chdir(temp_dir)
+
+                        # Run pytest with coverage
+                        cmd = [
+                            pytest_executable,
+                            f"--cov=sample_{example_id}.py",
+                            "test_sample.py",
+                            f"--cov-report=term"
+                        ]
+                        
                         proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=30)
                         print(proc.stdout)
                         print(proc.stderr)
+                                                
+
                         import json
                         with open(cov_file, "r") as f:
                             coverage_data = json.load(f)
                             sample_result["coverage"] = coverage_data["totals"]["percent_covered"]
+                        os.chdir(current_dir)
+                        
                     except Exception as e:
                         print(f"Error while getting coverage: {e}")
+                        os.chdir(current_dir)
                         pass
 
         else:
