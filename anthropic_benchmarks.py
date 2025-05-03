@@ -209,6 +209,11 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
         / f"responses_{args.temperature}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{'sys' if args.system_prompt else ''}_{'thinking' if args.thinking_mode else ''}_{seed}.json"
     )
 
+    with Path(output_file).open("w", encoding="utf-8") as out:
+        for record in r_final:
+            line = json.dumps(record, ensure_ascii=False)
+            out.write(line + "\n")
+
     if args.wandb:
         import wandb
 
@@ -226,9 +231,22 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
         )
         for arg in vars(args):
             wandb.config[arg] = getattr(args, arg)
-        wandb.log({"responses": r_final})
 
-    with output_file.open("w", encoding="utf-8") as out:
+        # Log records as a WandB table
+        table = wandb.Table(columns=["example_id", "prompt", "response", "thinking"])
         for record in r_final:
-            line = json.dumps(record, ensure_ascii=False)
-            out.write(line + "\n")
+            table.add_data(
+                record["example_id"],
+                record["prompt"],
+                record["response"],
+                record["thinking"],
+            )
+        wandb.log({"responses_table": table})
+
+        # Log the JSONL file as a WandB artifact
+        artifact = wandb.Artifact(
+            name=f"responses_{args.temperature}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{'sys' if args.system_prompt else ''}_{'thinking' if args.thinking_mode else ''}_{seed}",
+            type="responses",
+        )
+        artifact.add_file(str(output_file))
+        wandb.log_artifact(artifact)
