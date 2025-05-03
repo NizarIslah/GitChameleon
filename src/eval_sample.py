@@ -126,8 +126,8 @@ def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest", c
                         cmd = [
                             pytest_executable,
                             f"--cov=sample_{example_id}.py",
-                            "test_sample.py",
-                            f"--cov-report=term"
+                            f"--cov-report=term",
+                            "test_sample.py"
                         ]
                         
                         proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=30)
