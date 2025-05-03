@@ -134,11 +134,11 @@ def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest", c
                         with open(cov_file, "r") as f:
                             coverage_data = json.load(f)
                             sample_result["coverage"] = coverage_data["totals"]["percent_covered"]
-                        os.chdir(current_dir)
+                        # os.chdir(current_dir)
                         
                     except Exception as e:
                         print(f"Error while getting coverage: {e}")
-                        os.chdir(current_dir)
+                        # os.chdir(current_dir)
                         pass
 
         else:

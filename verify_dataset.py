@@ -82,6 +82,10 @@ def main():
             print(f"[!] Error processing record {idx} (example_id={example_id}): {e}")
             continue
 
+        # print progress coverage so far
+        if idx % 25 == 0:
+            print(f"Avg. coverage so far: {sum([r['coverage'] for r in results if 'coverage' in r]) / len(results):.2f}%")
+
     # 3) Build DataFrame and save CSV
     df = pd.DataFrame(results)
     output_csv = os.path.splitext(args.jsonl_file)[0] + "_verification_results.csv"
