@@ -19,6 +19,7 @@ def main():
     parser.add_argument(
         "test_dir", help="Path to the dir where the test files are stored"
     )
+    parser.add_argument("--cov", default=False, action="store_true")
     args = parser.parse_args()
 
     # 1) Read all JSONL lines into a list of dicts
@@ -56,7 +57,7 @@ def main():
                 "test_file": test_file_content,
                 "codes": {"solution_code": {"code": code + solution}},
             }
-            eval_res = eval_sample(example_id, env_path, code_dict, coverage=False)["codes"]["solution_code"]
+            eval_res = eval_sample(example_id, env_path, code_dict, coverage=args.cov)["codes"]["solution_code"]
 
             # Append row for this example
             results.append({
