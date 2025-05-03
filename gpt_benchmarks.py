@@ -68,7 +68,6 @@ parser.add_argument("--wandb", type=bool, default=False, help="Use WandB for log
 parser.add_argument(
     "--wandb_entity", type=str, help="WandB entity name"
 )
-parser.add_argument("--wandb_key", type=str, help="WandB API key")
 parser.add_argument(
     "--wandb_project", type=str, help="WandB project name"
 )
@@ -230,7 +229,6 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
 
     if args.wandb:
         import wandb
-        os.environ["WANDB_API_KEY"] = args.wandb_key
 
         wandb.init(
             project=args.wandb_project,
