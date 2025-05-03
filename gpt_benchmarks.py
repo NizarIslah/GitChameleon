@@ -64,6 +64,17 @@ parser.add_argument(
     default="2024-05-01-preview",
     help="Azure API version",
 )
+parser.add_argument("--wandb", type=bool, default=False, help="Use WandB for logging")
+parser.add_argument(
+    "--wandb_entity", type=str, help="WandB entity name"
+)
+parser.add_argument("--wandb_key", type=str, help="WandB API key")
+parser.add_argument(
+    "--wandb_project", type=str, help="WandB project name"
+)
+parser.add_argument(
+    "--wandb_run_name", type=str, help="WandB run name"
+)
 parser.add_argument(
     "--logprobs", type=bool, default=True, help="Whether to include logprobs"
 )
@@ -216,6 +227,26 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
                 "log_prob_sum": log_prob_sum,
             }
         )
+
+    if args.wandb:
+        import wandb
+        os.environ["WANDB_API_KEY"] = args.wandb_key
+
+        wandb.init(
+            project=args.wandb_project,
+            entity=args.wandb_entity,
+            name=args.wandb_run_name,
+            config={
+                "model": args.model,
+                "temperature": args.temperature,
+                "top_p": args.top_p,
+                "max_tokens": args.max_tokens,
+                "seed": seed,
+            },
+        )
+        for arg in vars(args):
+            wandb.config[arg] = getattr(args, arg)
+        wandb.log({"responses": r_final})
 
     output_file = (
         Path(args.output_data)
