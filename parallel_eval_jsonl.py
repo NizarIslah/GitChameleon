@@ -162,13 +162,19 @@ def main():
         default=os.cpu_count() or 4,
         help="Number of threads to use (default: CPU count)",
     )
+    parser.add_argument(
+        "--wandb",
+        action="store_true",
+        help="Log results to Weights & Biases (wandb)",
+    )
     args = parser.parse_args()
 
-    run = wandb.init(
-        project="GC_Evals_EMNLP",
-        entity="cl4code",
-        config={"jsonl_file": args.jsonl_file},
-    )
+    if args.wandb:
+        run = wandb.init(
+            project="GC_Evals_EMNLP",
+            entity="cl4code",
+            config={"jsonl_file": args.jsonl_file},
+        )
 
     # Load JSONL records
     starting_codes = {}
@@ -210,15 +216,16 @@ def main():
     print(f"[✓] Saved results to {output_csv}")
 
     # log to wandb
-    run.log({"eval_results": wandb.Table(dataframe=df)})
-    # log as an artifact
-    artifact = wandb.Artifact(
-        name=os.path.basename(output_csv),
-        type="evaluation",
-        description="Evaluation results of the model outputs",
-    )
-    artifact.add_file(output_csv)
-    run.log_artifact(artifact)
+    if args.wandb:
+        run.log({"eval_results": wandb.Table(dataframe=df)})
+        # log as an artifact
+        artifact = wandb.Artifact(
+            name=os.path.basename(output_csv),
+            type="evaluation",
+            description="Evaluation results of the model outputs",
+        )
+        artifact.add_file(output_csv)
+        run.log_artifact(artifact)
 
     # fraction passed
     passed = df["passed"].sum()
@@ -233,6 +240,15 @@ def main():
     print(f"[✓] {passed_manual}/{total_manual} tests passed (visible) ({passed_manual/total_manual:.2%})")
     compiled_manual = df["compiled_manual"].sum()
     print(f"[✓] {compiled_manual}/{total_manual} tests compiled (visible) ({compiled_manual/total_manual:.2%})")
+
+    if args.wandb:
+        run.log({
+            "pass_at_1_hidden": passed / total,
+            "pass_at_1_visible": passed_manual / total_manual,
+            "compiled_at_1_hidden": compiled / total,
+            "compiled_at_1_visible": compiled_manual / total_manual,
+        })
+        run.finish()
 
 
 if __name__ == "__main__":
