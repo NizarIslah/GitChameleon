@@ -6,6 +6,7 @@ import re
 from tqdm import tqdm
 import pandas as pd
 import tempfile
+import py_compile
 import wandb
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from src.eval_sample import eval_sample
@@ -133,6 +134,7 @@ def process_record(idx, record, starting_codes, manual_tests, env_dir, test_dir)
         }
 
     except Exception as e:
+        print(f"Error processing record {idx}: {e}")
         return {
             "idx": idx,
             "example_id": example_id,
