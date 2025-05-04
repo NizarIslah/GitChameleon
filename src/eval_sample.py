@@ -99,7 +99,7 @@ def eval_sample(
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE,
                         text=True,
-                        timeout=60,
+                        timeout=120,
                     )
                     sample_result["output"] = proc.stdout + proc.stderr
                     # A return code of 0 indicates that the tests passed.

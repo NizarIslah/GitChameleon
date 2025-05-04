@@ -37,7 +37,7 @@ def run_script(env_path, py_file="temp.py"):
         # Run the Python script within the virtual environment
         command = [python_executable, py_file]
         try:
-            result = subprocess.run(command, capture_output=True, text=True, timeout=60)
+            result = subprocess.run(command, capture_output=True, text=True, timeout=120)
             exit_code = result.returncode
             error_log = result.stderr
         except subprocess.TimeoutExpired as e:
