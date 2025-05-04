@@ -5,8 +5,53 @@ import argparse
 import re
 from tqdm import tqdm
 import pandas as pd
+import tempfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from src.eval_sample import eval_sample
+
+def run_script(python_executable, py_file="temp.py"):
+    if py_file is None:
+        return False, False, "", ""
+
+    parsed_code = ""
+    try:
+        with open(py_file, "r") as file:
+            parsed_code = file.read()
+    except Exception as e:
+        print(py_file, type(py_file))
+        print("Error at py_file open:", e)
+
+    error_log = ""
+    try:
+        # Try to compile the temporary file
+        py_compile.compile(py_file, doraise=True)
+        compile_code = 0  # Compilation successful
+    except py_compile.PyCompileError as e:
+        compile_code = 1  # Compilation failed due to a syntax error
+        error_log = str(e)
+    if compile_code == 0:
+        # Run the Python script within the virtual environment
+        command = [python_executable, py_file]
+        try:
+            result = subprocess.run(command, capture_output=True, text=True, timeout=60)
+            exit_code = result.returncode
+            error_log = result.stderr
+        except subprocess.TimeoutExpired as e:
+            print(e)
+            exit_code = 1
+            error_log = "TimeoutError"
+    else:
+        exit_code = 1  # since Compilation failed, the script will not run
+    try:
+        os.remove(py_file)
+    except Exception as e:
+        print(e)
+    result = {
+        "compiled_manual": bool(1 - compile_code),
+        "passed_manual": bool(1 - exit_code),
+        "output_manual": error_log,
+    }
+    return result  # 1 = pass, 0 = fail
 
 def extract_code(text: str) -> str:
     """Parse raw string into python code"""
@@ -40,7 +85,7 @@ def get_example_id(record):
     return id
 
 
-def process_record(idx, record, starting_codes, env_dir, test_dir):
+def process_record(idx, record, starting_codes, manual_tests, env_dir, test_dir):
     """
     Process one JSON record: run eval_sample() and return a dict
     with example_id, code_id, output, passed, compiled, and idx.
@@ -49,6 +94,7 @@ def process_record(idx, record, starting_codes, env_dir, test_dir):
     try:
         example_id = int(example_id)
         code = starting_codes[example_id]
+        manual_test = manual_tests[example_id]
         solution = get_solution(record)
         env_path = os.path.join(env_dir, f"gcham_venv_{example_id}")
 
@@ -62,6 +108,14 @@ def process_record(idx, record, starting_codes, env_dir, test_dir):
         }
         eval_res = eval_sample(example_id, env_path, code_dict)["codes"]["solution_code"]
 
+        with tempfile.TemporaryDirectory() as temp_dir:
+            test_code = solution + '\n' + manual_test
+            test_file = os.path.join(temp_dir, f"manual_test_sample_{example_id}.py")
+            willh open(test_file, "w") as f:
+                f.write(test_code)
+            eval_res_manual = run_script(env_path, test_file)
+
+
         return {
             "idx": idx,
             "example_id": example_id,
@@ -69,6 +123,9 @@ def process_record(idx, record, starting_codes, env_dir, test_dir):
             "output": eval_res.get("output", "").strip(),
             "passed": eval_res.get("pass", False),
             "compiled": eval_res.get("compile", True),
+            "output_manual": eval_res_manual.get("output_manual", "").strip(),
+            "passed_manual": eval_res_manual.get("passed_manual", False),
+            "compiled_manual": eval_res_manual.get("compiled_manual", True),
         }
 
     except Exception as e:
@@ -79,6 +136,9 @@ def process_record(idx, record, starting_codes, env_dir, test_dir):
             "output": f"Error: {e}",
             "passed": False,
             "compiled": False,
+            "output_manual": f"Error: {e}",
+            "passed_manual": False,
+            "compiled_manual": False,
         }
 
 
@@ -100,12 +160,14 @@ def main():
 
    # Load JSONL records
     starting_codes = {}
+    manual_tests = {}
     with open(args.data_file, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if line:
                 data = json.loads(line)
                 starting_codes[int(data["example_id"])] = data["starting_code"]
+                manual_tests[int(data["example_id"])] = data["test"]
 
     # Load JSONL records
     outputs = []
@@ -119,7 +181,7 @@ def main():
     # Kick off parallel tasks
     with ThreadPoolExecutor(max_workers=args.workers) as exe:
         futures = [
-            exe.submit(process_record, idx, rec, starting_codes, args.env_dir, args.test_dir)
+            exe.submit(process_record, idx, rec, starting_codes, manual_tests, args.env_dir, args.test_dir)
             for idx, rec in enumerate(outputs)
         ]
         for fut in tqdm(as_completed(futures), total=len(futures), desc="Evaluating"):
