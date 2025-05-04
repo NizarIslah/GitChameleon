@@ -5,6 +5,7 @@ import argparse
 import re
 from tqdm import tqdm
 import pandas as pd
+import subprocess
 import tempfile
 import py_compile
 import wandb
