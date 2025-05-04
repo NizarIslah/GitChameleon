@@ -19,6 +19,7 @@ def main():
     parser.add_argument(
         "test_dir", help="Path to the dir where the test files are stored"
     )
+    parser.add_argument("--cov", default=False, action="store_true")
     args = parser.parse_args()
 
     # 1) Read all JSONL lines into a list of dicts
@@ -56,7 +57,7 @@ def main():
                 "test_file": test_file_content,
                 "codes": {"solution_code": {"code": code + solution}},
             }
-            eval_res = eval_sample(example_id, env_path, code_dict, coverage=False)["codes"]["solution_code"]
+            eval_res = eval_sample(example_id, env_path, code_dict, coverage=args.cov)["codes"]["solution_code"]
 
             # Append row for this example
             results.append({
@@ -80,6 +81,10 @@ def main():
             })
             print(f"[!] Error processing record {idx} (example_id={example_id}): {e}")
             continue
+
+        # print progress coverage so far
+        if idx % 25 == 0:
+            print(f"Avg. coverage so far: {sum([r['coverage'] for r in results if 'coverage' in r]) / len(results):.2f}%")
 
     # 3) Build DataFrame and save CSV
     df = pd.DataFrame(results)

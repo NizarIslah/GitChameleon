@@ -213,6 +213,10 @@ def main(args):
                         failed_count.append(example_id)
                 else:
                     print(f"Environment already exists for {example_id}.")
+                    if args.install_pkgs:
+                        returncode = install_packages(env_path, library, version, additional_dependencies, python_version)
+                        if returncode != 0:
+                            failed_count.append(example_id)
 
     print(f"Failed: {len(failed_count)}")
     for example_id in failed_count:
@@ -225,6 +229,7 @@ if __name__ == "__main__":
     parser.add_argument("--dataset", type=str, required=True, help="Path to the JSONL dataset file.")
     parser.add_argument("--base_path", type=str, default="eval_venvs", help="Base path for virtual environments.")
     parser.add_argument("--create_anyway", action="store_true", default=False, help="Recreate environments if they already exist.")
+    parser.add_argument("--install_pkgs", action="store_true", default=False, help="Install packages in the virtual environment.")
     parser.add_argument("--start", type=int, default=0, help="Start line number (inclusive) from which to create the environments.")
     parser.add_argument("--end", type=int, default=sys.maxsize, help="End line number (inclusive) until which to create the environments.")
     args = parser.parse_args()
