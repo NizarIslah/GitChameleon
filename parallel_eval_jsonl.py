@@ -12,7 +12,8 @@ import wandb
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from src.eval_sample import eval_sample
 
-def run_script(python_executable, py_file="temp.py"):
+def run_script(env_path, py_file="temp.py"):
+    python_executable = os.path.join(env_path, "bin", "python")
     if py_file is None:
         return False, False, "", ""
 
