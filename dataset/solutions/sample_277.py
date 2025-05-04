@@ -4,7 +4,6 @@
 import librosa
 import numpy as np
 
-def compute_rms(y: np.ndarray) -> np.float32:
-    
 
+def compute_rms(y: np.ndarray) -> np.float32:
     return librosa.feature.rmse(y=y)

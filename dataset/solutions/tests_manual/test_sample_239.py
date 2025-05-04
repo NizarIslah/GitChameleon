@@ -4,18 +4,21 @@ import unittest
 
 import falcon
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from sample_239 import custom_body
 
 status = HTTPStatus(falcon.HTTP_200)
-info = 'Falcon'
+info = "Falcon"
 
 import warnings
+
 with warnings.catch_warnings(record=True) as w:
     warnings.simplefilter("always")
     resp = custom_body(status, info)
     if w:
-        assert issubclass(w[-1].category, DeprecationWarning), "Expected a DeprecationWarning but got something else!"
+        assert issubclass(
+            w[-1].category, DeprecationWarning
+        ), "Expected a DeprecationWarning but got something else!"
 
-expect = 'Falcon'
+expect = "Falcon"
 assert resp.text == expect

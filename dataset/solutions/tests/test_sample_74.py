@@ -30,7 +30,7 @@ class TestCustomSometrue(unittest.TestCase):
         self.assertTrue(custom_sometrue(arr))
 
         # String array will cause a ufunc error under np.any → we expect a TypeError
-        arr_str = np.array(['', 'test', ''], dtype='<U4')
+        arr_str = np.array(["", "test", ""], dtype="<U4")
         with self.assertRaises(TypeError):
             custom_sometrue(arr_str)
 
@@ -42,7 +42,7 @@ class TestCustomSometrue(unittest.TestCase):
 
     def test_object_array(self):
         """Test with an object-dtype array of strings."""
-        arr = np.array(['', 'test', ''], dtype=object)
+        arr = np.array(["", "test", ""], dtype=object)
         # np.any on object dtype falls back, returns 'test', which is truthy
         self.assertTrue(custom_sometrue(arr))
 

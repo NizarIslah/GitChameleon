@@ -4,6 +4,8 @@
 from falcon import stream
 
 import io
+
+
 class DummyRequest:
     def __init__(self, data: bytes):
         self.stream = io.BytesIO(data)

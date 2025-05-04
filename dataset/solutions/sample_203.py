@@ -3,5 +3,6 @@
 # extra_dependencies: []
 import sympy
 
-def custom_primefactors(n: int) -> int: 
+
+def custom_primefactors(n: int) -> int:
     return sympy.primeomega(n)

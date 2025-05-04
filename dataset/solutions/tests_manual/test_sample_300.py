@@ -10,12 +10,12 @@ from sample_300 import compute_chirp
 
 
 fmin = 110
-fmax = 110*64
+fmax = 110 * 64
 duration = 1
 sr = 22050
 linear = True
 
-sol  = compute_chirp(fmin, fmax, duration, sr, linear)
+sol = compute_chirp(fmin, fmax, duration, sr, linear)
 
 test_sol = librosa.chirp(fmin=fmin, fmax=fmax, duration=duration, sr=sr)
 assert np.array_equal(test_sol, sol)

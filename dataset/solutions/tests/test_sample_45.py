@@ -5,14 +5,14 @@ import unittest
 import warnings
 from unittest.mock import MagicMock, patch
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import numpy as np
 import sample_45
 from sklearn.cross_decomposition import CCA
 
 # Filter deprecation warnings
-warnings.filterwarnings('ignore', category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 class TestGetCoefShape(unittest.TestCase):
@@ -59,9 +59,3 @@ class TestGetCoefShape(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-
-
-
-
-

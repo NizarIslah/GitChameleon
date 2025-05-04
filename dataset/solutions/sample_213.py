@@ -8,4 +8,4 @@ from matplotlib.axes import Axes
 
 
 def custom_boxenplot(data: pd.DataFrame) -> Axes:
-    return sns.boxenplot(x='x', y='y', data=data, width_method='exponential')
+    return sns.boxenplot(x="x", y="y", data=data, width_method="exponential")

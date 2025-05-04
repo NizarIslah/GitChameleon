@@ -8,7 +8,22 @@ from typing import Union, Optional
 
 DTypeLike = Union[np.dtype, type]
 
-def compute_griffinlim(y: np.ndarray, sr: int, S: np.ndarray, random_state: int, n_iter: int, hop_length: Optional[int], win_length: Optional[int], window: str, center: bool, dtype: DTypeLike, length: Optional[int], pad_mode: str, n_fft: int) -> np.ndarray:
+
+def compute_griffinlim(
+    y: np.ndarray,
+    sr: int,
+    S: np.ndarray,
+    random_state: int,
+    n_iter: int,
+    hop_length: Optional[int],
+    win_length: Optional[int],
+    window: str,
+    center: bool,
+    dtype: DTypeLike,
+    length: Optional[int],
+    pad_mode: str,
+    n_fft: int,
+) -> np.ndarray:
     """
     Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
 
@@ -28,25 +43,45 @@ def compute_griffinlim(y: np.ndarray, sr: int, S: np.ndarray, random_state: int,
     n_fft: FFT size.
 
     Returns:
-        The Griffin-Lim waveform.        
+        The Griffin-Lim waveform.
     """
     rng = np.random.RandomState(seed=random_state)
 
-
     angles = np.exp(2j * np.pi * rng.rand(*S.shape))
-    
-    rebuilt = 0.
-    
+
+    rebuilt = 0.0
+
     for _ in range(n_iter):
         tprev = rebuilt
-    
-        inverse = istft(S * angles, hop_length=hop_length, win_length=win_length,
-        window=window, center=center, dtype=dtype, length=length)
-    
-        rebuilt = stft(inverse, n_fft=n_fft, hop_length=hop_length,
-        win_length=win_length, window=window, center=center,
-        pad_mode=pad_mode)
-    
+
+        inverse = istft(
+            S * angles,
+            hop_length=hop_length,
+            win_length=win_length,
+            window=window,
+            center=center,
+            dtype=dtype,
+            length=length,
+        )
+
+        rebuilt = stft(
+            inverse,
+            n_fft=n_fft,
+            hop_length=hop_length,
+            win_length=win_length,
+            window=window,
+            center=center,
+            pad_mode=pad_mode,
+        )
+
         angles[:] = rebuilt - (momentum / (1 + momentum)) * tprev
         angles[:] /= np.abs(angles) + 1e-16
-    return istft(S * angles, hop_length=hop_length, win_length=win_length,window=window, center=center, dtype=dtype, length=length)
+    return istft(
+        S * angles,
+        hop_length=hop_length,
+        win_length=win_length,
+        window=window,
+        center=center,
+        dtype=dtype,
+        length=length,
+    )

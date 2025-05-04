@@ -12,12 +12,9 @@ from sample_56 import get_grouped_df
 class TestGetGroupedDF(unittest.TestCase):
     def test_multiple_groups(self):
         """Test grouping with multiple distinct groups."""
-        df = pd.DataFrame({'x': [1, 2, 1, 2], 'value': [10, 20, 30, 40]})
+        df = pd.DataFrame({"x": [1, 2, 1, 2], "value": [10, 20, 30, 40]})
         result = get_grouped_df(df)
-        expected = pd.DataFrame(
-            {'value': [40, 60]},
-            index=pd.Index([1, 2], name='x')
-        )
+        expected = pd.DataFrame({"value": [40, 60]}, index=pd.Index([1, 2], name="x"))
         pd.testing.assert_frame_equal(result, expected)
 
 

@@ -32,7 +32,7 @@ def extract_first_python_code_block(text):
         match = re.search(r"```python(.*?)```", text, re.DOTALL)
     except Exception as e:
         try:
-            match = re.search(r"```(.*?)```", rf'{text}', re.DOTALL) # anthropic
+            match = re.search(r"```(.*?)```", rf"{text}", re.DOTALL)  # anthropic
         except Exception as e:
             print("Error: ", e)
             match = None

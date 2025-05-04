@@ -8,7 +8,22 @@ from typing import Union, Optional
 
 DTypeLike = Union[np.dtype, type]
 
-def compute_griffinlim(y: np.ndarray, sr: int, S: np.ndarray, random_state: int, n_iter: int, hop_length: Optional[int], win_length: Optional[int], window: str, center: bool, dtype: DTypeLike, length: Optional[int], pad_mode: str, n_fft: int) -> np.ndarray:
+
+def compute_griffinlim(
+    y: np.ndarray,
+    sr: int,
+    S: np.ndarray,
+    random_state: int,
+    n_iter: int,
+    hop_length: Optional[int],
+    win_length: Optional[int],
+    window: str,
+    center: bool,
+    dtype: DTypeLike,
+    length: Optional[int],
+    pad_mode: str,
+    n_fft: int,
+) -> np.ndarray:
     """
     Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
 
@@ -28,9 +43,20 @@ def compute_griffinlim(y: np.ndarray, sr: int, S: np.ndarray, random_state: int,
         n_fft: FFT size.
 
     Returns:
-        The Griffin-Lim waveform.        
-    """    
+        The Griffin-Lim waveform.
+    """
     rng = np.random.RandomState(seed=random_state)
 
-
-    return librosa.griffinlim(S, n_iter, hop_length, win_length, window, center, dtype, length, pad_mode, momentum, random_state)
+    return librosa.griffinlim(
+        S,
+        n_iter,
+        hop_length,
+        win_length,
+        window,
+        center,
+        dtype,
+        length,
+        pad_mode,
+        momentum,
+        random_state,
+    )

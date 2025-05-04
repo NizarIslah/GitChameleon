@@ -4,13 +4,14 @@ from falcon import Request
 import sys
 import os
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from sample_253 import custom_get_param
 
 import warnings
 from falcon.testing import create_environ
 import json
+
 json_value = json.dumps({"bar": "baz"})
 query_string = f"foo={json_value}"
 
@@ -22,7 +23,9 @@ with warnings.catch_warnings(record=True) as w:
     result = custom_get_param(req)
     if w:
         for warn in w:
-            assert not issubclass(warn.category, DeprecationWarning), "Deprecated API used!"
+            assert not issubclass(
+                warn.category, DeprecationWarning
+            ), "Deprecated API used!"
 
 expect = {"bar": "baz"}
 assert result == expect

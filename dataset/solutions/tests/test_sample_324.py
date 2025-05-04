@@ -6,11 +6,12 @@ import unittest
 from unittest.mock import patch
 
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import sample_324
 
-class TestSample324(unittest.TestCase):
 
+class TestSample324(unittest.TestCase):
     def setUp(self):
         self.sample_324 = sample_324
 
@@ -32,7 +33,8 @@ class TestSample324(unittest.TestCase):
 
     def test_sol_dict_total(self):
         """Test that sol_dict['total'] is set to infinity."""
-        self.assertEqual(self.sample_324.sol_dict['total'], float('inf'))
+        self.assertEqual(self.sample_324.sol_dict["total"], float("inf"))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

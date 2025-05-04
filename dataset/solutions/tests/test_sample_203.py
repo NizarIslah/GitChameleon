@@ -37,11 +37,11 @@ class TestCustomPrimeFactors(unittest.TestCase):
         # Test powers of 2
         for n in range(1, 10):
             self.assertEqual(custom_primefactors(2**n), n, f"Failed for 2^{n}")
-        
+
         # Test powers of 3
         for n in range(1, 10):
             self.assertEqual(custom_primefactors(3**n), n, f"Failed for 3^{n}")
-        
+
         # Test powers of 5
         for n in range(1, 10):
             self.assertEqual(custom_primefactors(5**n), n, f"Failed for 5^{n}")
@@ -51,25 +51,25 @@ class TestCustomPrimeFactors(unittest.TestCase):
         # Test some composite numbers with known factorizations
         # 10 = 2 × 5
         self.assertEqual(custom_primefactors(10), 2)
-        
+
         # 15 = 3 × 5
         self.assertEqual(custom_primefactors(15), 2)
-        
+
         # 30 = 2 × 3 × 5
         self.assertEqual(custom_primefactors(30), 3)
-        
+
         # 42 = 2 × 3 × 7
         self.assertEqual(custom_primefactors(42), 3)
-        
+
         # 100 = 2² × 5²
         self.assertEqual(custom_primefactors(100), 4)
-        
+
         # 210 = 2 × 3 × 5 × 7
         self.assertEqual(custom_primefactors(210), 4)
-        
+
         # 1001 = 7 × 11 × 13
         self.assertEqual(custom_primefactors(1001), 3)
-        
+
         # 1024 = 2¹⁰
         self.assertEqual(custom_primefactors(1024), 10)
 
@@ -77,7 +77,7 @@ class TestCustomPrimeFactors(unittest.TestCase):
         """Test custom_primefactors with edge cases (0, 1)."""
         # For 1, the result should be 0 (no prime factors)
         self.assertEqual(custom_primefactors(1), 0)
-        
+
         # For 0, the behavior depends on the implementation
         # SymPy might raise an exception or return a specific value
         try:
@@ -93,7 +93,7 @@ class TestCustomPrimeFactors(unittest.TestCase):
         # For negative numbers, the behavior depends on the implementation
         # SymPy might count the prime factors of the absolute value
         # or raise an exception
-        
+
         # Test with some negative numbers
         try:
             result = custom_primefactors(-2)
@@ -102,7 +102,7 @@ class TestCustomPrimeFactors(unittest.TestCase):
         except Exception as e:
             # If an exception is raised, it's expected
             pass
-        
+
         try:
             result = custom_primefactors(-12)
             # If we get here, check that the result is a valid integer
@@ -116,15 +116,15 @@ class TestCustomPrimeFactors(unittest.TestCase):
         # Test with some large numbers
         # 10000 = 2⁴ × 5⁴
         self.assertEqual(custom_primefactors(10000), 8)
-        
+
         # 123456 = 2⁶ × 3 × 643
         # 643 is prime, so the total is 6 + 1 + 1 = 8
         self.assertEqual(custom_primefactors(123456), 8)
-        
+
         # 999999 = 3³ × 7 × 11 × 13 × 37
         # The total is 3 + 1 + 1 + 1 + 1 = 7
         self.assertEqual(custom_primefactors(999999), 7)
-        
+
         # 1000000 = 2⁶ × 5⁶
         self.assertEqual(custom_primefactors(1000000), 12)
 
@@ -132,7 +132,7 @@ class TestCustomPrimeFactors(unittest.TestCase):
         """Test custom_primefactors with non-integer inputs."""
         # The function is defined for integers
         # SymPy should raise an exception or handle this appropriately
-        
+
         # Test with float input
         try:
             result = custom_primefactors(3.5)
@@ -141,7 +141,7 @@ class TestCustomPrimeFactors(unittest.TestCase):
         except Exception as e:
             # If an exception is raised, it's expected
             pass
-        
+
         # Test with string input
         try:
             result = custom_primefactors("3")
@@ -152,5 +152,5 @@ class TestCustomPrimeFactors(unittest.TestCase):
             pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

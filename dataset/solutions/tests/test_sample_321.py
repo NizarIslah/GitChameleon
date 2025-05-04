@@ -1,4 +1,5 @@
 import os
+
 # Add the samples directory to the path so we can import the module
 import sys
 import unittest
@@ -6,7 +7,7 @@ import unittest
 import numpy as np
 from PIL import Image, ImageChops
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'samples'))
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "dataset", "samples"))
 from sample_321 import imaging
 
 
@@ -14,14 +15,14 @@ class TestImaging(unittest.TestCase):
     def setUp(self):
         # Create test images
         # Create a 100x100 black image
-        self.black_img = Image.new('RGB', (100, 100), color='black')
-        
+        self.black_img = Image.new("RGB", (100, 100), color="black")
+
         # Create a 100x100 white image
-        self.white_img = Image.new('RGB', (100, 100), color='white')
-        
+        self.white_img = Image.new("RGB", (100, 100), color="white")
+
         # Create a 100x100 red image
-        self.red_img = Image.new('RGB', (100, 100), color='red')
-        
+        self.red_img = Image.new("RGB", (100, 100), color="red")
+
         # Create a 100x100 gradient image
         gradient = np.zeros((100, 100, 3), dtype=np.uint8)
         for i in range(100):
@@ -39,10 +40,10 @@ class TestImaging(unittest.TestCase):
     def test_imaging_with_red(self):
         """Test soft_light with a colored image."""
         result = imaging(self.red_img, self.gradient_img)
-        
+
         # Verify result is an Image
         self.assertIsInstance(result, Image.Image)
-        
+
         # Check dimensions are preserved
         self.assertEqual(result.size, self.red_img.size)
 
@@ -50,16 +51,17 @@ class TestImaging(unittest.TestCase):
         """Test that our function matches the behavior of ImageChops.soft_light."""
         # Apply our function
         result1 = imaging(self.gradient_img, self.red_img)
-        
+
         # Apply ImageChops directly
         result2 = ImageChops.soft_light(self.gradient_img, self.red_img)
-        
+
         # Convert images to arrays for comparison
         arr1 = np.array(result1)
         arr2 = np.array(result2)
-        
+
         # They should be identical
         np.testing.assert_array_equal(arr1, arr2)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

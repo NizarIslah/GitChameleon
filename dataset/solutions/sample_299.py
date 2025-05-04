@@ -4,7 +4,10 @@
 import librosa
 import numpy as np
 
-def compute_chirp(fmin: int, fmax: int, duration: int, sr: int, linear: bool) -> np.ndarray:
+
+def compute_chirp(
+    fmin: int, fmax: int, duration: int, sr: int, linear: bool
+) -> np.ndarray:
     """
     Constructs a “chirp” or “sine-sweep” signal. The chirp sweeps from frequency fmin to fmax (in Hz).
 
@@ -17,12 +20,19 @@ def compute_chirp(fmin: int, fmax: int, duration: int, sr: int, linear: bool) ->
     Returns:
         np.ndarray: The chirp signal.
     """
-    
 
     import scipy
+
     period = 1.0 / sr
     phi = -np.pi * 0.5
 
     method = "linear" if linear else "logarithmic"
 
-    return scipy.signal.chirp(np.arange(int(duration * sr)) / sr, fmin, duration, fmax, method=method, phi=phi / np.pi * 180, )
+    return scipy.signal.chirp(
+        np.arange(int(duration * sr)) / sr,
+        fmin,
+        duration,
+        fmax,
+        method=method,
+        phi=phi / np.pi * 180,
+    )

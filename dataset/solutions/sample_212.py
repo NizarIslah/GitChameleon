@@ -8,4 +8,6 @@ from matplotlib.axes import Axes
 
 
 def custom_barplot(data: pd.DataFrame) -> Axes:
-    return sns.barplot(x='x', y='y', data=data, err_kws={'color': 'red', 'linewidth': 2})
+    return sns.barplot(
+        x="x", y="y", data=data, err_kws={"color": "red", "linewidth": 2}
+    )

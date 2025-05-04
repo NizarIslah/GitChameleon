@@ -4,7 +4,6 @@
 import librosa
 import numpy as np
 
-def compute_localmin(x: np.ndarray, axis: int) -> np.ndarray:
-    
 
+def compute_localmin(x: np.ndarray, axis: int) -> np.ndarray:
     return librosa.util.localmin(x, axis=axis)

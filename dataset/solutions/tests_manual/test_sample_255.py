@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 
 from falcon import Request
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from sample_255 import custom_get_dpr
 
 from falcon.testing import create_environ
@@ -21,7 +21,9 @@ with warnings.catch_warnings(record=True) as w:
     dpr = custom_get_dpr(req)
     if w:
         for warn in w:
-            assert not issubclass(warn.category, DeprecationWarning), "Deprecated API used!"
+            assert not issubclass(
+                warn.category, DeprecationWarning
+            ), "Deprecated API used!"
 
 expect = 2
 assert dpr == expect

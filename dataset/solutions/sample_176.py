@@ -4,5 +4,6 @@
 import sympy
 from sympy.matrices.expressions.fourier import DFT
 
+
 def custom_computeDFT(n: int) -> sympy.ImmutableDenseMatrix:
     return DFT(n).as_explicit()

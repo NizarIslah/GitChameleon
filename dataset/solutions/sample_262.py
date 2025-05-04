@@ -9,6 +9,7 @@ import socket
 
 COOKIE_SECRET = "MY_SECRET_KEY"
 
+
 class SetCookieHandler(tornado.web.RequestHandler):
     def get(self) -> None:
         self.set_signed_cookie("mycookie", "testvalue")

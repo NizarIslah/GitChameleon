@@ -5,7 +5,9 @@ import unittest
 
 import numpy as np
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'samples')))
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "dataset", "samples"))
+)
 
 from sample_289 import compute_fourier_tempogram
 
@@ -51,7 +53,7 @@ class TestFourierTempogram(unittest.TestCase):
     def test_compute_fourier_tempogram_with_sine(self):
         """Test the function with a sine wave input."""
         # Create a sine wave as the onset envelope
-        t = np.linspace(0, 2*np.pi, 100)
+        t = np.linspace(0, 2 * np.pi, 100)
         oenv = np.sin(t)
         sr = 22050
         hop_length = 512

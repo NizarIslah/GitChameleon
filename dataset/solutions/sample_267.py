@@ -3,6 +3,7 @@
 # extra_dependencies: []
 import plotly.graph_objects as go
 
+
 def custom_fig(fig: go.Figure) -> go.Figure:
     return fig.add_annotation(
         x=0.5,
@@ -10,5 +11,5 @@ def custom_fig(fig: go.Figure) -> go.Figure:
         text="Example Annotation",
         xref="paper",
         yref="paper",
-        showarrow=False
+        showarrow=False,
     )

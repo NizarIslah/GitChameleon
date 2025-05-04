@@ -9,9 +9,25 @@ from typing import Union
 DTypeLike = Union[np.dtype, type]
 
 
-def compute_vqt(y: np.ndarray, sr: int, hop_length: int, fmin: int, n_bins: int, gamma: int, bins_per_octave: int, tuning: float, filter_scale: int, norm: 1, sparsity: float, window: str, scale: bool, pad_mode: str, res_type: str, dtype: DTypeLike) -> np.ndarray:
-    
-   # How many octaves are we dealing with?
+def compute_vqt(
+    y: np.ndarray,
+    sr: int,
+    hop_length: int,
+    fmin: int,
+    n_bins: int,
+    gamma: int,
+    bins_per_octave: int,
+    tuning: float,
+    filter_scale: int,
+    norm: 1,
+    sparsity: float,
+    window: str,
+    scale: bool,
+    pad_mode: str,
+    res_type: str,
+    dtype: DTypeLike,
+) -> np.ndarray:
+    # How many octaves are we dealing with?
     def dtype_r2c(d, default=np.complex64):
         """Find the complex numpy dtype corresponding to a real dtype.
 
@@ -72,7 +88,9 @@ def compute_vqt(y: np.ndarray, sr: int, hop_length: int, fmin: int, n_bins: int,
         fmin = librosa.note_to_hz("C1")
 
     if tuning is None:
-        tuning = librosa.pitch.estimate_tuning(y=y, sr=sr, bins_per_octave=bins_per_octave)
+        tuning = librosa.pitch.estimate_tuning(
+            y=y, sr=sr, bins_per_octave=bins_per_octave
+        )
 
     if gamma is None:
         gamma = 24.7 * alpha / 0.108
@@ -84,9 +102,9 @@ def compute_vqt(y: np.ndarray, sr: int, hop_length: int, fmin: int, n_bins: int,
     fmin = fmin * 2.0 ** (tuning / bins_per_octave)
 
     # First thing, get the freqs of the top octave
-    freqs = librosa.time_frequency.cqt_frequencies(n_bins, fmin, bins_per_octave=bins_per_octave)[
-        -bins_per_octave:
-    ]
+    freqs = librosa.time_frequency.cqt_frequencies(
+        n_bins, fmin, bins_per_octave=bins_per_octave
+    )[-bins_per_octave:]
 
     fmin_t = np.min(freqs)
     fmax_t = np.max(freqs)
@@ -107,7 +125,9 @@ def compute_vqt(y: np.ndarray, sr: int, hop_length: int, fmin: int, n_bins: int,
             res_type = "kaiser_best"
 
     downsample_count1 = max(
-        0, int(np.ceil(np.log2(librosa.audio.BW_FASTEST * nyquist / filter_cutoff)) - 1) - 1
+        0,
+        int(np.ceil(np.log2(librosa.audio.BW_FASTEST * nyquist / filter_cutoff)) - 1)
+        - 1,
     )
 
     def num_two_factors(x):
@@ -119,19 +139,18 @@ def compute_vqt(y: np.ndarray, sr: int, hop_length: int, fmin: int, n_bins: int,
             x //= 2
 
         return num_twos
-    num_twos=num_two_factors(hop_length)
+
+    num_twos = num_two_factors(hop_length)
     downsample_count2 = max(0, num_twos - n_octaves + 1)
     downsample_count = min(downsample_count1, downsample_count2)
-
 
     vqt_resp = []
 
     # Make sure our hop is long enough to support the bottom octave
 
-    num_twos=num_two_factors(hop_length)
+    num_twos = num_two_factors(hop_length)
 
-
-    #num_twos = __num_two_factors(hop_length)
+    # num_twos = __num_two_factors(hop_length)
     if num_twos < n_octaves - 1:
         raise ParameterError(
             "hop_length must be a positive integer "
@@ -142,6 +161,7 @@ def compute_vqt(y: np.ndarray, sr: int, hop_length: int, fmin: int, n_bins: int,
 
     # Now do the recursive bit
     my_y, my_sr, my_hop = y, sr, hop_length
+
     def sparsify_rows(x, quantile=0.01, dtype=None):
         """Return a row-sparse matrix approximating the input
 
@@ -234,7 +254,6 @@ def compute_vqt(y: np.ndarray, sr: int, hop_length: int, fmin: int, n_bins: int,
         n_fft = basis.shape[1]
 
         if hop_length is not None and n_fft < 2.0 ** (1 + np.ceil(np.log2(hop_length))):
-
             n_fft = int(2.0 ** (1 + np.ceil(np.log2(hop_length))))
 
         # re-normalize bases with respect to the FFT window length
@@ -249,13 +268,17 @@ def compute_vqt(y: np.ndarray, sr: int, hop_length: int, fmin: int, n_bins: int,
 
         return fft_basis, n_fft, lengths
 
-
     def cqt_response(y, n_fft, hop_length, fft_basis, mode, dtype=None):
         """Compute the filter response with a target STFT hop."""
 
         # Compute the STFT matrix
         D = librosa.stft(
-            y, n_fft=n_fft, hop_length=hop_length, window="ones", pad_mode=mode, dtype=dtype
+            y,
+            n_fft=n_fft,
+            hop_length=hop_length,
+            window="ones",
+            pad_mode=mode,
+            dtype=dtype,
         )
 
         # And filter response energy
@@ -278,7 +301,7 @@ def compute_vqt(y: np.ndarray, sr: int, hop_length: int, fmin: int, n_bins: int,
 
         fft_basis, n_fft, _ = cqt_filter_fft(
             my_sr,
-            fmin_t * 2.0 ** -i,
+            fmin_t * 2.0**-i,
             n_filters,
             bins_per_octave,
             filter_scale,
@@ -290,7 +313,7 @@ def compute_vqt(y: np.ndarray, sr: int, hop_length: int, fmin: int, n_bins: int,
         )
 
         # Re-scale the filters to compensate for downsampling
-        fft_basis[:] *= np.sqrt(2 ** i)
+        fft_basis[:] *= np.sqrt(2**i)
 
         # Compute the vqt filter response and append to the stack
         vqt_resp.append(

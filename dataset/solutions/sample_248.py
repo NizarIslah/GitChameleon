@@ -3,5 +3,6 @@
 # extra_dependencies: []
 import falcon
 
+
 def custom_falcons() -> falcon.App:
     return falcon.App()

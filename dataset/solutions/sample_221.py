@@ -3,12 +3,15 @@
 # extra_dependencies: []
 import contextlib
 
+
 class DummyClientConn:
     def __init__(self, peername):
         self.peername = peername
 
+
 class ConnectionLogger:
     pass
+
 
 def solution() -> None:
     def client_connected(self, client_conn: DummyClientConn) -> None:

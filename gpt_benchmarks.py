@@ -14,10 +14,22 @@ from tqdm import tqdm
 
 from pydantic import BaseModel
 
+
 # 1) Define your schema as a Pydantic model
 class MyResponse(BaseModel):
     answer: str
     explanation: str
+
+
+class Step(BaseModel):
+    explanation: str
+    output: str
+
+
+class CodeReasoning(BaseModel):
+    steps: list[Step]
+    answer: str
+
 
 parser = argparse.ArgumentParser(description="Arguments for GPT benchmarking")
 parser.add_argument(
@@ -55,7 +67,9 @@ parser.add_argument(
     default=4096,
     help="Maximum tokens for the model. (4096 for baseline, 6000 for CoT)",
 )
-parser.add_argument("--struct_output", type=bool, default=False, help="Use structured output")
+parser.add_argument(
+    "--struct_output", type=bool, default=False, help="Use structured output"
+)
 parser.add_argument("--api_key", type=str, required=True, help="OpenAI API key")
 parser.add_argument("--azure_endpoint", type=str, required=True, help="Azure endpoint")
 parser.add_argument(
@@ -65,15 +79,9 @@ parser.add_argument(
     help="Azure API version",
 )
 parser.add_argument("--wandb", type=bool, default=False, help="Use WandB for logging")
-parser.add_argument(
-    "--wandb_entity", type=str, help="WandB entity name"
-)
-parser.add_argument(
-    "--wandb_project", type=str, help="WandB project name"
-)
-parser.add_argument(
-    "--wandb_run_name", type=str, help="WandB run name"
-)
+parser.add_argument("--wandb_entity", type=str, help="WandB entity name")
+parser.add_argument("--wandb_project", type=str, help="WandB project name")
+parser.add_argument("--wandb_run_name", type=str, help="WandB run name")
 parser.add_argument(
     "--logprobs", type=bool, default=True, help="Whether to include logprobs"
 )
@@ -126,10 +134,21 @@ def get_completion_with_retry(prompt, seed, args, max_retries=5, delay=10):
     while retries < max_retries:
         try:
             if args.struct_output:
-                if args.model in ["o1", "o1-mini", "o3-mini"]:
-                    response = client.beta.chat.completions.parse(
-                        model=args.model, messages=prompt, seed=seed, response_format=MyResponse
-                    )
+                if args.model in ["o1", "gpt-4o-mini", "gpt-4o", "o3-mini"]:
+                    if args.cot:
+                        response = client.beta.chat.completions.parse(
+                            model=args.model,
+                            messages=prompt,
+                            seed=seed,
+                            response_format=CodeReasoning,
+                        )
+                    else:
+                        response = client.beta.chat.completions.parse(
+                            model=args.model,
+                            messages=prompt,
+                            seed=seed,
+                            response_format=MyResponse,
+                        )
                 else:
                     response = client.beta.chat.completions.parse(
                         model=args.model,
@@ -194,15 +213,23 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
     for prompt, response in zip(prompts, responses):
         content = (
             response.choices[0].message.parsed
-            if not isinstance(response, str) # and not response.startswith("Error") # this would throw an error for pydantic because its not a string
+            if not isinstance(
+                response, str
+            )  # and not response.startswith("Error") # this would throw an error for pydantic because its not a string
             else response
         )
         explanation = content.explanation if hasattr(content, "explanation") else ""
         answer = content.answer if hasattr(content, "answer") else ""
 
+        steps = None
+
+        if args.cot:
+            steps = content.steps if hasattr(content, "steps") else ""
+            steps = [vars(step) for step in steps]
+
         log_prob_mean = None
         log_prob_sum = None
-        
+
         if not args.struct_output:
             answer = content
             explanation = ""
@@ -264,7 +291,17 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
         wandb.log_artifact(artifact)
 
         # Log the records as a WandB table
-        table = wandb.Table(columns=["example_id", "prompt", "answer", "explanation", "log_prob_mean", "log_prob_sum"])
+        table = wandb.Table(
+            columns=[
+                "example_id",
+                "prompt",
+                "answer",
+                "explanation",
+                "log_prob_mean",
+                "log_prob_sum",
+                "steps",
+            ]
+        )
         for record in r_final:
             table.add_data(
                 record["example_id"],
@@ -273,5 +310,6 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
                 record["explanation"],
                 record["log_prob_mean"],
                 record["log_prob_sum"],
+                record["steps"],
             )
         wandb.log({"responses_table": table})

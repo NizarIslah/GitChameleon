@@ -5,7 +5,7 @@ import unittest
 
 import plotly.graph_objects as go
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from sample_267 import custom_fig
 
 fig = go.Figure()

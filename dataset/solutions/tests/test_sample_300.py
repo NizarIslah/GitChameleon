@@ -17,16 +17,16 @@ class TestComputeChirp(unittest.TestCase):
         duration = 2
         sr = 22050
         linear = True
-        
+
         chirp_signal = compute_chirp(fmin, fmax, duration, sr, linear)
-        
+
         # Check that the output is a numpy array
         self.assertIsInstance(chirp_signal, np.ndarray)
-        
+
         # Check that the length of the signal matches the expected duration
         expected_length = duration * sr
         self.assertEqual(len(chirp_signal), expected_length)
-    
+
     def test_compute_chirp_different_params(self):
         """Test compute_chirp with different parameter values."""
         fmin = 200
@@ -34,16 +34,16 @@ class TestComputeChirp(unittest.TestCase):
         duration = 1
         sr = 44100
         linear = False
-        
+
         chirp_signal = compute_chirp(fmin, fmax, duration, sr, linear)
-        
+
         # Check that the output is a numpy array
         self.assertIsInstance(chirp_signal, np.ndarray)
-        
+
         # Check that the length of the signal matches the expected duration
         expected_length = duration * sr
         self.assertEqual(len(chirp_signal), expected_length)
-    
+
     def test_compute_chirp_frequency_range(self):
         """Test that the chirp signal contains frequencies in the expected range."""
         fmin = 100
@@ -51,14 +51,15 @@ class TestComputeChirp(unittest.TestCase):
         duration = 5
         sr = 22050
         linear = True
-        
+
         chirp_signal = compute_chirp(fmin, fmax, duration, sr, linear)
-        
+
         # Check that the signal is not all zeros
         self.assertFalse(np.all(chirp_signal == 0))
-        
+
         # Check that the signal has some variation (not a constant value)
         self.assertTrue(np.std(chirp_signal) > 0)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

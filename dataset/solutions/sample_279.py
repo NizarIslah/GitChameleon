@@ -4,7 +4,6 @@
 import librosa
 import numpy as np
 
-def compute_fill_diagonal(mut_x: np.ndarray, radius: float) -> np.ndarray:
-    
 
-    return librosa.fill_off_diagonal(mut_x,  radius)
+def compute_fill_diagonal(mut_x: np.ndarray, radius: float) -> np.ndarray:
+    return librosa.fill_off_diagonal(mut_x, radius)

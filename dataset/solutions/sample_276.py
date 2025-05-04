@@ -5,9 +5,7 @@ import numpy as np
 import librosa
 from scipy.spatial.distance import cdist
 
+
 def compute_dtw(X: np.ndarray, Y: np.ndarray) -> np.ndarray:
-    
-
-
-    dist_matrix = cdist(X.T, Y.T, metric='euclidean')
-    return librosa.sequence.dtw(C=dist_matrix, metric='invalid')[0]
+    dist_matrix = cdist(X.T, Y.T, metric="euclidean")
+    return librosa.sequence.dtw(C=dist_matrix, metric="invalid")[0]

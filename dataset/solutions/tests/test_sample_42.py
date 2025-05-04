@@ -5,13 +5,13 @@ import gradio as gr
 import sys
 import os
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import gradio as gr
 import sample_42 as gradio_app_module
 
-class TestGradioInterface(unittest.TestCase):
 
+class TestGradioInterface(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # This ensures that the module is loaded once for all tests in this class
@@ -26,26 +26,35 @@ class TestGradioInterface(unittest.TestCase):
         Test that the 'iface' variable exists and is an instance of gr.Interface.
         """
         self.assertIsNotNone(self.iface, "The 'iface' variable should not be None.")
-        self.assertIsInstance(self.iface, gr.Interface,
-                              f"Expected iface to be a gr.Interface, but got {type(self.iface)}.")
+        self.assertIsInstance(
+            self.iface,
+            gr.Interface,
+            f"Expected iface to be a gr.Interface, but got {type(self.iface)}.",
+        )
 
     def test_iface_output_components(self):
         """
         Test the properties of the output components of the interface.
         """
-        self.assertIsInstance(self.iface.output_components, list, "Output components should be a list.")
-        self.assertEqual(len(self.iface.output_components), 1, "There should be one output component.")
+        self.assertIsInstance(
+            self.iface.output_components, list, "Output components should be a list."
+        )
+        self.assertEqual(
+            len(self.iface.output_components),
+            1,
+            "There should be one output component.",
+        )
 
         output_textbox = self.iface.output_components[0]
         # The shorthand 'text' for outputs resolves to a gr.Textbox component
-        self.assertIsInstance(output_textbox, gr.Textbox,
-                              "The output component should be a gr.Textbox.")
+        self.assertIsInstance(
+            output_textbox, gr.Textbox, "The output component should be a gr.Textbox."
+        )
         # For 'text' output, the label might be None or a default if not explicitly set in a more complex setup.
         # If the Textbox component was created explicitly like gr.Textbox(label="My Output"), you'd test that.
         # Here, it defaults. For gr.Textbox, label defaults to None if not specified.
         self.assertEqual(output_textbox.label, "output")
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

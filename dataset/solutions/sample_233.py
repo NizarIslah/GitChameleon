@@ -3,6 +3,7 @@
 # extra_dependencies: []
 import pytest
 
+
 class CustomItem(pytest.Item):
     def __init__(self, *, additional_arg, **kwargs):
         super().__init__(**kwargs)

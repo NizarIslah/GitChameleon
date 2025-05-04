@@ -27,7 +27,7 @@ class TestCustomTrace(unittest.TestCase):
 
     def test_custom_trace_with_symbol(self):
         """Test that custom_trace returns the same symbol that was passed in."""
-        x = sympy.Symbol('x')
+        x = sympy.Symbol("x")
         result = custom_trace(x)
         self.assertEqual(result, x)
 

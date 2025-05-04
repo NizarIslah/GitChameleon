@@ -46,9 +46,7 @@ def main():
             env_path = os.path.join(args.env_dir, f"gcham_venv_{example_id}")
 
             # Locate the matching test file
-            test_file_path = os.path.join(
-                args.test_dir, f"test_sample_{example_id}.py"
-            )
+            test_file_path = os.path.join(args.test_dir, f"test_sample_{example_id}.py")
             with open(test_file_path, "r") as tf:
                 test_file_content = tf.read()
 
@@ -57,34 +55,42 @@ def main():
                 "test_file": test_file_content,
                 "codes": {"solution_code": {"code": code + solution}},
             }
-            eval_res = eval_sample(example_id, env_path, code_dict, coverage=args.cov)["codes"]["solution_code"]
+            eval_res = eval_sample(example_id, env_path, code_dict, coverage=args.cov)[
+                "codes"
+            ]["solution_code"]
 
             # Append row for this example
-            results.append({
-                "example_id": example_id,
-                "code_id": "solution_code",
-                "output": eval_res.get("output", "").strip(),
-                "passed": eval_res.get("pass", False),
-                "compiled": eval_res.get("compile", True),
-                "coverage": eval_res.get("coverage", -1),
-            })
+            results.append(
+                {
+                    "example_id": example_id,
+                    "code_id": "solution_code",
+                    "output": eval_res.get("output", "").strip(),
+                    "passed": eval_res.get("pass", False),
+                    "compiled": eval_res.get("compile", True),
+                    "coverage": eval_res.get("coverage", -1),
+                }
+            )
 
         except Exception as e:
             # On error, still record a failure row
-            results.append({
-                "example_id": example_id,
-                "code_id": "solution_code",
-                "output": f"Error: {e}",
-                "passed": False,
-                "compiled": False,
-                "coverage": 0,
-            })
+            results.append(
+                {
+                    "example_id": example_id,
+                    "code_id": "solution_code",
+                    "output": f"Error: {e}",
+                    "passed": False,
+                    "compiled": False,
+                    "coverage": 0,
+                }
+            )
             print(f"[!] Error processing record {idx} (example_id={example_id}): {e}")
             continue
 
         # print progress coverage so far
         if idx % 25 == 0:
-            print(f"Avg. coverage so far: {sum([r['coverage'] for r in results if 'coverage' in r]) / len(results):.2f}%")
+            print(
+                f"Avg. coverage so far: {sum([r['coverage'] for r in results if 'coverage' in r]) / len(results):.2f}%"
+            )
 
     # 3) Build DataFrame and save CSV
     df = pd.DataFrame(results)

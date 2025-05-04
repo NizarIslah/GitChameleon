@@ -5,8 +5,9 @@ import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 
 # Add the parent directory to sys.path to import the module to test
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import sample_55
+
 
 class TestSample55(unittest.TestCase):
     def test_cmap_reversed(self):
@@ -25,6 +26,7 @@ class TestSample55(unittest.TestCase):
                 ref_color = ref_colors[i]
                 for j in range(len(color)):
                     self.assertAlmostEqual((color[j]), (ref_color[j]))
-             
+
+
 if __name__ == "__main__":
     unittest.main()

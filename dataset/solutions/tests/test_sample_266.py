@@ -8,7 +8,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import plotly.graph_objects as go
 from sample_266 import custom_fig
 
@@ -26,10 +26,10 @@ class TestSample266(unittest.TestCase):
         x_data = ["A", "B", "C"]
         y_data = [1, 2, 3]
         fig = custom_fig(x_data, y_data)
-        
+
         # Check that there's at least one trace
         self.assertGreater(len(fig.data), 0)
-        
+
         # Check that the first trace is a Bar
         self.assertIsInstance(fig.data[0], go.Bar)
 
@@ -38,7 +38,7 @@ class TestSample266(unittest.TestCase):
         x_data = ["A", "B", "C"]
         y_data = [1, 2, 3]
         fig = custom_fig(x_data, y_data)
-        
+
         # Check that the x and y data match what was provided
         self.assertEqual(list(fig.data[0].x), x_data)
         self.assertEqual(list(fig.data[0].y), y_data)
@@ -48,7 +48,7 @@ class TestSample266(unittest.TestCase):
         x_data = ["A", "B", "C"]
         y_data = [1, 2, 3]
         fig = custom_fig(x_data, y_data)
-        
+
         # Check that the orientation is vertical
         self.assertEqual(fig.data[0].orientation, "v")
 

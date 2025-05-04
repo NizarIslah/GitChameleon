@@ -10,7 +10,22 @@ from typing import Union, Optional
 DTypeLike = Union[np.dtype, type]
 
 
-def compute_mel_to_audio(y: np.ndarray, sr: int, S: np.ndarray, M: np.ndarray, n_fft: int, hop_length: Optional[int], win_length: Optional[int], window: str, center: bool, pad_mode: str, power: float, n_iter: int, length: Optional[int], dtype: DTypeLike) -> np.ndarray:
+def compute_mel_to_audio(
+    y: np.ndarray,
+    sr: int,
+    S: np.ndarray,
+    M: np.ndarray,
+    n_fft: int,
+    hop_length: Optional[int],
+    win_length: Optional[int],
+    window: str,
+    center: bool,
+    pad_mode: str,
+    power: float,
+    n_iter: int,
+    length: Optional[int],
+    dtype: DTypeLike,
+) -> np.ndarray:
     np.random.seed(seed=0)
 
     return librosa.feature.inverse.mel_to_audio(M)

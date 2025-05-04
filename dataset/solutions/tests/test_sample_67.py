@@ -14,7 +14,7 @@ class TestApplyConvolutionValid(unittest.TestCase):
         arr1 = np.array([1, 2, 3])
         arr2 = np.array([0, 1, 0.5])
         result = apply_convolution_valid(arr1, arr2)
-        expected = np.convolve(arr1, arr2, mode='valid')
+        expected = np.convolve(arr1, arr2, mode="valid")
         np.testing.assert_array_almost_equal(result, expected)
 
     def test_different_dtypes(self):
@@ -22,7 +22,7 @@ class TestApplyConvolutionValid(unittest.TestCase):
         arr1 = np.array([1, 2, 3], dtype=np.int32)
         arr2 = np.array([0.5, 1.5], dtype=np.float64)
         result = apply_convolution_valid(arr1, arr2)
-        expected = np.convolve(arr1, arr2, mode='valid')
+        expected = np.convolve(arr1, arr2, mode="valid")
         np.testing.assert_array_almost_equal(result, expected)
 
     def test_empty_arrays(self):
@@ -40,7 +40,7 @@ class TestApplyConvolutionValid(unittest.TestCase):
         arr1 = np.array([1, 2, 3])
         arr2 = np.array([4, 5, 6])
         result = apply_convolution_valid(arr1, arr2)
-        expected = np.convolve(arr1, arr2, mode='valid')
+        expected = np.convolve(arr1, arr2, mode="valid")
         np.testing.assert_array_equal(result, expected)
 
 

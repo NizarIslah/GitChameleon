@@ -4,6 +4,7 @@
 import librosa
 import numpy as np
 
+
 def compute_tone(frequency: int, sr: int, length: int) -> np.ndarray:
     """
     Constructs a pure tone (cosine) signal at a given frequency.
@@ -16,6 +17,5 @@ def compute_tone(frequency: int, sr: int, length: int) -> np.ndarray:
     Returns:
         np.ndarray: The pure tone signal.
     """
-    
 
     return librosa.tone(frequency, sr=sr, length=length)

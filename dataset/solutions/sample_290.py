@@ -4,6 +4,7 @@
 import librosa
 import numpy as np
 
+
 def compute_fourier_tempogram(oenv: np.ndarray, sr: int, hop_length: int) -> np.ndarray:
     """
     Compute the Fourier tempogram: the short-time Fourier transform of the onset strength envelope.
@@ -16,6 +17,7 @@ def compute_fourier_tempogram(oenv: np.ndarray, sr: int, hop_length: int) -> np.
     Returns:
        The computed Fourier tempogram.
     """
-    
 
-    return librosa.feature.fourier_tempogram(onset_envelope=oenv, sr=sr, hop_length=hop_length)
+    return librosa.feature.fourier_tempogram(
+        onset_envelope=oenv, sr=sr, hop_length=hop_length
+    )

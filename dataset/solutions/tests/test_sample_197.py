@@ -16,7 +16,7 @@ class TestCustomIsPerfectSquare(unittest.TestCase):
         for num in perfect_squares:
             with self.subTest(num=num):
                 self.assertTrue(custom_is_perfect_square(num))
-    
+
     def test_with_non_perfect_squares(self):
         """Test custom_is_perfect_square with non-perfect squares."""
         # Test a range of non-perfect squares
@@ -24,12 +24,12 @@ class TestCustomIsPerfectSquare(unittest.TestCase):
         for num in non_perfect_squares:
             with self.subTest(num=num):
                 self.assertFalse(custom_is_perfect_square(num))
-    
+
     def test_with_zero(self):
         """Test custom_is_perfect_square with zero."""
         # Zero is considered a perfect square (0^2 = 0)
         self.assertTrue(custom_is_perfect_square(0))
-    
+
     def test_with_negative_numbers(self):
         """Test custom_is_perfect_square with negative numbers."""
         # Negative numbers are not perfect squares in the real number system
@@ -37,7 +37,7 @@ class TestCustomIsPerfectSquare(unittest.TestCase):
         for num in negative_numbers:
             with self.subTest(num=num):
                 self.assertFalse(custom_is_perfect_square(num))
-    
+
     def test_with_large_numbers(self):
         """Test custom_is_perfect_square with large numbers."""
         # Test with large perfect squares
@@ -45,13 +45,13 @@ class TestCustomIsPerfectSquare(unittest.TestCase):
         for num in large_perfect_squares:
             with self.subTest(num=num):
                 self.assertTrue(custom_is_perfect_square(num))
-        
+
         # Test with large non-perfect squares
         large_non_perfect_squares = [10001, 1000001, 10000000001]
         for num in large_non_perfect_squares:
             with self.subTest(num=num):
                 self.assertFalse(custom_is_perfect_square(num))
-    
+
     def test_with_non_integer_input(self):
         """Test custom_is_perfect_square with non-integer input."""
         # The function expects an integer input
@@ -64,7 +64,7 @@ class TestCustomIsPerfectSquare(unittest.TestCase):
         except Exception as e:
             # If an exception is raised, it could be a ValueError or TypeError
             self.assertTrue(isinstance(e, (ValueError, TypeError)))
-        
+
         try:
             result = custom_is_perfect_square(4.5)
             # If we get here, the function accepted the input
@@ -73,24 +73,24 @@ class TestCustomIsPerfectSquare(unittest.TestCase):
         except Exception as e:
             # If an exception is raised, it could be a ValueError or TypeError
             self.assertTrue(isinstance(e, (ValueError, TypeError)))
-    
+
     def test_with_edge_cases(self):
         """Test custom_is_perfect_square with edge cases."""
         # Test with 1, which is a perfect square (1^2 = 1)
         self.assertTrue(custom_is_perfect_square(1))
-        
+
         # Test with very large perfect square
         # 2^30 = 1073741824, and (2^15)^2 = 1073741824
         self.assertTrue(custom_is_perfect_square(1073741824))
-    
+
     def test_return_type(self):
         """Test that the return type is a boolean."""
         result = custom_is_perfect_square(4)
         self.assertIsInstance(result, bool)
-        
+
         result = custom_is_perfect_square(5)
         self.assertIsInstance(result, bool)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

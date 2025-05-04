@@ -4,5 +4,6 @@
 import geopandas as gpd
 from shapely.geometry import box
 
+
 def perform_union(gdf: gpd.GeoDataFrame) -> gpd.GeoSeries:
     return gdf.geometry.cascaded_union

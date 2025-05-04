@@ -5,7 +5,14 @@ import librosa
 import numpy as np
 import scipy
 
-def compute_mfcc_to_mel(mfcc: np.ndarray, n_mels: int=128, dct_type: int=2, norm: str='ortho', ref: float=1.0) -> np.ndarray:
+
+def compute_mfcc_to_mel(
+    mfcc: np.ndarray,
+    n_mels: int = 128,
+    dct_type: int = 2,
+    norm: str = "ortho",
+    ref: float = 1.0,
+) -> np.ndarray:
     """
     Invert Mel-frequency cepstral coefficients to approximate a Mel power spectrogram.
 
@@ -17,8 +24,8 @@ def compute_mfcc_to_mel(mfcc: np.ndarray, n_mels: int=128, dct_type: int=2, norm
         ref: Reference power for (inverse) decibel calculation
 
     Returns:
-        An approximate Mel power spectrum recovered from mfcc.        
-    """    
+        An approximate Mel power spectrum recovered from mfcc.
+    """
     np.random.seed(seed=0)
 
     return librosa.feature.inverse.mfcc_to_mel(mfcc)

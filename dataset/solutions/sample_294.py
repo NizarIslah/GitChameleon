@@ -4,7 +4,10 @@
 import librosa
 import numpy as np
 
-def compute_times_like(y: np.ndarray, sr: int, hop_length: int, D: np.ndarray) -> np.ndarray:
+
+def compute_times_like(
+    y: np.ndarray, sr: int, hop_length: int, D: np.ndarray
+) -> np.ndarray:
     """
     Compute the times vector of a spectrogram.
 
@@ -17,6 +20,5 @@ def compute_times_like(y: np.ndarray, sr: int, hop_length: int, D: np.ndarray) -
     Returns:
         The computed times vector.
     """
-    
 
     return librosa.times_like(D, sr=sr)

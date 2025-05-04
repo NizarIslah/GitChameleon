@@ -3,5 +3,6 @@
 # extra_dependencies: []
 import sympy
 
+
 def custom_prime_counting(n: int) -> int:
- return sympy.primepi(n)
+    return sympy.primepi(n)

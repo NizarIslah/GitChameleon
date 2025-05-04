@@ -3,5 +3,6 @@
 # extra_dependencies: []
 import numpy as np
 
-def custom_alltrue(arr:np.ndarray) -> np.ndarray:
+
+def custom_alltrue(arr: np.ndarray) -> np.ndarray:
     return np.alltrue(arr)

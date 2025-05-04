@@ -3,5 +3,6 @@
 # extra_dependencies: []
 import numpy as np
 
-def custom_round(arr:np.ndarray) -> np.ndarray:
+
+def custom_round(arr: np.ndarray) -> np.ndarray:
     return np.round_(arr)

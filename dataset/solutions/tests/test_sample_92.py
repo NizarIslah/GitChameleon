@@ -3,7 +3,8 @@ import spacy
 from spacy.training import Example
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from sample_92 import create_whitespace_variant
 
 
@@ -18,7 +19,11 @@ class TestCreateWhitespaceVariant(unittest.TestCase):
             doc,
             {
                 "token_annotation": {"ORTH": [t.text for t in doc]},
-                "doc_annotation": {"entities": ["O"] * len(doc), "links": {}, "spans": {}},
+                "doc_annotation": {
+                    "entities": ["O"] * len(doc),
+                    "links": {},
+                    "spans": {},
+                },
             },
         )
 
@@ -27,7 +32,9 @@ class TestCreateWhitespaceVariant(unittest.TestCase):
         whitespace = "  "  # two spaces
         # insert at the end (after last token)
         position = len(self.example.reference)
-        augmented = create_whitespace_variant(self.nlp, self.example, whitespace, position)
+        augmented = create_whitespace_variant(
+            self.nlp, self.example, whitespace, position
+        )
         aug_text = augmented.text
         orig_text = self.example.text
 

@@ -11,20 +11,21 @@ try:
     # Check numpy version first
     import numpy
     from packaging import version
+
     if version.parse(numpy.__version__) < version.parse("1.23"):
         raise ImportError(
             f"Skipping tests because numpy>=1.23 is required, found {numpy.__version__}"
         )
-    
+
     import gradio as gr
 
     # Only insert parent directory after we confirm imports won't fail
-    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
     import sample_40
 
     # Filter deprecation warnings
-    warnings.filterwarnings('ignore', category=DeprecationWarning)
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
 
     # Check gradio version
     gr_version = gr.__version__
@@ -47,7 +48,7 @@ try:
             # Check that the result is a string
             self.assertIsInstance(result, str)
 
-        @patch('gradio.Interface.launch')
+        @patch("gradio.Interface.launch")
         def test_interface_launch(self, mock_launch):
             """Test that the interface can be launched."""
             mock_launch.return_value = MagicMock()
@@ -55,7 +56,7 @@ try:
             mock_launch.assert_called_once()
             self.assertIsNotNone(result)
 
-        @patch('gradio.Interface.launch')
+        @patch("gradio.Interface.launch")
         def test_interface_launch_with_share(self, mock_launch):
             """Test that the interface can be launched with sharing enabled."""
             mock_launch.return_value = MagicMock()
@@ -63,7 +64,7 @@ try:
             mock_launch.assert_called_once_with(share=True)
             self.assertIsNotNone(result)
 
-        @patch('gradio.Interface.launch')
+        @patch("gradio.Interface.launch")
         def test_interface_with_custom_server_name(self, mock_launch):
             """Test that the interface can be launched with a custom server name."""
             mock_launch.return_value = MagicMock()
@@ -85,7 +86,6 @@ try:
             result = sample_40.process_image({"path": "image.jpg", "type": "jpg"})
             self.assertEqual(result, "Processed")
 
-
 except ImportError as e:
     # If imports fail, we skip all tests.
     SKIP_REASON = str(e)
@@ -96,5 +96,5 @@ except ImportError as e:
             pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -5,5 +5,6 @@ import seaborn as sns
 import pandas as pd
 from matplotlib.axes import Axes
 
+
 def custom_pointplot(data: pd.DataFrame) -> Axes:
-    return sns.pointplot(x='x', y='y', data=data, markers="o", linestyles="none")
+    return sns.pointplot(x="x", y="y", data=data, markers="o", linestyles="none")

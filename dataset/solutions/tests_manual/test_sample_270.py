@@ -2,11 +2,12 @@ import os
 import sys
 import unittest
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import plotly.graph_objects as go
 from sample_270 import custom_make_subplots
 
 import warnings
+
 with warnings.catch_warnings(record=True) as w:
     warnings.simplefilter("always")
     fig = custom_make_subplots(2, 2)

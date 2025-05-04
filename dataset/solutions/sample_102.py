@@ -8,5 +8,7 @@ from django.forms import Form
 
 if not settings.configured:
     settings.configure()
-def save_existing(formset: BaseModelFormSet, form : Form, instance:str) -> None:
-    return formset.save_existing(form=form,obj=instance)
+
+
+def save_existing(formset: BaseModelFormSet, form: Form, instance: str) -> None:
+    return formset.save_existing(form=form, obj=instance)

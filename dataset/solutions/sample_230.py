@@ -4,6 +4,7 @@
 import pytest
 import pathlib
 
+
 @pytest.hookimpl()
-def pytest_pycollect_makemodule(module_path:pathlib.Path):
+def pytest_pycollect_makemodule(module_path: pathlib.Path):
     pass

@@ -14,4 +14,5 @@ def test_custom_cumproduct():
     expected = np.cumproduct(arr)
     assert np.array_equal(result, expected)
 
+
 test_custom_cumproduct()

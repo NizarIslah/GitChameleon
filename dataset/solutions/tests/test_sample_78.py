@@ -7,6 +7,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sample_78 import custom_cumproduct
 
+
 def test_custom_cumproduct_1d_array():
     """Test custom_cumproduct with a 1D array."""
     arr = np.array([1, 2, 3, 4])

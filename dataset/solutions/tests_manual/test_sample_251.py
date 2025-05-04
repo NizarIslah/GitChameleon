@@ -5,7 +5,7 @@ import unittest
 import falcon
 import pytest
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from sample_251 import raise_too_large_error
 
 
@@ -24,7 +24,9 @@ with warnings.catch_warnings(record=True) as w:
 
     if w:
         for warn in w:
-            assert not issubclass(warn.category, DeprecationWarning), "Deprecated API used!"
+            assert not issubclass(
+                warn.category, DeprecationWarning
+            ), "Deprecated API used!"
 
 expected_message = error_message
 assert str(exception_raised) == expected_message

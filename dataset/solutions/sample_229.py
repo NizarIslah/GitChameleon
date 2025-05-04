@@ -4,6 +4,7 @@
 import pytest
 import pathlib
 
+
 @pytest.hookimpl()
-def pytest_collect_file(file_path:pathlib.Path):
+def pytest_collect_file(file_path: pathlib.Path):
     pass

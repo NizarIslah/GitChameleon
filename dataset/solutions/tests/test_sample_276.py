@@ -18,7 +18,8 @@ class TestComputeDTW(unittest.TestCase):
         def patched_compute_dtw(X, Y):
             import librosa
             from scipy.spatial.distance import cdist
-            dist_matrix = cdist(X.T, Y.T, metric='euclidean')
+
+            dist_matrix = cdist(X.T, Y.T, metric="euclidean")
             return librosa.sequence.dtw(C=dist_matrix)[0]  # Using default metric
 
         try:
@@ -32,5 +33,5 @@ class TestComputeDTW(unittest.TestCase):
             self.skipTest(f"Patched function failed with error: {str(e)}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

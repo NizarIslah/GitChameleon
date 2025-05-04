@@ -29,6 +29,7 @@ COT=FALSE
 FEEDBACK=FALSE
 SEED=42
 USE_WANDB=FALSE
+STRUCT_OUTPUT=FALSE
 
 # Parse command-line arguments
 while [[ "$#" -gt 0 ]]; do
@@ -42,6 +43,7 @@ while [[ "$#" -gt 0 ]]; do
         --system_prompt) SYSTEM_PROMPT=TRUE ;;
         --thinking_mode) THINKING_MODE=TRUE ;;
         --cot) COT=TRUE ;;
+        --struct_output) STRUCT_OUTPUT=TRUE ;;
         --feedback) FEEDBACK=TRUE ;;
         --seed) SEED="$2"; shift ;;
         --wandb) USE_WANDB=TRUE ;;
@@ -66,4 +68,4 @@ if [[ "$USE_WANDB" == "TRUE" ]]; then
 fi
 
 # Run the anthropic_benchmarks.py script with the parsed arguments
-python anthropic_benchmarks.py --input_data "$INPUT_DATA" --output_data "$OUTPUT_DATA" --model "$MODEL" --top_p "$TOP_P" --temperature "$TEMPERATURE" --max_tokens "$MAX_TOKENS" --api_key "$API_KEY" --system_prompt "$SYSTEM_PROMPT" --thinking_mode "$THINKING_MODE" --cot "$COT" --feedback "$FEEDBACK" --seed "$SEED" --wandb "$USE_WANDB" --wandb_project "$WANDB_PROJECT" --wandb_entity "$WANDB_ENTITY" --wandb_run_name "$WANDB_RUN_NAME"
+python anthropic_benchmarks.py --input_data "$INPUT_DATA" --output_data "$OUTPUT_DATA" --model "$MODEL" --top_p "$TOP_P" --temperature "$TEMPERATURE" --max_tokens "$MAX_TOKENS" --api_key "$API_KEY" --system_prompt "$SYSTEM_PROMPT" --thinking_mode "$THINKING_MODE" --cot "$COT" --feedback "$FEEDBACK" --seed "$SEED" --wandb "$USE_WANDB" --wandb_project "$WANDB_PROJECT" --wandb_entity "$WANDB_ENTITY" --wandb_run_name "$WANDB_RUN_NAME" --struct_response "$STRUCT_OUTPUT"

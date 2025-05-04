@@ -15,4 +15,3 @@ output[0] = 100
 
 assert m[0, 0] == 1
 assert output[0] == 100
-

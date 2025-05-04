@@ -1,5 +1,6 @@
 import re
 
+
 def extract_first_python_code_block(text) -> str:
     """
     Extracts the first Python code block from the given text.

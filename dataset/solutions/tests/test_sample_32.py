@@ -4,13 +4,13 @@ import sys
 import unittest
 import warnings
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import networkx as nx
 from sample_32 import naive_modularity_communities
 
 # Filter deprecation warnings
-warnings.filterwarnings('ignore', category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 # Check networkx version
 nx_version = nx.__version__
@@ -44,11 +44,7 @@ class TestNaiveModularityCommunities(unittest.TestCase):
     def test_directed_graph_input(self):
         """Test with a directed graph input."""
         G = nx.DiGraph()
-        G.add_edges_from([
-            (0, 1), (1, 2), (2, 0),
-            (3, 4), (4, 5), (5, 3),
-            (2, 3)
-        ])
+        G.add_edges_from([(0, 1), (1, 2), (2, 0), (3, 4), (4, 5), (5, 3), (2, 3)])
         communities = list(naive_modularity_communities(G))
         self.assertIsInstance(communities, list)
 

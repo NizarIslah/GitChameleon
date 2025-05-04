@@ -4,13 +4,13 @@ import sys
 import unittest
 import warnings
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import networkx as nx
 import sample_34
 
 # Filter deprecation warnings
-warnings.filterwarnings('ignore', category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 # Check networkx version
 nx_version = nx.__version__
@@ -25,10 +25,10 @@ class TestGetFirstEdge(unittest.TestCase):
         # Create a simple graph with a single edge
         G = nx.Graph()
         G.add_edge(0, 1)
-        
+
         # Get the first edge
         edge = sample_34.get_first_edge(G)
-        
+
         # Check that we get a tuple
         self.assertIsInstance(edge, tuple)
         # Check that the tuple contains the correct nodes
@@ -43,10 +43,10 @@ class TestGetFirstEdge(unittest.TestCase):
         G.add_edge(0, 1)
         G.add_edge(1, 2)
         G.add_edge(2, 0)
-        
+
         # Get the first edge
         edge = sample_34.get_first_edge(G)
-        
+
         # Check that we get a tuple
         self.assertIsInstance(edge, tuple)
         # Check that the tuple contains valid nodes
@@ -63,10 +63,10 @@ class TestGetFirstEdge(unittest.TestCase):
         G.add_edge(0, 1)
         G.add_edge(1, 2)
         G.add_edge(2, 0)
-        
+
         # Get the first edge
         edge = sample_34.get_first_edge(G)
-        
+
         # Check that we get a tuple
         self.assertIsInstance(edge, tuple)
         # Check that the tuple contains valid nodes
@@ -86,10 +86,10 @@ class TestGetFirstEdge(unittest.TestCase):
         G.add_edge(0, 1, key=0)
         G.add_edge(0, 1, key=1)  # Duplicate edge with different key
         G.add_edge(1, 2)
-        
+
         # Get the first edge
         edge = sample_34.get_first_edge(G)
-        
+
         # Check that we get a tuple
         self.assertIsInstance(edge, tuple)
         # For multigraphs, the edge might be a 3-tuple (u, v, key)
@@ -106,10 +106,10 @@ class TestGetFirstEdge(unittest.TestCase):
         # Add edges with string nodes
         G.add_edge("A", "B")
         G.add_edge("B", "C")
-        
+
         # Get the first edge
         edge = sample_34.get_first_edge(G)
-        
+
         # Check that we get a tuple
         self.assertIsInstance(edge, tuple)
         # Check that the tuple contains valid nodes
@@ -126,10 +126,10 @@ class TestGetFirstEdge(unittest.TestCase):
         G.add_edge(0, "A")
         G.add_edge("A", 2.5)
         G.add_edge(2.5, True)
-        
+
         # Get the first edge
         edge = sample_34.get_first_edge(G)
-        
+
         # Check that we get a tuple
         self.assertIsInstance(edge, tuple)
         # Check that the tuple contains valid nodes
@@ -142,7 +142,7 @@ class TestGetFirstEdge(unittest.TestCase):
     def test_empty_graph(self):
         """Test with an empty graph (should raise IndexError)."""
         G = nx.Graph()
-        
+
         # This should raise an IndexError
         with self.assertRaises(IndexError):
             sample_34.get_first_edge(G)
@@ -152,7 +152,7 @@ class TestGetFirstEdge(unittest.TestCase):
         G = nx.Graph()
         for i in range(5):
             G.add_node(i)
-        
+
         # This should raise an IndexError
         with self.assertRaises(IndexError):
             sample_34.get_first_edge(G)
@@ -161,11 +161,11 @@ class TestGetFirstEdge(unittest.TestCase):
         """Test with a non-graph input (should raise TypeError or AttributeError)."""
         # Try with a list instead of a graph
         G = [0, 1, 2, 3, 4]
-        
+
         # This should raise a TypeError or AttributeError
         with self.assertRaises((TypeError, AttributeError)):
             sample_34.get_first_edge(G)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 
 from falcon import Request
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from sample_255 import custom_get_dpr
 
 
@@ -20,13 +20,13 @@ class TestSample255(unittest.TestCase):
         for value in range(4):  # 0, 1, 2, 3
             # Configure the mock to return the specified value
             self.mock_request.get_param_as_int.return_value = value
-            
+
             # Call the function with our mock
             result = custom_get_dpr(self.mock_request)
-            
+
             # Assert the function returns the expected value
             self.assertEqual(result, value)
-            
+
             # Verify the mock was called with correct parameters
             self.mock_request.get_param_as_int.assert_called_with(
                 "dpr", min_value=0, max_value=3

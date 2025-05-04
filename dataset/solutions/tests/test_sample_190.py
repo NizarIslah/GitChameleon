@@ -22,7 +22,7 @@ class TestCustomBody(unittest.TestCase):
         """Test that the RigidBody has the correct name."""
         rigid_body, _ = custom_body("test_body", "test_particle")
         self.assertEqual(rigid_body.name, "test_body")
-        
+
         # Test with a different name
         rigid_body, _ = custom_body("another_body", "test_particle")
         self.assertEqual(rigid_body.name, "another_body")
@@ -31,7 +31,7 @@ class TestCustomBody(unittest.TestCase):
         """Test that the Particle has the correct name."""
         _, particle = custom_body("test_body", "test_particle")
         self.assertEqual(particle.name, "test_particle")
-        
+
         # Test with a different name
         _, particle = custom_body("test_body", "another_particle")
         self.assertEqual(particle.name, "another_particle")
@@ -46,9 +46,9 @@ class TestCustomBody(unittest.TestCase):
         """Test that special characters in names are handled correctly."""
         special_body_name = "body!@#$%^&*()"
         special_particle_name = "particle!@#$%^&*()"
-        
+
         rigid_body, particle = custom_body(special_body_name, special_particle_name)
-        
+
         self.assertEqual(rigid_body.name, special_body_name)
         self.assertEqual(particle.name, special_particle_name)
 
@@ -56,12 +56,12 @@ class TestCustomBody(unittest.TestCase):
         """Test that numeric strings are handled correctly."""
         numeric_body_name = "123"
         numeric_particle_name = "456"
-        
+
         rigid_body, particle = custom_body(numeric_body_name, numeric_particle_name)
-        
+
         self.assertEqual(rigid_body.name, numeric_body_name)
         self.assertEqual(particle.name, numeric_particle_name)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

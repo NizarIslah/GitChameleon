@@ -5,6 +5,8 @@ import random
 import pickle
 import statistics
 import anthropic
+import instructor
+from pydantic import BaseModel
 from joblib import Parallel, delayed
 
 import argparse
@@ -52,15 +54,9 @@ parser.add_argument(
 parser.add_argument("--api_key", type=str, required=True, help="Anthropic API key")
 
 parser.add_argument("--wandb", type=bool, default=False, help="Use WandB for logging")
-parser.add_argument(
-    "--wandb_entity", type=str, help="WandB entity name"
-)
-parser.add_argument(
-    "--wandb_project", type=str, help="WandB project name"
-)
-parser.add_argument(
-    "--wandb_run_name", type=str, help="WandB run name"
-)
+parser.add_argument("--wandb_entity", type=str, help="WandB entity name")
+parser.add_argument("--wandb_project", type=str, help="WandB project name")
+parser.add_argument("--wandb_run_name", type=str, help="WandB run name")
 
 parser.add_argument(
     "--system_prompt",
@@ -79,10 +75,23 @@ parser.add_argument("--feedback", help="Whether to include feedback")
 parser.add_argument(
     "--cot", type=bool, default=False, help="Whether to include chain of thought"
 )
+parser.add_argument("--struct_response", type=bool, default=False, help="Whether to use structured response")
 args = parser.parse_args()
 
 # Set the random seed for reproducibility
 random.seed(args.seed)
+
+class MyResponse(BaseModel):
+    answer: str
+    explanation: str
+        
+class Step(BaseModel):
+    explanation: str
+    output: str
+
+class CodeReasoning(BaseModel):
+    steps: list[Step]
+    answer: str
 
 # check if the temp is 0 when feedback is true and set to 0
 if args.feedback and args.temperature != 0:
@@ -97,7 +106,7 @@ with open(args.input_data) as f:
     prompts = [
         {
             "id": data.get("example_id", str(i)),
-            "prompt": data.get("cot_messages" if args.cot else "messages"),
+            "prompt": data.get("cot_messages" if args.cot or args.thinking_mode else "messages"),
         }
         for i, line in enumerate(f)
         for data in [json.loads(line)]
@@ -107,6 +116,8 @@ client = anthropic.Anthropic(
     api_key=args.api_key,
 )
 
+if args.struct_response:
+    client = instructor.from_anthropic(client)
 
 # Function to call Anthropic's chat completion with retry logic, including seed and temperature
 def get_completion_with_retry(prompt, seed, args, max_retries=5, delay=10):
@@ -117,47 +128,55 @@ def get_completion_with_retry(prompt, seed, args, max_retries=5, delay=10):
     while retries < max_retries:
         try:
             if args.system_prompt and args.thinking_mode:
-                response = client.messages.create(
-                    model=args.model,
-                    system="You are a seasoned python developer and data scientist at a Fortune 500 company. Your goal is to provide clean, correct and efficient solutions to coding problems.",
-                    thinking={
-                        "type": "enabled",
-                        "budget_tokens": int(0.6 * args.max_tokens),
-                    },
-                    max_tokens=args.max_tokens,
-                    temperature=args.temperature,
-                    top_p=args.top_p,
-                    messages=[{"role": "user", "content": message}],
-                )
-            elif args.system_prompt and not args.thinking_mode:
-                response = client.messages.create(
-                    model=args.model,
-                    system="You are a seasoned python developer and data scientist at a Fortune 500 company. Your goal is to provide clean, correct and efficient solutions to coding problems.",
-                    max_tokens=args.max_tokens,
-                    temperature=args.temperature,
-                    top_p=args.top_p,
-                    messages=[{"role": "user", "content": message}],
-                )
-            elif args.thinking_mode and not args.system_prompt:
-                response = client.messages.create(
-                    model=args.model,
-                    thinking={
-                        "type": "enabled",
-                        "budget_tokens": int(0.6 * args.max_tokens),
-                    },
-                    max_tokens=args.max_tokens,
-                    temperature=args.temperature,
-                    top_p=args.top_p,
-                    messages=[{"role": "user", "content": message}],
-                )
-            else:
-                response = client.messages.create(
-                    model=args.model,
-                    max_tokens=args.max_tokens,
-                    temperature=args.temperature,
-                    top_p=args.top_p,
-                    messages=[{"role": "user", "content": message}],
-                )
+                if args.struct_response and not args.thinking_mode:
+                    response_model = CodeReasoning if args.cot else MyResponse
+                else:
+                    response_model = None
+
+                if args.system_prompt and args.thinking_mode:
+                    response = client.messages.create(
+                        model=args.model,
+                        system="You are a seasoned python developer and data scientist at a Fortune 500 company. Your goal is to provide clean, correct and efficient solutions to coding problems.",
+                        thinking={
+                            "type": "enabled",
+                            "budget_tokens": int(0.6 * args.max_tokens),
+                        },
+                        max_tokens=args.max_tokens,
+                        temperature=args.temperature,
+                        top_p=args.top_p,
+                        messages=[{"role": "user", "content": message}],
+                    )
+                elif args.system_prompt and not args.thinking_mode:
+                    response = client.messages.create(
+                        model=args.model,
+                        system="You are a seasoned python developer and data scientist at a Fortune 500 company. Your goal is to provide clean, correct and efficient solutions to coding problems.",
+                        max_tokens=args.max_tokens,
+                        temperature=args.temperature,
+                        top_p=args.top_p,
+                        messages=[{"role": "user", "content": message}],
+                        **({"response_model": response_model} if response_model else {}),
+                    )
+                elif args.thinking_mode and not args.system_prompt:
+                    response = client.messages.create(
+                        model=args.model,
+                        thinking={
+                            "type": "enabled",
+                            "budget_tokens": int(0.6 * args.max_tokens),
+                        },
+                        max_tokens=args.max_tokens,
+                        temperature=args.temperature,
+                        top_p=args.top_p,
+                        messages=[{"role": "user", "content": message}],
+                    )
+                else:
+                    response = client.messages.create(
+                        model=args.model,
+                        max_tokens=args.max_tokens,
+                        temperature=args.temperature,
+                        top_p=args.top_p,
+                        messages=[{"role": "user", "content": message}],
+                        **({"response_model": response_model} if response_model else {}),
+                    )
             return response
         except anthropic.RateLimitError as e:
             retries += 1
@@ -191,6 +210,14 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
             if args.thinking_mode:
                 thinking = getattr(response.content[0], "thinking", None)
                 content = getattr(response.content[1], "text", None)
+            elif args.struct_response:
+                if args.cot:
+                    content = getattr(response, "answer", None)
+                    steps = getattr(response, "steps", None)
+                    steps = [vars(step) for step in steps]
+                else:
+                    content = getattr(response, "answer", None)
+                    explanation = getattr(response, "explanation", None)
             else:
                 thinking = None
                 content = getattr(response.content[0], "text", None)
@@ -199,8 +226,10 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
             {
                 "example_id": prompt["id"],
                 "prompt": prompt["prompt"],
-                "response": content,
-                "thinking": thinking if args.thinking_mode else None,
+                "answer": content,
+                "explanation": explanation if not args.cot and not args.thinking_mode and args.struct_response else None,
+                "steps": steps if args.cot and args.struct_response else None,
+                "thinking": thinking if args.thinking_mode and not args.struct_response else None,
             }
         )
 
@@ -233,19 +262,21 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
             wandb.config[arg] = getattr(args, arg)
 
         # Log records as a WandB table
-        table = wandb.Table(columns=["example_id", "prompt", "response", "thinking"])
+        table = wandb.Table(columns=["example_id", "prompt", "response", "explaination", "steps", "thinking"])
         for record in r_final:
             table.add_data(
                 record["example_id"],
                 record["prompt"],
-                record["response"],
+                record["answer"],
+                record["explanation"],
+                record["steps"],
                 record["thinking"],
             )
         wandb.log({"responses_table": table})
 
         # Log the JSONL file as a WandB artifact
         artifact = wandb.Artifact(
-            name=f"responses_{args.temperature}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{'sys' if args.system_prompt else ''}_{'thinking' if args.thinking_mode else ''}_{seed}",
+            name=f"responses_{args.temperature}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{'sys' if args.system_prompt else ''}_{'thinking' if args.thinking_mode else ''}_{'structured' if args.struct_response else ''}_{seed}",
             type="responses",
         )
         artifact.add_file(str(output_file))

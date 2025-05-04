@@ -7,5 +7,6 @@ import sympy
 from sample_178 import custom_trace
 
 from sympy.physics.quantum.trace import Tr
+
 expect = Tr(2)
 assert custom_trace(2) == expect

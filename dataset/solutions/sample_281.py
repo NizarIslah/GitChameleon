@@ -5,8 +5,7 @@ import librosa
 import numpy as np
 from typing import Tuple
 
-def compute_extraction(y: np.ndarray, sr: int) -> Tuple[np.ndarray, bool]:
-    
 
-    M_from_y = librosa.feature.melspectrogram(y=y, sr=sr) 
+def compute_extraction(y: np.ndarray, sr: int) -> Tuple[np.ndarray, bool]:
+    M_from_y = librosa.feature.melspectrogram(y=y, sr=sr)
     return M_from_y, M_from_y.dtype == np.float64

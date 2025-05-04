@@ -1,4 +1,5 @@
 import os
+
 # Add the parent directory to the path so we can import the module
 import sys
 import unittest
@@ -11,8 +12,8 @@ from sample_291 import compute_plp
 
 filename = librosa.util.example_audio_file()
 y, sr = librosa.load(filename)
-hop_length=512
-win_length=384
+hop_length = 512
+win_length = 384
 tempo_min = None
 tempo_max = None
 onset_env = librosa.onset.onset_strength(y=y, sr=sr, hop_length=hop_length)

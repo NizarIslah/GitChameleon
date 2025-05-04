@@ -4,14 +4,14 @@ import sys
 import unittest
 import warnings
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import geopandas as gpd
 import sample_23
 from shapely.geometry import Point
 
 # Filter deprecation warnings
-warnings.filterwarnings('ignore', category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 class TestCreateGeoseries(unittest.TestCase):
@@ -22,20 +22,20 @@ class TestCreateGeoseries(unittest.TestCase):
         # Create lists of x and y coordinates
         x = [0, 1, 2, 3]
         y = [0, 1, 2, 3]
-        
+
         # Create a GeoSeries using the function
         result = sample_23.create_geoseries(x, y)
-        
+
         # Convert to GeoSeries if it's not already one
         if not isinstance(result, gpd.GeoSeries):
             result = gpd.GeoSeries(result)
-        
+
         # Check that the result is a GeoSeries
         self.assertIsInstance(result, gpd.GeoSeries)
-        
+
         # Check that the length is correct
         self.assertEqual(len(result), len(x))
-        
+
         # Check that each point has the correct coordinates
         for i, point in enumerate(result):
             self.assertIsInstance(point, Point)
@@ -47,17 +47,17 @@ class TestCreateGeoseries(unittest.TestCase):
         # Create empty lists
         x = []
         y = []
-        
+
         # Create a GeoSeries using the function
         result = sample_23.create_geoseries(x, y)
-        
+
         # Convert to GeoSeries if it's not already one
         if not isinstance(result, gpd.GeoSeries):
             result = gpd.GeoSeries(result)
-        
+
         # Check that the result is a GeoSeries
         self.assertIsInstance(result, gpd.GeoSeries)
-        
+
         # Check that the result is empty
         self.assertEqual(len(result), 0)
 
@@ -66,7 +66,7 @@ class TestCreateGeoseries(unittest.TestCase):
         # Create lists of different lengths
         x = [0, 1, 2]
         y = [0, 1]
-        
+
         # This should raise a ValueError because the lists have different lengths
         with self.assertRaises(ValueError):
             sample_23.create_geoseries(x, y)
@@ -76,17 +76,17 @@ class TestCreateGeoseries(unittest.TestCase):
         # Create lists of float coordinates
         x = [0.5, 1.5, 2.5]
         y = [0.5, 1.5, 2.5]
-        
+
         # Create a GeoSeries using the function
         result = sample_23.create_geoseries(x, y)
-        
+
         # Convert to GeoSeries if it's not already one
         if not isinstance(result, gpd.GeoSeries):
             result = gpd.GeoSeries(result)
-        
+
         # Check that the result is a GeoSeries
         self.assertIsInstance(result, gpd.GeoSeries)
-        
+
         # Check that each point has the correct coordinates
         for i, point in enumerate(result):
             self.assertIsInstance(point, Point)
@@ -98,20 +98,20 @@ class TestCreateGeoseries(unittest.TestCase):
         # Create lists with a single point
         x = [10]
         y = [20]
-        
+
         # Create a GeoSeries using the function
         result = sample_23.create_geoseries(x, y)
-        
+
         # Convert to GeoSeries if it's not already one
         if not isinstance(result, gpd.GeoSeries):
             result = gpd.GeoSeries(result)
-        
+
         # Check that the result is a GeoSeries
         self.assertIsInstance(result, gpd.GeoSeries)
-        
+
         # Check that the length is 1
         self.assertEqual(len(result), 1)
-        
+
         # Check that the point has the correct coordinates
         self.assertEqual(result[0].x, 10)
         self.assertEqual(result[0].y, 20)
@@ -121,20 +121,20 @@ class TestCreateGeoseries(unittest.TestCase):
         # Create lists of coordinates
         x = [0, 1, 2]
         y = [0, 1, 2]
-        
+
         # Create a GeoSeries using the function
         result = sample_23.create_geoseries(x, y)
-        
+
         # Convert to GeoSeries if it's not already one
         if not isinstance(result, gpd.GeoSeries):
             result = gpd.GeoSeries(result)
-        
+
         # Check that the result is a GeoSeries
         self.assertIsInstance(result, gpd.GeoSeries)
-        
+
         # By default, the CRS should be None
         self.assertIsNone(result.crs)
-        
+
         # We should be able to set the CRS
         result.crs = "EPSG:4326"
         self.assertEqual(result.crs, "EPSG:4326")
@@ -144,16 +144,16 @@ class TestCreateGeoseries(unittest.TestCase):
         # Test with integer inputs
         with self.assertRaises(TypeError):
             sample_23.create_geoseries(1, 2)
-        
+
         # Test with string inputs
         # This should raise a ValueError because it can't convert string to float
         with self.assertRaises(ValueError):
             sample_23.create_geoseries("1,2,3", "4,5,6")
-        
+
         # Test with None inputs
         with self.assertRaises(TypeError):
             sample_23.create_geoseries(None, None)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
