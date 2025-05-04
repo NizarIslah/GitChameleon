@@ -99,12 +99,13 @@ def eval_sample(
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE,
                         text=True,
-                        timeout=30,
+                        timeout=60,
                     )
                     sample_result["output"] = proc.stdout + proc.stderr
                     # A return code of 0 indicates that the tests passed.
                     sample_result["pass"] = proc.returncode == 0
                 except subprocess.TimeoutExpired as e:
+                    print(f"Timeout expired: {e}")
                     sample_result["output"] = f"Timeout: {str(e)}"
                     sample_result["pass"] = False
                 except Exception as e:
