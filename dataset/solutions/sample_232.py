@@ -4,6 +4,7 @@
 import pytest
 import pathlib
 
+
 @pytest.hookimpl()
-def pytest_report_collectionfinish(start_path:pathlib.Path):
+def pytest_report_collectionfinish(start_path: pathlib.Path):
     pass

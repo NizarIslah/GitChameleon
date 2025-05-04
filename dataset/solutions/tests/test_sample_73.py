@@ -7,6 +7,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sample_73 import custom_cumproduct
 
+
 class TestCustomCumproduct(unittest.TestCase):
     def test_custom_cumproduct_1d_array(self):
         """Test with a 1D array."""
@@ -28,6 +29,7 @@ class TestCustomCumproduct(unittest.TestCase):
         np.testing.assert_array_equal(custom_cumproduct(arr), expected)
 
     # ... any other existing tests remain unchanged ...
+
 
 if __name__ == "__main__":
     unittest.main()

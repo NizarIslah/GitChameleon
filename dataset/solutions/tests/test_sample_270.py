@@ -2,13 +2,12 @@ import os
 import sys
 import unittest
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import plotly.graph_objects as go
 from sample_270 import custom_make_subplots
 
 
 class TestSample270(unittest.TestCase):
-
     def test_custom_make_subplots(self):
         """Test that custom_make_subplots returns a Figure with correct rows and cols."""
         # Test with 2 rows and 3 columns

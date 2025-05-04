@@ -9,32 +9,51 @@ import librosa
 import numpy as np
 import scipy
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from sample_307 import compute_pyin
 
 
-freq=110
-sr=22050
+freq = 110
+sr = 22050
 y = librosa.tone(freq, duration=1.0)
 fmin = 110
 fmax = 880
 frame_length = 2048
 center = False
-pad_mode = 'reflect'
+pad_mode = "reflect"
 win_length = None
 hop_length = None
-#trough_threshold = 0.1
+# trough_threshold = 0.1
 
-n_thresholds=100
-beta_parameters=(2, 18)
-boltzmann_parameter=2
-resolution=0.1
-max_transition_rate=35.92
-switch_prob=0.01
-no_trough_prob=0.01
-fill_na=np.nan
+n_thresholds = 100
+beta_parameters = (2, 18)
+boltzmann_parameter = 2
+resolution = 0.1
+max_transition_rate = 35.92
+switch_prob = 0.01
+no_trough_prob = 0.01
+fill_na = np.nan
 
-sol = compute_pyin(freq, sr, y, fmin, fmax, frame_length, center, pad_mode, win_length, hop_length, n_thresholds, beta_parameters, boltzmann_parameter, resolution, max_transition_rate, switch_prob, no_trough_prob, fill_na)
+sol = compute_pyin(
+    freq,
+    sr,
+    y,
+    fmin,
+    fmax,
+    frame_length,
+    center,
+    pad_mode,
+    win_length,
+    hop_length,
+    n_thresholds,
+    beta_parameters,
+    boltzmann_parameter,
+    resolution,
+    max_transition_rate,
+    switch_prob,
+    no_trough_prob,
+    fill_na,
+)
 
 if win_length is None:
     win_length = frame_length // 2
@@ -55,7 +74,7 @@ b = np.fft.rfft(y_frames[win_length::-1, :], frame_length, axis=0)
 acf_frames = np.fft.irfft(a * b, frame_length, axis=0)[win_length:]
 acf_frames[np.abs(acf_frames) < 1e-6] = 0
 
-energy_frames = np.cumsum(y_frames ** 2, axis=0)
+energy_frames = np.cumsum(y_frames**2, axis=0)
 energy_frames = energy_frames[win_length:, :] - energy_frames[:-win_length, :]
 energy_frames[np.abs(energy_frames) < 1e-6] = 0
 
@@ -70,7 +89,9 @@ yin_frames = yin_numerator / (yin_denominator + librosa.util.tiny(yin_denominato
 parabolic_shifts = np.zeros_like(yin_frames)
 parabola_a = (yin_frames[:-2, :] + yin_frames[2:, :] - 2 * yin_frames[1:-1, :]) / 2
 parabola_b = (yin_frames[2:, :] - yin_frames[:-2, :]) / 2
-parabolic_shifts[1:-1, :] = -parabola_b / (2 * parabola_a + librosa.util.tiny(parabola_a))
+parabolic_shifts[1:-1, :] = -parabola_b / (
+    2 * parabola_a + librosa.util.tiny(parabola_a)
+)
 parabolic_shifts[np.abs(parabolic_shifts) > 1] = 0
 
 thresholds = np.linspace(0, 1, n_thresholds + 1)
@@ -98,9 +119,7 @@ for i, yin_frame in enumerate(yin_frames.T):
     probs = np.sum(trough_prior * beta_probs, axis=1)
     global_min = np.argmin(trough_heights)
     n_thresholds_below_min = np.count_nonzero(~trough_thresholds[global_min, :])
-    probs[global_min] += no_trough_prob * np.sum(
-        beta_probs[:n_thresholds_below_min]
-    )
+    probs[global_min] += no_trough_prob * np.sum(beta_probs[:n_thresholds_below_min])
 
     yin_probs[trough_index, i] = probs
 

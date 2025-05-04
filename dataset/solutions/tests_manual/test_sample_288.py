@@ -1,4 +1,5 @@
 import os
+
 # Add the parent directory to the path so we can import the sample module
 import sys
 import unittest
@@ -12,7 +13,7 @@ from sample_288 import compute_lpc_coef
 
 filename = librosa.util.example_audio_file()
 y, sr = librosa.load(filename)
-order=2
+order = 2
 
 sol = compute_lpc_coef(y, sr, order)
 test_sol = librosa.lpc(y, order)

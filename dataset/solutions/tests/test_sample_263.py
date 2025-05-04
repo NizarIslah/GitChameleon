@@ -4,7 +4,7 @@ import unittest
 
 import tornado.testing
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from sample_263 import DummyAuth
 
 
@@ -22,7 +22,7 @@ class TestDummyAuth(tornado.testing.AsyncTestCase):
         # Test with a sample access token
         access_token = "sample_token"
         result = await self.auth.async_get_user_info(access_token)
-        
+
         # Verify the result contains the expected keys and values
         self.assertIn("user", result)
         self.assertIn("token", result)
@@ -35,7 +35,7 @@ class TestDummyAuth(tornado.testing.AsyncTestCase):
         # Test with an empty access token
         access_token = ""
         result = await self.auth.async_get_user_info(access_token)
-        
+
         # Verify the result contains the expected keys and values
         self.assertIn("user", result)
         self.assertIn("token", result)

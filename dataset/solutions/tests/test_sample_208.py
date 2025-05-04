@@ -16,32 +16,29 @@ class TestCustomPointplot(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures before each test method."""
         # Create a simple DataFrame for testing
-        self.simple_data = pd.DataFrame({
-            'x': ['A', 'B', 'C'],
-            'y': [1, 2, 3]
-        })
-        
+        self.simple_data = pd.DataFrame({"x": ["A", "B", "C"], "y": [1, 2, 3]})
+
         # Create a more complex DataFrame with multiple points per category
-        self.complex_data = pd.DataFrame({
-            'x': ['A', 'A', 'A', 'B', 'B', 'B', 'C', 'C', 'C'],
-            'y': [1, 2, 3, 4, 5, 6, 7, 8, 9]
-        })
-        
+        self.complex_data = pd.DataFrame(
+            {
+                "x": ["A", "A", "A", "B", "B", "B", "C", "C", "C"],
+                "y": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            }
+        )
+
         # Create a DataFrame with numeric x values
-        self.numeric_data = pd.DataFrame({
-            'x': [1, 2, 3, 4, 5],
-            'y': [10, 20, 30, 40, 50]
-        })
-        
+        self.numeric_data = pd.DataFrame(
+            {"x": [1, 2, 3, 4, 5], "y": [10, 20, 30, 40, 50]}
+        )
+
         # Create a DataFrame with missing values
-        self.missing_data = pd.DataFrame({
-            'x': ['A', 'B', 'C', 'D', None],
-            'y': [1, 2, None, 4, 5]
-        })
+        self.missing_data = pd.DataFrame(
+            {"x": ["A", "B", "C", "D", None], "y": [1, 2, None, 4, 5]}
+        )
 
     def tearDown(self):
         """Clean up after each test method."""
-        plt.close('all')  # Close all figure windows
+        plt.close("all")  # Close all figure windows
 
     def test_return_type(self):
         """Test that the function returns a matplotlib Axes object."""
@@ -54,8 +51,8 @@ class TestCustomPointplot(unittest.TestCase):
         # Removed collection checks to avoid failures
 
         # Check axis labels
-        self.assertEqual(ax.get_xlabel(), 'x')
-        self.assertEqual(ax.get_ylabel(), 'y')
+        self.assertEqual(ax.get_xlabel(), "x")
+        self.assertEqual(ax.get_ylabel(), "y")
 
     def test_complex_data(self):
         """Test with more complex data having multiple points per category."""
@@ -73,8 +70,10 @@ class TestCustomPointplot(unittest.TestCase):
         # With numeric x values, the x-axis should have numeric ticks
         # We can check that the tick labels are numeric (or empty)
         tick_labels = [t.get_text() for t in ax.get_xticklabels()]
-        self.assertTrue(all(label.isdigit() or label == '' for label in tick_labels),
-                        "X-axis tick labels should be numeric or empty")
+        self.assertTrue(
+            all(label.isdigit() or label == "" for label in tick_labels),
+            "X-axis tick labels should be numeric or empty",
+        )
 
     def test_missing_data(self):
         """Test with missing data."""
@@ -96,18 +95,15 @@ class TestCustomPointplot(unittest.TestCase):
         """Test using a custom figure and axes."""
         fig, ax = plt.subplots(figsize=(10, 6))
         result = custom_pointplot(self.simple_data)
-        
+
         # The function should return the axes object
         self.assertIsInstance(result, Axes)
 
     def test_data_validation(self):
         """Test that the function validates input data correctly."""
         # Test with DataFrame missing required columns
-        invalid_data = pd.DataFrame({
-            'a': [1, 2, 3],
-            'b': [4, 5, 6]
-        })
-        
+        invalid_data = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+
         # This should raise a ValueError because 'x' and 'y' columns are required
         with self.assertRaises(ValueError):
             custom_pointplot(invalid_data)
@@ -116,12 +112,12 @@ class TestCustomPointplot(unittest.TestCase):
         """Test with empty DataFrame."""
         # Seaborn's pointplot doesn't handle completely empty DataFrames well
         # Let's use a DataFrame with at least one row
-        empty_data = pd.DataFrame({'x': ['A'], 'y': [1]})
-        
+        empty_data = pd.DataFrame({"x": ["A"], "y": [1]})
+
         # This should not raise an exception
         ax = custom_pointplot(empty_data)
         self.assertIsInstance(ax, Axes)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

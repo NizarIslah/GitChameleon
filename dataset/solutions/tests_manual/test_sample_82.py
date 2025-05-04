@@ -10,6 +10,9 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import sample_82
 
 import numpy as np
-assert 'cvbooster' in cv_results
-assert len(cv_results['cvbooster'].boosters) == NFOLD
-assert all(isinstance(booster, lgb.Booster) for booster in cv_results['cvbooster'].boosters)
+
+assert "cvbooster" in cv_results
+assert len(cv_results["cvbooster"].boosters) == NFOLD
+assert all(
+    isinstance(booster, lgb.Booster) for booster in cv_results["cvbooster"].boosters
+)

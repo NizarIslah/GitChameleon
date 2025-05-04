@@ -7,7 +7,7 @@ import sys
 import os
 
 # Add the parent directory to sys.path to import the module
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from sample_85 import convert_cint32_array_to_numpy
 
 c_array_type = ctypes.POINTER(ctypes.c_int32)

@@ -6,6 +6,7 @@ Unit tests for sample_316.py
 """
 
 import os
+
 # Add the parent directory to the path so we can import the sample module
 import sys
 import unittest
@@ -13,7 +14,9 @@ import unittest
 import librosa
 import numpy as np
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../dataset/samples')))
+sys.path.insert(
+    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../dataset/samples"))
+)
 from sample_316 import compute_mfcc_to_mel
 
 

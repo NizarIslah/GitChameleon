@@ -3,5 +3,6 @@
 # extra_dependencies: []
 import numpy as np
 
-def custom_cumproduct(arr:np.ndarray) -> np.ndarray:
+
+def custom_cumproduct(arr: np.ndarray) -> np.ndarray:
     return np.cumprod(arr)

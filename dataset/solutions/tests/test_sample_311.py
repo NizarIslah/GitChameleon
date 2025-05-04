@@ -2,6 +2,7 @@
 # Test file for sample_311.py
 
 import os
+
 # Add the parent directory to the path so we can import the sample
 import sys
 import unittest
@@ -9,7 +10,7 @@ import unittest
 import librosa
 import numpy as np
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from sample_311 import compute_griffinlim_cqt
 
 
@@ -20,21 +21,21 @@ class TestGriffinLimCQT(unittest.TestCase):
         self.hop_length = 512  # Hop length
         self.bins_per_octave = 12  # Bins per octave
         self.n_bins = 84  # Number of frequency bins
-        self.fmin = librosa.note_to_hz('C1')  # Minimum frequency
-        
+        self.fmin = librosa.note_to_hz("C1")  # Minimum frequency
+
         # Create a simple audio signal (sine wave)
         duration = 3  # seconds
         t = np.linspace(0, duration, int(duration * self.sr), endpoint=False)
         self.y = 0.5 * np.sin(2 * np.pi * 440 * t)  # 440 Hz sine wave
-        
+
         # Compute CQT of the signal
         self.C = librosa.cqt(
-            self.y, 
-            sr=self.sr, 
+            self.y,
+            sr=self.sr,
             hop_length=self.hop_length,
             fmin=self.fmin,
             n_bins=self.n_bins,
-            bins_per_octave=self.bins_per_octave
+            bins_per_octave=self.bins_per_octave,
         )
 
     def test_basic_functionality(self):
@@ -52,23 +53,23 @@ class TestGriffinLimCQT(unittest.TestCase):
             filter_scale=1,
             norm=1,
             sparsity=0.0,
-            window='hann',
+            window="hann",
             scale=True,
-            pad_mode='reflect',
-            res_type='kaiser_best',
+            pad_mode="reflect",
+            res_type="kaiser_best",
             dtype=np.float32,
             length=None,
             momentum=0.99,
-            init=None
+            init=None,
         )
-        
+
         # Check that the output is a numpy array
         self.assertIsInstance(y_reconstructed, np.ndarray)
-        
+
         # Check that the output has the expected shape (should be similar to input)
         # The length might not be exactly the same due to windowing effects
         self.assertEqual(y_reconstructed.ndim, 1)
-        
+
         # Check that the output is not all zeros
         self.assertGreater(np.abs(y_reconstructed).sum(), 0)
 
@@ -86,22 +87,22 @@ class TestGriffinLimCQT(unittest.TestCase):
             filter_scale=1,
             norm=1,
             sparsity=0.0,
-            window='hann',
+            window="hann",
             scale=True,
-            pad_mode='reflect',
-            res_type='kaiser_best',
+            pad_mode="reflect",
+            res_type="kaiser_best",
             dtype=np.float32,
             length=None,
             momentum=0.99,
-            init="random"
+            init="random",
         )
-        
+
         # Check that the output is a numpy array
         self.assertIsInstance(y_reconstructed, np.ndarray)
-        
+
         # Check that the output has the expected shape
         self.assertEqual(y_reconstructed.ndim, 1)
-        
+
         # Check that the output is not all zeros
         self.assertGreater(np.abs(y_reconstructed).sum(), 0)
 
@@ -119,19 +120,19 @@ class TestGriffinLimCQT(unittest.TestCase):
             filter_scale=1,
             norm=1,
             sparsity=0.0,
-            window='hann',
+            window="hann",
             scale=True,
-            pad_mode='reflect',
-            res_type='kaiser_best',
+            pad_mode="reflect",
+            res_type="kaiser_best",
             dtype=np.float32,
             length=None,
             momentum=0.5,  # Different momentum value
-            init=None
+            init=None,
         )
-        
+
         # Check that the output is a numpy array
         self.assertIsInstance(y_reconstructed, np.ndarray)
-        
+
         # Check that the output is not all zeros
         self.assertGreater(np.abs(y_reconstructed).sum(), 0)
 
@@ -150,16 +151,16 @@ class TestGriffinLimCQT(unittest.TestCase):
             filter_scale=1,
             norm=1,
             sparsity=0.0,
-            window='hann',
+            window="hann",
             scale=True,
-            pad_mode='reflect',
-            res_type='kaiser_best',
+            pad_mode="reflect",
+            res_type="kaiser_best",
             dtype=np.float32,
             length=target_length,  # Specify the exact length
             momentum=0.99,
-            init=None
+            init=None,
         )
-        
+
         # Check that the output has the expected length
         self.assertEqual(len(y_reconstructed), target_length)
 
@@ -177,21 +178,22 @@ class TestGriffinLimCQT(unittest.TestCase):
             filter_scale=1,
             norm=1,
             sparsity=0.0,
-            window='hann',
+            window="hann",
             scale=True,
-            pad_mode='reflect',
-            res_type='kaiser_best',
+            pad_mode="reflect",
+            res_type="kaiser_best",
             dtype=np.float32,
             length=None,
             momentum=0.99,
-            init=None
+            init=None,
         )
-        
+
         # Check that the output is a numpy array
         self.assertIsInstance(y_reconstructed, np.ndarray)
-        
+
         # Check that the output is not all zeros
         self.assertGreater(np.abs(y_reconstructed).sum(), 0)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

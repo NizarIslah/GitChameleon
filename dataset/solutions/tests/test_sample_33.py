@@ -4,13 +4,13 @@ import sys
 import unittest
 import warnings
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import networkx as nx
 import sample_33
 
 # Filter deprecation warnings
-warnings.filterwarnings('ignore', category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 # Check networkx version
 nx_version = nx.__version__
@@ -26,10 +26,10 @@ class TestGetNodes(unittest.TestCase):
         G = nx.Graph()
         for i in range(5):
             G.add_node(i)
-        
+
         # Get the nodes
         nodes = sample_33.get_nodes(G)
-        
+
         # Check that we get a list
         self.assertIsInstance(nodes, list)
         # Check that the list contains all the nodes
@@ -40,10 +40,10 @@ class TestGetNodes(unittest.TestCase):
     def test_empty_graph(self):
         """Test with an empty graph."""
         G = nx.Graph()
-        
+
         # Get the nodes
         nodes = sample_33.get_nodes(G)
-        
+
         # Check that we get a list
         self.assertIsInstance(nodes, list)
         # Check that the list is empty
@@ -53,10 +53,10 @@ class TestGetNodes(unittest.TestCase):
         """Test with a graph that has a single node."""
         G = nx.Graph()
         G.add_node(0)
-        
+
         # Get the nodes
         nodes = sample_33.get_nodes(G)
-        
+
         # Check that we get a list
         self.assertIsInstance(nodes, list)
         # Check that the list contains the single node
@@ -71,10 +71,10 @@ class TestGetNodes(unittest.TestCase):
         G.add_edge(0, 1)
         G.add_edge(1, 2)
         G.add_edge(2, 0)
-        
+
         # Get the nodes
         nodes = sample_33.get_nodes(G)
-        
+
         # Check that we get a list
         self.assertIsInstance(nodes, list)
         # Check that the list contains all the nodes
@@ -89,10 +89,10 @@ class TestGetNodes(unittest.TestCase):
         G.add_edge(0, 1)
         G.add_edge(1, 2)
         G.add_edge(2, 0)
-        
+
         # Get the nodes
         nodes = sample_33.get_nodes(G)
-        
+
         # Check that we get a list
         self.assertIsInstance(nodes, list)
         # Check that the list contains all the nodes
@@ -108,10 +108,10 @@ class TestGetNodes(unittest.TestCase):
         G.add_edge(0, 1)  # Duplicate edge
         G.add_edge(1, 2)
         G.add_edge(2, 0)
-        
+
         # Get the nodes
         nodes = sample_33.get_nodes(G)
-        
+
         # Check that we get a list
         self.assertIsInstance(nodes, list)
         # Check that the list contains all the nodes
@@ -126,10 +126,10 @@ class TestGetNodes(unittest.TestCase):
         G.add_node("A")
         G.add_node("B")
         G.add_node("C")
-        
+
         # Get the nodes
         nodes = sample_33.get_nodes(G)
-        
+
         # Check that we get a list
         self.assertIsInstance(nodes, list)
         # Check that the list contains all the nodes
@@ -145,10 +145,10 @@ class TestGetNodes(unittest.TestCase):
         G.add_node("A")
         G.add_node(2.5)
         G.add_node(True)
-        
+
         # Get the nodes
         nodes = sample_33.get_nodes(G)
-        
+
         # Check that we get a list
         self.assertIsInstance(nodes, list)
         # Check that the list contains all the nodes
@@ -160,11 +160,11 @@ class TestGetNodes(unittest.TestCase):
         """Test with a non-graph input (should raise TypeError or AttributeError)."""
         # Try with a list instead of a graph
         G = [0, 1, 2, 3, 4]
-        
+
         # This should raise a TypeError or AttributeError
         with self.assertRaises((TypeError, AttributeError)):
             sample_33.get_nodes(G)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

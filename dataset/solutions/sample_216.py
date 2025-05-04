@@ -4,9 +4,10 @@
 import time
 import mitmproxy.connection as conn
 
+
 def custom_client(ip_address: str, i_port: int, o_port: int) -> conn.Client:
-    return  conn.Client(
-    peername=(ip_address, i_port),
-    sockname=(ip_address, o_port),
-    timestamp_start=time.time()
-)
+    return conn.Client(
+        peername=(ip_address, i_port),
+        sockname=(ip_address, o_port),
+        timestamp_start=time.time(),
+    )

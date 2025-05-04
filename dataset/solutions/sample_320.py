@@ -6,5 +6,4 @@ from PIL import Image, ImageChops
 
 
 def imaging(img1: Image, img2: Image) -> Image:
-    
     return ImageChops.overlay(img1, img2)

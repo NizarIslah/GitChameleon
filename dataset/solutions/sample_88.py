@@ -4,6 +4,7 @@
 import ctypes
 import lightgbm.basic as basic
 
+
 def create_c_array(values: list, ctype: type) -> ctypes.Array:
     """
     Create a ctypes array from a list of values.

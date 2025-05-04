@@ -1,4 +1,5 @@
 from typing import Union
+
 # library: django
 # version: 4.0.0
 # extra_dependencies: []
@@ -8,21 +9,23 @@ from django import forms
 from django.template import Template, Context
 
 if not settings.configured:
-  settings.configure(
+    settings.configure(
         TEMPLATES=[
             {
-                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                "BACKEND": "django.template.backends.django.DjangoTemplates",
             },
         ],
     )
 django.setup()
 
+
 def render_output(template_string):
-  form = SampleForm()
-  template = Template(template_string)
-  context = Context({'form': form})
-  rendered_output = template.render(context)
-  return rendered_output
+    form = SampleForm()
+    template = Template(template_string)
+    context = Context({"form": form})
+    rendered_output = template.render(context)
+    return rendered_output
+
 
 # target for html string
 # <form>
@@ -35,10 +38,13 @@ def render_output(template_string):
 #   </div>
 # </form>
 
+
 class SampleForm(forms.Form):
-    name = forms.CharField(label='Name', help_text='Enter your name')
-def get_template_string()->str:
-    return '''
+    name = forms.CharField(label="Name", help_text="Enter your name")
+
+
+def get_template_string() -> str:
+    return """
 <form>
   <div>
     {{ form.name.label_tag }}
@@ -51,4 +57,4 @@ def get_template_string()->str:
     {{ form.name }}
   </div>
 </form>
-'''
+"""

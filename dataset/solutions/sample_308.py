@@ -8,7 +8,27 @@ from typing import Union, Optional, Tuple
 
 DTypeLike = Union[np.dtype, type]
 
-def compute_pyin(freq: int, sr: int, y: int, fmin: int, fmax: int, frame_length: int, center: bool, pad_mode: str, win_length: Optional[int], hop_length: Optional[int], n_thresholds: int, beta_parameters: Tuple[int], boltzmann_parameter: int, resolution: float, max_transition_rate: float, switch_prob: float, no_trough_prob: float, fill_na: DTypeLike) -> np.ndarray:
+
+def compute_pyin(
+    freq: int,
+    sr: int,
+    y: int,
+    fmin: int,
+    fmax: int,
+    frame_length: int,
+    center: bool,
+    pad_mode: str,
+    win_length: Optional[int],
+    hop_length: Optional[int],
+    n_thresholds: int,
+    beta_parameters: Tuple[int],
+    boltzmann_parameter: int,
+    resolution: float,
+    max_transition_rate: float,
+    switch_prob: float,
+    no_trough_prob: float,
+    fill_na: DTypeLike,
+) -> np.ndarray:
     """
     Calculates the fundamental frequency estimation using probabilistic YIN.
 
@@ -34,6 +54,6 @@ def compute_pyin(freq: int, sr: int, y: int, fmin: int, fmax: int, frame_length:
 
     Returns:
         Time series of fundamental frequencies in Hertz.
-    """    
+    """
 
     return librosa.pyin(y, fmin=fmin, fmax=fmax, center=center)[0]

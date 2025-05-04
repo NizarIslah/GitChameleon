@@ -9,6 +9,7 @@ import lightgbm as lgb
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import sample_82
 
+
 class TestLightGBMCV(unittest.TestCase):
     def test_dataset_creation(self):
         """Test that the Dataset is created correctly with the right dimensions."""

@@ -10,4 +10,4 @@ from sample_68 import apply_correlate_full
 
 arr1 = np.array([1, 2, 3])
 arr2 = np.array([0, 1, 0.5])
-assert apply_correlate_full(arr1, arr2).all() == np.correlate(arr1, arr2, 'full').all()
+assert apply_correlate_full(arr1, arr2).all() == np.correlate(arr1, arr2, "full").all()

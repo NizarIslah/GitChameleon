@@ -7,6 +7,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 from sample_224 import generate_cert_new
 
+
 def test_generate_cert_new():
     hostname = "example.com"
     cert_pem, key_pem = generate_cert_new(hostname)
@@ -15,5 +16,6 @@ def test_generate_cert_new():
 
     assert cert_pem.strip() != "", "Certificate PEM is empty"
     assert key_pem.strip() != "", "Key PEM is empty"
+
 
 test_generate_cert_new()

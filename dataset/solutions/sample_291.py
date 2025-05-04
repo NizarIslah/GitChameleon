@@ -14,11 +14,11 @@ def compute_plp(
     win_length: int,
     tempo_min: Optional[float],
     tempo_max: Optional[float],
-    onset_env: np.ndarray
+    onset_env: np.ndarray,
 ) -> np.ndarray:
     """
     Compute the Predominant Local Pulse (PLP) of an audio signal.
-    
+
     Parameters:
         y: The audio signal.
         sr: The sampling rate of the audio signal in Hertz.
@@ -27,14 +27,13 @@ def compute_plp(
         tempo_min: The minimum tempo (in BPM) for consideration.
         tempo_max: The maximum tempo (in BPM) for consideration.
         onset_env: The onset envelope of the audio signal.
-        
+
     Returns:
         The computed PLP (Predominant Local Pulse) values.
     """
 
-
     ftgram = stft(onset_env, n_fft=win_length, hop_length=1, center=True, window="hann")
-    
+
     tempo_frequencies = np.fft.rfftfreq(n=win_length, d=(sr * 60 / float(hop_length)))
 
     ftmag = np.abs(ftgram)

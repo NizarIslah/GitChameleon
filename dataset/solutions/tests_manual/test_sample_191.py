@@ -18,4 +18,6 @@ with warnings.catch_warnings(record=True) as w:
     warnings.simplefilter("always", SymPyDeprecationWarning)
     expect = a.free_symbols
     assert output == expect
-    assert not any(isinstance(warn.message, SymPyDeprecationWarning) for warn in w), "Test Failed: Deprecation warning was triggered!"
+    assert not any(
+        isinstance(warn.message, SymPyDeprecationWarning) for warn in w
+    ), "Test Failed: Deprecation warning was triggered!"

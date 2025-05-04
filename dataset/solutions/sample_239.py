@@ -5,6 +5,6 @@ import falcon
 from falcon import HTTPStatus
 
 
-def custom_body(status: falcon.HTTPStatus, info:str) -> falcon.HTTPStatus:
+def custom_body(status: falcon.HTTPStatus, info: str) -> falcon.HTTPStatus:
     status.text = info
     return status

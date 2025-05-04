@@ -2,7 +2,7 @@ import os
 import sys
 import unittest
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from sample_246 import custom_environ
 
 import warnings
@@ -13,7 +13,9 @@ with warnings.catch_warnings(record=True) as w:
     env = custom_environ(version)
     if w:
         for warn in w:
-            assert not issubclass(warn.category, DeprecationWarning), "Deprecated API used!"
+            assert not issubclass(
+                warn.category, DeprecationWarning
+            ), "Deprecated API used!"
 
 expect = "HTTP/1.1"
-assert env.get('SERVER_PROTOCOL', '') == expect
+assert env.get("SERVER_PROTOCOL", "") == expect

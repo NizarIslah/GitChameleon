@@ -3,8 +3,10 @@
 # extra_dependencies: []
 import pytest
 
+
 def foo(a, b):
     return (10 * a - b + 7) // 3
+
 
 @pytest.mark.parametrize(
     ["a", "b", "result"],

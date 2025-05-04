@@ -4,5 +4,6 @@
 import geopandas as gpd
 from shapely.geometry import Point, Polygon
 
-def spatial_query(gdf:gpd.GeoDataFrame, other:gpd.GeoSeries) -> gpd.GeoDataFrame:
+
+def spatial_query(gdf: gpd.GeoDataFrame, other: gpd.GeoSeries) -> gpd.GeoDataFrame:
     return gdf.sindex.query_bulk(other)

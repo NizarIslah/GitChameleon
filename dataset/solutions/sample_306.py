@@ -6,7 +6,23 @@ import numpy as np
 import scipy
 from typing import Optional
 
-def compute_yin(sr: int, fmin: int, fmax: int, duration: float, period: float, phi: float, method: str, y: np.ndarray, frame_length: int, center: bool, pad_mode: str, win_length: Optional[int], hop_length: Optional[int], trough_threshold: float) -> np.ndarray:
+
+def compute_yin(
+    sr: int,
+    fmin: int,
+    fmax: int,
+    duration: float,
+    period: float,
+    phi: float,
+    method: str,
+    y: np.ndarray,
+    frame_length: int,
+    center: bool,
+    pad_mode: str,
+    win_length: Optional[int],
+    hop_length: Optional[int],
+    trough_threshold: float,
+) -> np.ndarray:
     """
     Calculates the fundamental frequency (F0) estimation using the YIN algorithm.
 
@@ -29,6 +45,5 @@ def compute_yin(sr: int, fmin: int, fmax: int, duration: float, period: float, p
     Returns:
         The estimated fundamental frequency in Hz.
     """
-
 
     return librosa.yin(y, fmin=fmin, fmax=fmax, sr=sr)

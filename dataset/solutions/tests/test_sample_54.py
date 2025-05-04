@@ -2,7 +2,8 @@ import unittest
 import numpy as np
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from sample_54 import get_pairwise_dist
 
 
@@ -17,7 +18,7 @@ class TestManhattanDistance(unittest.TestCase):
         # = [[2, 4],
         #    [0, 2]]
         result = get_pairwise_dist(X, Y)
-        expected = np.array([[2., 4.], [0., 2.]])
+        expected = np.array([[2.0, 4.0], [0.0, 2.0]])
         np.testing.assert_array_equal(result, expected)
 
     def test_get_pairwise_dist_zero(self):
@@ -28,7 +29,7 @@ class TestManhattanDistance(unittest.TestCase):
         # [[0, 4],
         #  [4, 0]]
         result = get_pairwise_dist(X, Y)
-        expected = np.array([[0., 4.], [4., 0.]])
+        expected = np.array([[0.0, 4.0], [4.0, 0.0]])
         np.testing.assert_array_equal(result, expected)
 
     def test_get_pairwise_dist_negative_values(self):
@@ -39,7 +40,7 @@ class TestManhattanDistance(unittest.TestCase):
         # [[6, 4],
         #  [4, 14]]
         result = get_pairwise_dist(X, Y)
-        expected = np.array([[6., 4.], [4., 14.]])
+        expected = np.array([[6.0, 4.0], [4.0, 14.0]])
         np.testing.assert_array_equal(result, expected)
 
     def test_get_pairwise_dist_single_point(self):
@@ -50,7 +51,7 @@ class TestManhattanDistance(unittest.TestCase):
         # [[7],
         #  [4]]
         result = get_pairwise_dist(X, Y)
-        expected = np.array([[7.], [4.]])
+        expected = np.array([[7.0], [4.0]])
         np.testing.assert_array_equal(result, expected)
 
 

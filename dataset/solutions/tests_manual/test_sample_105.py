@@ -6,11 +6,13 @@ import unittest
 from uuid import uuid4
 from django.apps import AppConfig
 
-class MyAppConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'            
-    label = 'myapp_' + str(uuid4())
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+class MyAppConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    label = "myapp_" + str(uuid4())
+
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Import the module to test
 from sample_105 import Square, create_square, display_side_and_area
@@ -21,7 +23,7 @@ class TestSquareModel(unittest.TestCase):
 
     def setUp(self):
         # Create the necessary tables in the in-memory database
-        from django.db import connection       
+        from django.db import connection
 
 
 with connection.schema_editor() as schema_editor:

@@ -5,7 +5,7 @@ import unittest
 from django.db import connection
 from django.db.utils import OperationalError
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from sample_106 import Square, create_square, display_side_and_area
 
@@ -31,16 +31,16 @@ class TestSquareModel(unittest.TestCase):
     def test_create_square(self):
         # Test creating a square with side=5
         square = create_square(5)
-        
+
         # Verify the square was created with correct side
         self.assertEqual(square.side, 5)
-        
+
         # Verify the area was calculated correctly
         self.assertEqual(square.area, 25)
-        
+
         # Verify the object was saved to the database
         self.assertIsNotNone(square.id)
-        
+
         # Verify we can retrieve it from the database
         retrieved_square = Square.objects.get(id=square.id)
         self.assertEqual(retrieved_square.side, 5)
@@ -49,10 +49,10 @@ class TestSquareModel(unittest.TestCase):
     def test_display_side_and_area(self):
         # Create a square to test with
         square = create_square(7)
-        
+
         # Test the display function
         side, area = display_side_and_area(square)
-        
+
         # Verify correct values are returned
         self.assertEqual(side, 7)
         self.assertEqual(area, 49)
@@ -60,12 +60,12 @@ class TestSquareModel(unittest.TestCase):
     def test_multiple_squares(self):
         # Test creating multiple squares
         squares = [create_square(i) for i in range(1, 6)]
-        
+
         # Verify each square has the correct area
         for i, square in enumerate(squares, 1):
             self.assertEqual(square.side, i)
             self.assertEqual(square.area, i * i)
-        
+
         # Verify count in database
         self.assertEqual(Square.objects.count(), 5)
 
@@ -83,5 +83,5 @@ class TestSquareModel(unittest.TestCase):
         self.assertEqual(square.area, large_side * large_side)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

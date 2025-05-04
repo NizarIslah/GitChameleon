@@ -12,10 +12,12 @@ from sympy.utilities.exceptions import SymPyDeprecationWarning
 
 with warnings.catch_warnings(record=True) as w:
     warnings.simplefilter("always", SymPyDeprecationWarning)
-    
+
     expect = True
-    output = custom_divides(10,2)
+    output = custom_divides(10, 2)
 
     assert output == expect
 
-    assert not any(isinstance(warn.message, SymPyDeprecationWarning) for warn in w), "Test Failed: Deprecation warning was triggered!"
+    assert not any(
+        isinstance(warn.message, SymPyDeprecationWarning) for warn in w
+    ), "Test Failed: Deprecation warning was triggered!"

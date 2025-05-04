@@ -14,4 +14,5 @@ def test_custom_sometrue():
     expected = np.sometrue(arr)
     assert result == expected
 
+
 test_custom_sometrue()

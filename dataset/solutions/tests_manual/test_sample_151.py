@@ -1,4 +1,5 @@
 import datetime
+
 # Add the parent directory to import sys
 import os
 import sys
@@ -11,6 +12,7 @@ from sample_151 import convert_timedelta_to_seconds
 
 
 import datetime
-td = datetime.timedelta(hours=2, minutes=30,microseconds=1)
-assertion_results = convert_timedelta_to_seconds(td)==9000
+
+td = datetime.timedelta(hours=2, minutes=30, microseconds=1)
+assertion_results = convert_timedelta_to_seconds(td) == 9000
 assert assertion_results

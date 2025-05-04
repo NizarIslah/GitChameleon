@@ -4,12 +4,12 @@ import sys
 import unittest
 from unittest.mock import Mock
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from falcon.stream import BoundedStream
 from sample_244 import custom_writable
 
@@ -24,7 +24,9 @@ with warnings.catch_warnings(record=True) as w:
     writable_val = custom_writable(bstream)
     if w:
         for warn in w:
-            assert not issubclass(warn.category, DeprecationWarning), "Deprecated API used!"
+            assert not issubclass(
+                warn.category, DeprecationWarning
+            ), "Deprecated API used!"
 
-expect = False 
+expect = False
 assert writable_val == expect

@@ -5,10 +5,11 @@ import sys
 import unittest
 import warnings
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import gradio as gr
 import sample_39
+
 
 class TestImageDisplay(unittest.TestCase):
     """Test cases for the display_image function and Gradio Interface in sample_39.py."""
@@ -24,6 +25,5 @@ class TestImageDisplay(unittest.TestCase):
         self.assertTrue(result.startswith("http"))
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

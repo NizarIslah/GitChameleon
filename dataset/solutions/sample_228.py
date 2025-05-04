@@ -4,6 +4,7 @@
 import pytest
 import pathlib
 
+
 @pytest.hookimpl()
-def pytest_ignore_collect(collection_path:pathlib.Path):
+def pytest_ignore_collect(collection_path: pathlib.Path):
     pass

@@ -52,15 +52,9 @@ parser.add_argument(
 parser.add_argument("--api_key", type=str, required=True, help="Anthropic API key")
 
 parser.add_argument("--wandb", type=bool, default=False, help="Use WandB for logging")
-parser.add_argument(
-    "--wandb_entity", type=str, help="WandB entity name"
-)
-parser.add_argument(
-    "--wandb_project", type=str, help="WandB project name"
-)
-parser.add_argument(
-    "--wandb_run_name", type=str, help="WandB run name"
-)
+parser.add_argument("--wandb_entity", type=str, help="WandB entity name")
+parser.add_argument("--wandb_project", type=str, help="WandB project name")
+parser.add_argument("--wandb_run_name", type=str, help="WandB run name")
 
 parser.add_argument(
     "--system_prompt",

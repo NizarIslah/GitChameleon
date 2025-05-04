@@ -8,13 +8,14 @@ import pandas as pd
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from src.eval_sample import eval_sample
 
+
 def extract_code(text: str) -> str:
     """Parse raw string into python code"""
     try:
         match = re.search(r"```python(.*?)```", text, re.DOTALL)
     except Exception as e:
         try:
-            match = re.search(r"```(.*?)```", rf'{text}', re.DOTALL) # anthropic
+            match = re.search(r"```(.*?)```", rf"{text}", re.DOTALL)  # anthropic
         except Exception as e:
             print("Error: ", e)
             match = None
@@ -30,7 +31,8 @@ def get_solution(record):
     if solution == "":
         raise ValueError("No solution found in record")
     return extract_code(solution)
-    
+
+
 def get_example_id(record):
     id = record.get("example_id", "")
     if id == "":
@@ -60,7 +62,9 @@ def process_record(idx, record, starting_codes, env_dir, test_dir):
             "test_file": test_file_content,
             "codes": {"solution_code": {"code": solution}},
         }
-        eval_res = eval_sample(example_id, env_path, code_dict)["codes"]["solution_code"]
+        eval_res = eval_sample(example_id, env_path, code_dict)["codes"][
+            "solution_code"
+        ]
 
         return {
             "idx": idx,
@@ -87,7 +91,9 @@ def main():
         description="Process a JSONL file in parallel with eval_sample and save results."
     )
     parser.add_argument("data_file", help="Path to the dataset JSONL file to process")
-    parser.add_argument("jsonl_file", help="Path to the model outputs JSONL file to process")
+    parser.add_argument(
+        "jsonl_file", help="Path to the model outputs JSONL file to process"
+    )
     parser.add_argument("env_dir", help="Path to the dir where environments live")
     parser.add_argument("test_dir", help="Path to the dir where test files are stored")
     parser.add_argument(
@@ -98,7 +104,7 @@ def main():
     )
     args = parser.parse_args()
 
-   # Load JSONL records
+    # Load JSONL records
     starting_codes = {}
     with open(args.data_file, "r", encoding="utf-8") as f:
         for line in f:
@@ -119,7 +125,9 @@ def main():
     # Kick off parallel tasks
     with ThreadPoolExecutor(max_workers=args.workers) as exe:
         futures = [
-            exe.submit(process_record, idx, rec, starting_codes, args.env_dir, args.test_dir)
+            exe.submit(
+                process_record, idx, rec, starting_codes, args.env_dir, args.test_dir
+            )
             for idx, rec in enumerate(outputs)
         ]
         for fut in tqdm(as_completed(futures), total=len(futures), desc="Evaluating"):

@@ -4,10 +4,10 @@ import unittest
 
 from sympy.physics.mechanics import Body, PinJoint
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from sample_181 import custom_pinJoint
 
-parent, child = Body('parent'), Body('child')
+parent, child = Body("parent"), Body("child")
 pin = custom_pinJoint(parent, child)
 expect1 = parent.frame.x
 expect2 = -child.frame.x

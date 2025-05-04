@@ -4,6 +4,7 @@
 import librosa
 import numpy as np
 
+
 def compute_lpc_coef(y: np.ndarray, sr: int, order: int) -> np.ndarray:
     """
     Compute the Linear Prediction Coefficients of an audio signal.
@@ -16,6 +17,5 @@ def compute_lpc_coef(y: np.ndarray, sr: int, order: int) -> np.ndarray:
     Returns:
         LP prediction error coefficients, i.e. filter denominator polynomial.
     """
-
 
     return librosa.lpc(y, order)

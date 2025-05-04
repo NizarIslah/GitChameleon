@@ -2,7 +2,7 @@ import unittest
 
 import matplotlib
 
-matplotlib.use('Agg')  # Use non-interactive backend for testing
+matplotlib.use("Agg")  # Use non-interactive backend for testing
 import os
 import sys
 
@@ -13,7 +13,7 @@ from matplotlib.figure import Figure
 
 # Import the function to test
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from sample_326 import modify
 
 
@@ -30,23 +30,23 @@ class TestSample326(unittest.TestCase):
         # Verify initial state has ticks
         self.assertEqual(len(self.ax.get_xticks()), 3)
         self.assertEqual(len(self.ax.get_yticks()), 3)
-        
+
         # Call the function to test
         modify(self.fig, self.ax)
-        
+
         # Verify ticks are removed
         self.assertEqual(len(self.ax.get_xticks()), 0)
         self.assertEqual(len(self.ax.get_yticks()), 0)
-    
+
     def test_modify_preserves_minor_ticks_setting(self):
         """Test that the modify function sets minor=False for ticks."""
         # Add some minor ticks
         self.ax.set_xticks([0.5, 1.5], minor=True)
         self.ax.set_yticks([0.5, 1.5], minor=True)
-        
+
         # Call the function to test
         modify(self.fig, self.ax)
-        
+
         # Verify major ticks are removed but minor ticks remain untouched
         self.assertEqual(len(self.ax.get_xticks()), 0)
         self.assertEqual(len(self.ax.get_yticks()), 0)
@@ -57,5 +57,6 @@ class TestSample326(unittest.TestCase):
         """Clean up after each test."""
         plt.close(self.fig)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

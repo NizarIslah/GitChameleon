@@ -4,7 +4,7 @@ import sys
 import unittest
 from typing import Any, Dict
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from sample_243 import custom_environ
 
 
@@ -20,7 +20,7 @@ class TestCustomEnviron(unittest.TestCase):
         """Test that custom_environ sets the root_path correctly."""
         test_path = "/test/path"
         result = custom_environ(test_path)
-        
+
         # In Falcon 3.0.0, the root_path is set in the SCRIPT_NAME environment variable
         self.assertEqual(result.get("SCRIPT_NAME"), test_path)
 
@@ -32,7 +32,7 @@ class TestCustomEnviron(unittest.TestCase):
     def test_custom_environ_default_values(self):
         """Test that custom_environ includes default values from falcon.testing.create_environ."""
         result = custom_environ("test_path")
-        
+
         # Check for some standard environment variables that should be present
         self.assertIn("REQUEST_METHOD", result)
         self.assertIn("wsgi.input", result)

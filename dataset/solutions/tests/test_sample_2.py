@@ -6,7 +6,7 @@ import unittest
 import numpy as np
 import torch
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from sample_2 import erf
 from scipy.special import erf as scipy_erf
@@ -20,13 +20,13 @@ class TestErf(unittest.TestCase):
         input_tensor = torch.tensor([0.0, 0.5, 1.0, 1.5, 2.0], dtype=torch.float32)
         result = erf(input_tensor)
         expected = torch.from_numpy(scipy_erf(input_tensor.numpy()))
-        
+
         # Check that the result is a tensor
         self.assertIsInstance(result, torch.Tensor)
-        
+
         # Check that the values match the expected output
         torch.testing.assert_close(result, expected)
-        
+
         # Check that the dtype is preserved
         self.assertEqual(result.dtype, input_tensor.dtype)
 
@@ -35,9 +35,9 @@ class TestErf(unittest.TestCase):
         input_tensor = torch.tensor([-0.5, -1.0, -1.5, -2.0], dtype=torch.float32)
         result = erf(input_tensor)
         expected = torch.from_numpy(scipy_erf(input_tensor.numpy()))
-        
+
         torch.testing.assert_close(result, expected)
-        
+
         # erf is an odd function, so erf(-x) = -erf(x)
         positive_input = torch.abs(input_tensor)
         positive_result = erf(positive_input)
@@ -47,7 +47,7 @@ class TestErf(unittest.TestCase):
         """Test erf with zero values."""
         input_tensor = torch.tensor([0.0], dtype=torch.float32)
         result = erf(input_tensor)
-        
+
         # erf(0) should be 0
         self.assertTrue(torch.allclose(result, torch.tensor([0.0])))
 
@@ -56,10 +56,10 @@ class TestErf(unittest.TestCase):
         input_tensor = torch.tensor([10.0, -10.0, 20.0, -20.0], dtype=torch.float32)
         result = erf(input_tensor)
         expected = torch.from_numpy(scipy_erf(input_tensor.numpy()))
-        
+
         # For very large values, erf approaches 1 or -1
         torch.testing.assert_close(result, expected)
-        
+
         # Check that large positive values approach 1
         self.assertTrue(torch.allclose(result[0], torch.tensor(1.0), atol=1e-7))
         # Check that large negative values approach -1
@@ -70,10 +70,10 @@ class TestErf(unittest.TestCase):
         input_tensor = torch.tensor([1e-10, -1e-10, 1e-5, -1e-5], dtype=torch.float64)
         result = erf(input_tensor)
         expected = torch.from_numpy(scipy_erf(input_tensor.numpy()))
-        
+
         # For very small values, erf(x) ≈ (2/√π) * x
         torch.testing.assert_close(result, expected)
-        
+
         # For small x, erf(x) ≈ (2/√π) * x ≈ 1.128379 * x
         approx_factor = 2 / np.sqrt(np.pi)
         approx_result = input_tensor * approx_factor
@@ -84,10 +84,10 @@ class TestErf(unittest.TestCase):
         input_tensor = torch.tensor([[0.0, 0.5], [1.0, 1.5]], dtype=torch.float32)
         result = erf(input_tensor)
         expected = torch.from_numpy(scipy_erf(input_tensor.numpy()))
-        
+
         # Check shape
         self.assertEqual(result.shape, input_tensor.shape)
-        
+
         # Check values
         torch.testing.assert_close(result, expected)
 
@@ -101,19 +101,19 @@ class TestErf(unittest.TestCase):
         """Test that erf matches scipy's erf implementation across a range of values."""
         # Create a range of values to test
         input_tensor = torch.linspace(-5.0, 5.0, 100, dtype=torch.float64)
-        
+
         # Calculate with our function
         result = erf(input_tensor)
-        
+
         # Calculate with scipy directly
         expected = torch.from_numpy(scipy_erf(input_tensor.numpy()))
-        
+
         # Check that they match closely
         torch.testing.assert_close(result, expected)
-        
+
         # Additional check for dtype preservation
         self.assertEqual(result.dtype, input_tensor.dtype)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

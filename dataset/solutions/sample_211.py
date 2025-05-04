@@ -6,5 +6,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 
+
 def custom_violinplot(data: pd.DataFrame) -> Axes:
-    return sns.violinplot(x='x', y='y', data=data, bw_method="scott")
+    return sns.violinplot(x="x", y="y", data=data, bw_method="scott")

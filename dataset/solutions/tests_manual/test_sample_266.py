@@ -8,7 +8,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import plotly.graph_objects as go
 from sample_266 import custom_fig
 

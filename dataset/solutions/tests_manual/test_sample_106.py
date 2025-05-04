@@ -5,7 +5,7 @@ import unittest
 from django.db import connection
 from django.db.utils import OperationalError
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from sample_106 import Square, create_square, display_side_and_area
 

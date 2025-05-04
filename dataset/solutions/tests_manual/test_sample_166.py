@@ -1,4 +1,5 @@
 import json
+
 # Add the parent directory to import sys
 import os
 import sys
@@ -10,11 +11,13 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sample_166 import MyCustomJSONHandler, app, data, eval_app
 
 
-app2 = flask.Flask('test2')
+app2 = flask.Flask("test2")
 
-@app2.route('/data2')
+
+@app2.route("/data2")
 def data2(num_arr):
-    return flask.jsonify({'numbers': num_arr})
+    return flask.jsonify({"numbers": num_arr})
+
 
 class MyCustomJSONHandler2(flask.json.provider.DefaultJSONProvider):
     def default(self, obj):
@@ -23,8 +26,37 @@ class MyCustomJSONHandler2(flask.json.provider.DefaultJSONProvider):
             return res
         return super().default(obj)
 
+
 app2.json_provider_class = MyCustomJSONHandler2
 app2.json = app2.json_provider_class(app2)
 
-assertion_results = eval_app(app2, data2,np.array([[3, 3, 1,], [2,2,4],[1,1,1]])) == eval_app(app, data,np.array([[3, 3, 1,], [2,2,4],[1,1,1]]))
+assertion_results = eval_app(
+    app2,
+    data2,
+    np.array(
+        [
+            [
+                3,
+                3,
+                1,
+            ],
+            [2, 2, 4],
+            [1, 1, 1],
+        ]
+    ),
+) == eval_app(
+    app,
+    data,
+    np.array(
+        [
+            [
+                3,
+                3,
+                1,
+            ],
+            [2, 2, 4],
+            [1, 1, 1],
+        ]
+    ),
+)
 assert assertion_results

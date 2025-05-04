@@ -4,8 +4,6 @@
 import librosa
 import numpy as np
 
+
 def compute_shear(E: np.ndarray, factor: int, axis: int) -> np.ndarray:
-    
-
-
     return librosa.util.shear(E, factor=factor, axis=axis)

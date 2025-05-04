@@ -7,6 +7,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sample_68 import apply_correlate_full
 
+
 class TestApplyCorrelateFull(unittest.TestCase):
     def test_empty_arrays(self):
         """Test that calling with two empty arrays raises ValueError."""
@@ -34,9 +35,3 @@ class TestApplyCorrelateFull(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-
-
-
-
-

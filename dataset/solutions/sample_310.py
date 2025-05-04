@@ -10,6 +10,4 @@ DTypeLike = Union[np.dtype, type]
 
 
 def compute_vqt(y: np.ndarray, sr: int) -> np.ndarray:
-    
-
     return librosa.vqt(y, sr=sr)

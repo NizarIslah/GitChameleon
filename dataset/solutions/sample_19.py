@@ -4,5 +4,6 @@
 import geopandas as gpd
 from shapely.geometry import Point, Polygon
 
-def spatial_join(gdf1 : gpd.GeoDataFrame, gdf2 : gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-    return gpd.sjoin(gdf1, gdf2, op='within')
+
+def spatial_join(gdf1: gpd.GeoDataFrame, gdf2: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    return gpd.sjoin(gdf1, gdf2, op="within")

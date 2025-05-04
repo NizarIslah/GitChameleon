@@ -1,4 +1,5 @@
 import os
+
 # Add the parent directory to the path so we can import the sample module
 import sys
 import unittest
@@ -13,14 +14,14 @@ from sample_294 import compute_times_like
 filename = librosa.util.example_audio_file()
 y, sr = librosa.load(filename)
 D = librosa.stft(y)
-hop_length = 512 
+hop_length = 512
 
 sol = compute_times_like(y, sr, hop_length, D)
-    
+
 if np.isscalar(D):
-    frames = np.arange(D) # type: ignore
+    frames = np.arange(D)  # type: ignore
 else:
-    frames = np.arange(D.shape[-1]) # type: ignore
+    frames = np.arange(D.shape[-1])  # type: ignore
 offset = 0
 samples = (np.asanyarray(frames) * hop_length + offset).astype(int)
 

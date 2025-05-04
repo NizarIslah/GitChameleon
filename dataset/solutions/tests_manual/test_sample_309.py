@@ -1,5 +1,6 @@
 # Test file for sample_309.py
 import os
+
 # Add the parent directory to the path so we can import the sample
 import sys
 import unittest
@@ -13,22 +14,40 @@ from sample_309 import compute_vqt
 
 filename = librosa.util.example_audio_file()
 y, sr = librosa.load(filename)
-hop_length=512
-fmin=None
-n_bins=84
-gamma=None
-bins_per_octave=12
-tuning=0.0
-filter_scale=1
-norm=1
-sparsity=0.01
-window="hann"
-scale=True
-pad_mode="reflect"
-res_type=None
-dtype=None
+hop_length = 512
+fmin = None
+n_bins = 84
+gamma = None
+bins_per_octave = 12
+tuning = 0.0
+filter_scale = 1
+norm = 1
+sparsity = 0.01
+window = "hann"
+scale = True
+pad_mode = "reflect"
+res_type = None
+dtype = None
 
-sol = compute_vqt(y, sr, hop_length, fmin, n_bins, gamma, bins_per_octave, tuning, filter_scale, norm, sparsity, window, scale, pad_mode, res_type, dtype)
+sol = compute_vqt(
+    y,
+    sr,
+    hop_length,
+    fmin,
+    n_bins,
+    gamma,
+    bins_per_octave,
+    tuning,
+    filter_scale,
+    norm,
+    sparsity,
+    window,
+    scale,
+    pad_mode,
+    res_type,
+    dtype,
+)
+
 
 def dtype_r2c(d, default=np.complex64):
     mapping = {
@@ -42,6 +61,7 @@ def dtype_r2c(d, default=np.complex64):
         return dt
 
     return np.dtype(mapping.get(dt, default))
+
 
 n_octaves = int(np.ceil(float(n_bins) / bins_per_octave))
 n_filters = min(bins_per_octave, n_bins)
@@ -64,9 +84,9 @@ if dtype is None:
 
 fmin = fmin * 2.0 ** (tuning / bins_per_octave)
 
-freqs = librosa.time_frequency.cqt_frequencies(n_bins, fmin, bins_per_octave=bins_per_octave)[
-    -bins_per_octave:
-]
+freqs = librosa.time_frequency.cqt_frequencies(
+    n_bins, fmin, bins_per_octave=bins_per_octave
+)[-bins_per_octave:]
 
 fmin_t = np.min(freqs)
 fmax_t = np.max(freqs)
@@ -89,6 +109,7 @@ downsample_count1 = max(
     0, int(np.ceil(np.log2(librosa.audio.BW_FASTEST * nyquist / filter_cutoff)) - 1) - 1
 )
 
+
 def num_two_factors(x):
     if x <= 0:
         return 0
@@ -98,25 +119,26 @@ def num_two_factors(x):
         x //= 2
 
     return num_twos
-num_twos=num_two_factors(hop_length)
+
+
+num_twos = num_two_factors(hop_length)
 downsample_count2 = max(0, num_twos - n_octaves + 1)
 downsample_count = min(downsample_count1, downsample_count2)
 
 
 vqt_resp = []
 
-num_twos=num_two_factors(hop_length)
+num_twos = num_two_factors(hop_length)
 if num_twos < n_octaves - 1:
     raise ParameterError(
         "hop_length must be a positive integer "
-        "multiple of 2^{0:d} for {1:d}-octave CQT/VQT".format(
-            n_octaves - 1, n_octaves
-        )
+        "multiple of 2^{0:d} for {1:d}-octave CQT/VQT".format(n_octaves - 1, n_octaves)
     )
 
 my_y, my_sr, my_hop = y, sr, hop_length
-def sparsify_rows(x, quantile=0.01, dtype=None):
 
+
+def sparsify_rows(x, quantile=0.01, dtype=None):
     if x.ndim == 1:
         x = x.reshape((1, -1))
 
@@ -147,6 +169,7 @@ def sparsify_rows(x, quantile=0.01, dtype=None):
         x_sparse[i, idx] = x[i, idx]
 
     return x_sparse.tocsr()
+
 
 def cqt_filter_fft(
     sr,
@@ -193,6 +216,7 @@ def cqt_response(y, n_fft, hop_length, fft_basis, mode, dtype=None):
     )
     return fft_basis.dot(D)
 
+
 for i in range(n_octaves):
     if i > 0:
         if len(my_y) < 2:
@@ -208,7 +232,7 @@ for i in range(n_octaves):
 
     fft_basis, n_fft, _ = cqt_filter_fft(
         my_sr,
-        fmin_t * 2.0 ** -i,
+        fmin_t * 2.0**-i,
         n_filters,
         bins_per_octave,
         filter_scale,
@@ -219,11 +243,10 @@ for i in range(n_octaves):
         dtype=dtype,
     )
 
-    fft_basis[:] *= np.sqrt(2 ** i)
+    fft_basis[:] *= np.sqrt(2**i)
 
-    vqt_resp.append(
-        cqt_response(my_y, n_fft, my_hop, fft_basis, pad_mode, dtype=dtype)
-    )
+    vqt_resp.append(cqt_response(my_y, n_fft, my_hop, fft_basis, pad_mode, dtype=dtype))
+
 
 def trim_stack(cqt_resp, n_bins, dtype):
     max_col = min(c_i.shape[-1] for c_i in cqt_resp)
@@ -240,6 +263,7 @@ def trim_stack(cqt_resp, n_bins, dtype):
         end -= n_oct
 
     return cqt_out
+
 
 V = trim_stack(vqt_resp, n_bins, dtype)
 

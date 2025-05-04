@@ -4,5 +4,6 @@
 from typing import Dict, Any
 import falcon.testing as testing
 
+
 def custom_environ(info: str) -> Dict[str, Any]:
     return testing.create_environ(root_path=info)

@@ -6,7 +6,23 @@ import numpy as np
 import scipy
 from typing import Optional
 
-def compute_yin(sr: int, fmin: int, fmax: int, duration: float, period: float, phi: float, method: str, y: np.ndarray, frame_length: int, center: bool, pad_mode: str, win_length: Optional[int], hop_length: Optional[int], trough_threshold: float) -> np.ndarray:
+
+def compute_yin(
+    sr: int,
+    fmin: int,
+    fmax: int,
+    duration: float,
+    period: float,
+    phi: float,
+    method: str,
+    y: np.ndarray,
+    frame_length: int,
+    center: bool,
+    pad_mode: str,
+    win_length: Optional[int],
+    hop_length: Optional[int],
+    trough_threshold: float,
+) -> np.ndarray:
     """
     Calculates the fundamental frequency (F0) estimation using the YIN algorithm.
 
@@ -29,15 +45,10 @@ def compute_yin(sr: int, fmin: int, fmax: int, duration: float, period: float, p
     Returns:
         The estimated fundamental frequency in Hz.
     """
-    
-    
 
-
-    
     # Set the default window length if it is not already specified.
     if win_length is None:
         win_length = frame_length // 2
-
 
     # Set the default hop if it is not already specified.
     if hop_length is None:
@@ -62,7 +73,7 @@ def compute_yin(sr: int, fmin: int, fmax: int, duration: float, period: float, p
     acf_frames[np.abs(acf_frames) < 1e-6] = 0
 
     # Energy terms.
-    energy_frames = np.cumsum(y_frames ** 2, axis=0)
+    energy_frames = np.cumsum(y_frames**2, axis=0)
     energy_frames = energy_frames[win_length:, :] - energy_frames[:-win_length, :]
     energy_frames[np.abs(energy_frames) < 1e-6] = 0
 
@@ -79,7 +90,9 @@ def compute_yin(sr: int, fmin: int, fmax: int, duration: float, period: float, p
     parabolic_shifts = np.zeros_like(yin_frames)
     parabola_a = (yin_frames[:-2, :] + yin_frames[2:, :] - 2 * yin_frames[1:-1, :]) / 2
     parabola_b = (yin_frames[2:, :] - yin_frames[:-2, :]) / 2
-    parabolic_shifts[1:-1, :] = -parabola_b / (2 * parabola_a + librosa.util.tiny(parabola_a))
+    parabolic_shifts[1:-1, :] = -parabola_b / (
+        2 * parabola_a + librosa.util.tiny(parabola_a)
+    )
     parabolic_shifts[np.abs(parabolic_shifts) > 1] = 0
 
     # Find local minima.
@@ -100,9 +113,9 @@ def compute_yin(sr: int, fmin: int, fmax: int, duration: float, period: float, p
 
     # Refine peak by parabolic interpolation.
     yin_period = (
-     min_period
-     + yin_period
-     + parabolic_shifts[yin_period, range(yin_frames.shape[1])]
+        min_period
+        + yin_period
+        + parabolic_shifts[yin_period, range(yin_frames.shape[1])]
     )
 
     # Convert period to fundamental frequency.

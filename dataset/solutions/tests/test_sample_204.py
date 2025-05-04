@@ -14,7 +14,9 @@ class TestCustomPrimeCounting(unittest.TestCase):
         """Test custom_prime_counting with basic known values."""
         # Test some known prime counting values
         self.assertEqual(custom_prime_counting(10), 4)  # π(10) = 4 (primes: 2, 3, 5, 7)
-        self.assertEqual(custom_prime_counting(20), 8)  # π(20) = 8 (primes: 2, 3, 5, 7, 11, 13, 17, 19)
+        self.assertEqual(
+            custom_prime_counting(20), 8
+        )  # π(20) = 8 (primes: 2, 3, 5, 7, 11, 13, 17, 19)
         self.assertEqual(custom_prime_counting(30), 10)  # π(30) = 10
         self.assertEqual(custom_prime_counting(100), 25)  # π(100) = 25
         self.assertEqual(custom_prime_counting(200), 46)  # π(200) = 46
@@ -24,7 +26,9 @@ class TestCustomPrimeCounting(unittest.TestCase):
         # Test each integer from 1 to 20
         expected_values = [0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 8, 8]
         for n in range(1, 21):
-            self.assertEqual(custom_prime_counting(n), expected_values[n-1], f"Failed for n={n}")
+            self.assertEqual(
+                custom_prime_counting(n), expected_values[n - 1], f"Failed for n={n}"
+            )
 
     def test_medium_integers(self):
         """Test custom_prime_counting with medium integers (50-200)."""
@@ -44,7 +48,7 @@ class TestCustomPrimeCounting(unittest.TestCase):
         """Test custom_prime_counting with edge cases (0, 1)."""
         # For 0, there are no primes less than or equal to 0
         self.assertEqual(custom_prime_counting(0), 0)
-        
+
         # For 1, there are no primes less than or equal to 1
         self.assertEqual(custom_prime_counting(1), 0)
 
@@ -52,7 +56,7 @@ class TestCustomPrimeCounting(unittest.TestCase):
         """Test custom_prime_counting with negative numbers."""
         # For negative numbers, there are no primes less than or equal to them
         # SymPy might return 0 or raise an exception
-        
+
         # Test with some negative numbers
         try:
             result = custom_prime_counting(-1)
@@ -61,7 +65,7 @@ class TestCustomPrimeCounting(unittest.TestCase):
         except Exception as e:
             # If an exception is raised, it's expected
             pass
-        
+
         try:
             result = custom_prime_counting(-10)
             # If we get here, check that the result is 0
@@ -74,13 +78,13 @@ class TestCustomPrimeCounting(unittest.TestCase):
         """Test custom_prime_counting with very large integers."""
         # Test with some very large integers
         # These might be slow to compute, so we'll just check if the result is reasonable
-        
+
         # π(10000) ≈ 1229
         result = custom_prime_counting(10000)
         # The result might be a sympy.Integer, which is not an instance of int
         # but can be compared with integers
         self.assertEqual(result, 1229)
-        
+
         # π(100000) ≈ 9592
         # This might be too slow to compute in a test, so we'll make it optional
         try:
@@ -94,7 +98,7 @@ class TestCustomPrimeCounting(unittest.TestCase):
         """Test custom_prime_counting with non-integer inputs."""
         # The function is defined for integers
         # SymPy should raise an exception or handle this appropriately
-        
+
         # Test with float input
         try:
             result = custom_prime_counting(3.5)
@@ -104,7 +108,7 @@ class TestCustomPrimeCounting(unittest.TestCase):
         except Exception as e:
             # If an exception is raised, it's expected
             pass
-        
+
         # Test with string input
         try:
             result = custom_prime_counting("3")
@@ -116,5 +120,5 @@ class TestCustomPrimeCounting(unittest.TestCase):
             pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

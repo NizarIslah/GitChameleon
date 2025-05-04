@@ -3,5 +3,6 @@
 # extra_dependencies: []
 from falcon.stream import BoundedStream
 
+
 def custom_writable(bstream: BoundedStream) -> bool:
     return bstream.writable()

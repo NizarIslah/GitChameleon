@@ -1,4 +1,5 @@
 import os
+
 # Import the function to test
 import sys
 import unittest
@@ -8,10 +9,14 @@ import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'dataset', 'solutions')))
+sys.path.append(
+    os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..", "dataset", "solutions")
+    )
+)
 from sample_327 import modify
 
-import numpy as np 
+import numpy as np
 
 fig, ax = plt.subplots()
 modify(fig, ax)

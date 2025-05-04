@@ -3,5 +3,6 @@
 # extra_dependencies: []
 import sympy
 
+
 def custom_mobius(n: int) -> int:
     return sympy.mobius(n)

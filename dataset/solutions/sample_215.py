@@ -6,4 +6,5 @@ import numpy as np
 
 def custom_iqr(data: np.ndarray) -> float:
     from scipy.stats import iqr
+
     return iqr(data)

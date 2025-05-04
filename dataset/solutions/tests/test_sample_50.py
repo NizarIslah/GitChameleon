@@ -8,20 +8,20 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sample_50 import get_imputer
 
+
 class TestSample50(unittest.TestCase):
-    
     def test_get_imputer_returns_simple_imputer(self):
         """Test that get_imputer returns a SimpleImputer instance."""
         data = np.array([[1, 2], [np.nan, 3], [7, 6]])
         imputer = get_imputer(data)
         self.assertIsInstance(imputer, SimpleImputer)
-    
+
     def test_get_imputer_default_strategy(self):
         """Test that the returned imputer has the default strategy (mean)."""
         data = np.array([[1, 2], [np.nan, 3], [7, 6]])
         imputer = get_imputer(data)
-        self.assertEqual(imputer.strategy, 'mean')
-    
+        self.assertEqual(imputer.strategy, "mean")
+
     def test_imputer_functionality(self):
         """Test that the imputer can actually impute missing values."""
         data = np.array([[1, 2], [np.nan, 3], [7, 6]])
@@ -33,5 +33,6 @@ class TestSample50(unittest.TestCase):
         # The mean of the first column is (1+7)/2 = 4
         self.assertEqual(transformed_data[1, 0], 4)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

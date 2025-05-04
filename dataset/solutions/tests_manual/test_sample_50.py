@@ -9,5 +9,5 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sample_50 import get_imputer
 
 data = np.array([[1, 2, 3], [4, None, 6], [7, 8, None]], dtype=float)
-expected_type=SimpleImputer
+expected_type = SimpleImputer
 assert isinstance(get_imputer(data), expected_type)

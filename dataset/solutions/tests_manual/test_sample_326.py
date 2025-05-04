@@ -2,7 +2,7 @@ import unittest
 
 import matplotlib
 
-matplotlib.use('Agg')  # Use non-interactive backend for testing
+matplotlib.use("Agg")  # Use non-interactive backend for testing
 import os
 import sys
 
@@ -13,10 +13,10 @@ from matplotlib.figure import Figure
 
 # Import the function to test
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from sample_326 import modify
 
-import numpy as np 
+import numpy as np
 
 fig, ax = plt.subplots()
 modify(fig, ax)

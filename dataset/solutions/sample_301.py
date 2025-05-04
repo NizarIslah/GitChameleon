@@ -4,12 +4,9 @@
 import librosa
 import numpy as np
 
+
 def compute_shear(E: np.ndarray, factor: int, axis: int) -> np.ndarray:
-    
-
-
     E_shear = np.empty_like(E)
     for i in range(E.shape[1]):
         E_shear[:, i] = np.roll(E[:, i], factor * i)
     return E_shear
-    

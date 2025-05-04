@@ -8,6 +8,6 @@ from matplotlib.axes import Axes
 
 
 def custom_set_axis_labels(data: pd.DataFrame) -> Axes:
-    ax = sns.scatterplot(x='x', y='y', data=data)
+    ax = sns.scatterplot(x="x", y="y", data=data)
     ax.set(xlabel="My X Label", ylabel="My Y Label")
     return ax

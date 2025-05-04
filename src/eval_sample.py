@@ -3,7 +3,9 @@ import subprocess
 import tempfile
 
 
-def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest", coverage=False) -> dict:
+def eval_sample(
+    example_id: int, env_path, code_dict: dict, strategy="pytest", coverage=False
+) -> dict:
     """
     Evaluate sample code using the specified strategy in the provided virtual environment.
 
@@ -113,7 +115,7 @@ def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest", c
                 if coverage:
                     cov_file = os.path.join(temp_dir, f"coverage_{example_id}.json")
                     # current_dir = os.getcwd()
-                    try : 
+                    try:
                         # os.chdir(temp_dir)
                         # Run pytest with coverage
                         cmd = [
@@ -122,20 +124,28 @@ def eval_sample(example_id: int, env_path, code_dict: dict, strategy="pytest", c
                             "pytest",
                             f"--cov=sample_{example_id}",
                             f"--cov-report=json:{cov_file}",
-                            test_filepath
+                            test_filepath,
                         ]
-                        
-                        proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=30)
+
+                        proc = subprocess.run(
+                            cmd,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            text=True,
+                            timeout=30,
+                        )
                         # print(proc.stdout)
                         # print(proc.stderr)
-                                                
 
                         import json
+
                         with open(cov_file, "r") as f:
                             coverage_data = json.load(f)
-                            sample_result["coverage"] = coverage_data["totals"]["percent_covered"]
+                            sample_result["coverage"] = coverage_data["totals"][
+                                "percent_covered"
+                            ]
                         # os.chdir(current_dir)
-                        
+
                     except Exception as e:
                         print(f"Error while getting coverage: {e}")
                         # os.chdir(current_dir)

@@ -8,20 +8,26 @@ import warnings
 # we'll skip these tests to avoid import errors.
 try:
     import gradio as gr
+
     GRADIO_AVAILABLE = True
 except ImportError:
     GRADIO_AVAILABLE = False
 
 try:
     import sample_38
+
     SAMPLE_38_AVAILABLE = True
 except ImportError:
     SAMPLE_38_AVAILABLE = False
 
 # Filter out DeprecationWarnings for cleaner test output
-warnings.filterwarnings('ignore', category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-@unittest.skipUnless(GRADIO_AVAILABLE and SAMPLE_38_AVAILABLE, "Gradio or sample_38 not available or missing correct dependencies.")
+
+@unittest.skipUnless(
+    GRADIO_AVAILABLE and SAMPLE_38_AVAILABLE,
+    "Gradio or sample_38 not available or missing correct dependencies.",
+)
 class TestImageDisplay(unittest.TestCase):
     """Test cases for the display_image function and Gradio Interface in sample_38.py."""
 
@@ -41,11 +47,13 @@ class TestImageDisplay(unittest.TestCase):
         self.assertEqual(sample_38.iface.fn, sample_38.display_image)
 
         # Check interface components if the Gradio version supports them
-        if hasattr(sample_38.iface, 'input_components'):
+        if hasattr(sample_38.iface, "input_components"):
             self.assertEqual(len(sample_38.iface.input_components), 0)
-        if hasattr(sample_38.iface, 'output_components'):
+        if hasattr(sample_38.iface, "output_components"):
             self.assertEqual(len(sample_38.iface.output_components), 1)
-            self.assertIsInstance(sample_38.iface.output_components[0], gr.components.Image)
+            self.assertIsInstance(
+                sample_38.iface.output_components[0], gr.components.Image
+            )
 
     def test_interface_launch(self):
         """Test that the interface can be launched without error."""
@@ -65,5 +73,5 @@ class TestImageDisplay(unittest.TestCase):
         self.assertIsNotNone(result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
