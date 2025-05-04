@@ -115,7 +115,7 @@ def process_record(idx, record, starting_codes, manual_tests, env_dir, test_dir)
         with tempfile.TemporaryDirectory() as temp_dir:
             test_code = solution + '\n' + manual_test
             test_file = os.path.join(temp_dir, f"manual_test_sample_{example_id}.py")
-            willh open(test_file, "w") as f:
+            with open(test_file, "w") as f:
                 f.write(test_code)
             eval_res_manual = run_script(env_path, test_file)
 
