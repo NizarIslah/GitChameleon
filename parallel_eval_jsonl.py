@@ -114,40 +114,47 @@ def process_record(idx, record, starting_codes, manual_tests, env_dir, test_dir)
         eval_res = eval_sample(example_id, env_path, code_dict)["codes"][
             "solution_code"
         ]
-
-        with tempfile.TemporaryDirectory() as temp_dir:
-            test_code = solution + '\n' + manual_test
-            test_file = os.path.join(temp_dir, f"manual_test_sample_{example_id}.py")
-            with open(test_file, "w") as f:
-                f.write(test_code)
-            eval_res_manual = run_script(env_path, test_file)
-
-
-        return {
+        res = {
             "idx": idx,
             "example_id": example_id,
             "code_id": "solution_code",
             "output": eval_res.get("output", "").strip(),
             "passed": eval_res.get("pass", False),
             "compiled": eval_res.get("compile", True),
-            "output_manual": eval_res_manual.get("output_manual", "").strip(),
-            "passed_manual": eval_res_manual.get("passed_manual", False),
-            "compiled_manual": eval_res_manual.get("compiled_manual", True),
         }
-
     except Exception as e:
-        print(f"Error processing record {idx}: {e}")
-        return {
+        print(f"Error processing record (hidden) {idx}: {e}")
+        res = {
             "idx": idx,
             "example_id": example_id,
             "code_id": "solution_code",
             "output": f"Error: {e}",
             "passed": False,
             "compiled": False,
+        }
+    try:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            test_code = solution + '\n' + manual_test
+            test_file = os.path.join(temp_dir, f"manual_test_sample_{example_id}.py")
+            with open(test_file, "w") as f:
+                f.write(test_code)
+            eval_res_manual = run_script(env_path, test_file)
+        res.update(
+            {
+                "output_manual": eval_res_manual.get("output_manual", "").strip(),
+                "passed_manual": eval_res_manual.get("passed_manual", False),
+                "compiled_manual": eval_res_manual.get("compiled_manual", True),
+            }
+        )
+
+    except Exception as e:
+        print(f"Error processing record (visible) {idx}: {e}")
+        res.update({
             "output_manual": f"Error: {e}",
             "passed_manual": False,
             "compiled_manual": False,
-        }
+        })
+    return res
 
 
 def main():
