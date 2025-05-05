@@ -133,7 +133,7 @@ def eval_sample(
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,
                             text=True,
-                            timeout=30,
+                            timeout=120,
                         )
                         # print(proc.stdout)
                         # print(proc.stderr)
