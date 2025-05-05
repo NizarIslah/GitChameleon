@@ -1,167 +1,104 @@
 #!/usr/bin/env python3
-import ast
 import argparse
+import ast
 import json
 import sys
 from pathlib import Path
-from typing import Set, Dict
-import re
-import os
-import py_compile
+from typing import Set
 
-def extract_code(text: str) -> str:
-    """Parse raw string into python code"""
-    try:
-        match = re.search(r"```python(.*?)```", text, re.DOTALL)
-    except Exception as e:
-        try:
-            match = re.search(r"```(.*?)```", rf"{text}", re.DOTALL)  # anthropic
-        except Exception as e:
-            print("Error: ", e)
-            match = None
-    return match.group(1) if match else text
-
-import ast
-
-def extract_api_calls_with_aliases(code_snippet):
+def extract_api_calls_with_aliases(code: str) -> Set[str]:
     """
-    Extract API calls (function calls) from a Python code snippet, considering aliases and direct imports.
-
-    Args:
-        code_snippet (str): The Python code snippet as a string.
-
-    Returns:
-        set: A set of normalized API calls used in the code snippet.
+    Extract API calls (module.func or func) from the given code via AST.
     """
-    class APICallVisitor(ast.NodeVisitor):
+    class Visitor(ast.NodeVisitor):
         def __init__(self):
-            self.api_calls = set()
+            self.calls = set()
             self.aliases = {}
 
         def visit_Import(self, node):
             for alias in node.names:
-                self.aliases[alias.asname or alias.name] = alias.name
+                name = alias.asname or alias.name
+                self.aliases[name] = alias.name
 
         def visit_ImportFrom(self, node):
-            module = node.module
+            mod = node.module or ""
             for alias in node.names:
-                full_name = f"{module}.{alias.name}" if module else alias.name
-                self.aliases[alias.asname or alias.name] = full_name
-
-        def get_full_attr(self, node):
-            if isinstance(node, ast.Name):
-                return self.aliases.get(node.id, node.id)
-            elif isinstance(node, ast.Attribute):
-                return f"{self.get_full_attr(node.value)}.{node.attr}"
-            return ""
+                asn = alias.asname or alias.name
+                fullname = f"{mod}.{alias.name}" if mod else alias.name
+                self.aliases[asn] = fullname
 
         def visit_Call(self, node):
-            full_name = self.get_full_attr(node.func)
-            if full_name:
-                self.api_calls.add(full_name)
+            fn = node.func
+            if isinstance(fn, ast.Attribute):
+                val = fn.value
+                if isinstance(val, ast.Name):
+                    mod = self.aliases.get(val.id, val.id)
+                    self.calls.add(f"{mod}.{fn.attr}")
+            elif isinstance(fn, ast.Name):
+                self.calls.add(self.aliases.get(fn.id, fn.id))
             self.generic_visit(node)
 
-    tree = ast.parse(code_snippet)
-    visitor = APICallVisitor()
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return set()
+    visitor = Visitor()
     visitor.visit(tree)
-    return visitor.api_calls
-
-def compare_api_calls(code_snippet1, code_snippet2):
-    """
-    Compare API calls between two code snippets.
-
-    Args:
-        code_snippet1 (str): The first Python code snippet.
-        code_snippet2 (str): The second Python code snippet.
-
-    Returns:
-        bool: True if the two code snippets use the same API calls, False otherwise.
-    """
-    calls1 = extract_api_calls_with_aliases(code_snippet1)
-    calls2 = extract_api_calls_with_aliases(code_snippet2)
-    # print("Ground Truth API Calls:", calls1)
-    # print("Generated Code API Calls:", calls2)
-    return calls1.issubset(calls2)
-
-
-def load_jsonl(path: Path, code_key: str) -> Dict[str, str]:
-    """
-    Load a JSONL mapping example_id -> code (from the given code_key field).
-    """
-    d = {}
-    with path.open("r", encoding="utf-8") as f:
-        for ln in f:
-            obj = json.loads(ln)
-            eid = obj["example_id"]
-            if code_key not in obj:
-                print(f"[WARN] {path.name}: no '{code_key}' field for example_id={eid}", file=sys.stderr)
-            d[eid] = obj.get(code_key, "")
-    return d
+    return visitor.calls
 
 def main():
-    p = argparse.ArgumentParser(
-        description="Compare API-call sets between ground truth (solution) and predictions (answer)."
+    parser = argparse.ArgumentParser(
+        description="For each record in a JSONL, detect if any API call appears in the solution portion."
     )
-    p.add_argument("dataset",  type=Path,
-                   help="Ground-truth JSONL (must have 'example_id' and 'solution' fields)")
-    p.add_argument("--pred","-p", type=Path, required=True,
-                   help="Prediction JSONL (must have 'example_id' and 'answer' fields)")
-    p.add_argument("--out", "-o", type=Path, required=True,
-                   help="Output JSONL with comparison results")
-    args = p.parse_args()
+    parser.add_argument("input_jsonl", type=Path,
+                        help="Path to input JSONL (must contain example_id, starting_code, solution fields)")
+    parser.add_argument("output_jsonl", type=Path,
+                        help="Path to write output JSONL (with example_id and solution_api_call bool)")
+    parser.add_argument("--id-field", default="example_id",
+                        help="JSON key for example ID (default: example_id)")
+    parser.add_argument("--start-field", default="starting_code",
+                        help="JSON key for starter code (default: starting_code)")
+    parser.add_argument("--sol-field", default="solution",
+                        help="JSON key for solution code (default: solution)")
+    args = parser.parse_args()
 
-    # Load ground truth from 'solution', predictions from 'answer'
-    gt_map   = load_jsonl(args.dataset,   code_key="solution")
-    starter_code_map = load_jsonl(args.dataset, code_key="starting_code")
-    gt_code_map = {eid: starter_code_map[eid] + gt_code for eid, gt_code in gt_map.items()}
-    pred_map = load_jsonl(args.pred, code_key="answer")
+    if not args.input_jsonl.is_file():
+        print(f"[ERROR] Input file not found: {args.input_jsonl}", file=sys.stderr)
+        sys.exit(1)
 
-    with Path(args.out / args.pred.name).open("w", encoding="utf-8") as outf:
-        for eid, gt_code in gt_code_map.items():
-            if eid not in pred_map:
-                print(f"[WARN] No prediction for example_id={eid}", file=sys.stderr)
+    with args.input_jsonl.open("r", encoding="utf-8") as inf, \
+         args.output_jsonl.open("w", encoding="utf-8") as outf:
+        for lineno, line in enumerate(inf, start=1):
+            line = line.strip()
+            if not line:
                 continue
-            pred_code = extract_code(pred_map[eid])
-
             try:
-                # check it compiles
-                # write to a tempfile
-                with open(f"{eid}.py", "w") as f:
-                    f.write(pred_code)
-                py_compile.compile(f"{eid}.py", cfile=f"{eid}.pyc", doraise=True)
-                os.remove(f"{eid}.pyc")
-                os.remove(f"{eid}.py")
-            except py_compile.PyCompileError as e:
-                print(f"[WARN] Compilation error for example_id={eid}: {e.msg}", file=sys.stderr)
+                rec = json.loads(line)
+            except json.JSONDecodeError as e:
+                print(f"[WARN] line {lineno}: invalid JSON: {e}", file=sys.stderr)
                 continue
 
-            calls_gt   = sorted(extract_api_calls_with_aliases(gt_code))
-            calls_pred = sorted(extract_api_calls_with_aliases(pred_code))
-            same       = compare_api_calls(gt_code, pred_code)
-            print(f"example_id={eid}: {calls_gt} == {calls_pred} -> {same}")
+            eid = rec.get(args.id_field)
+            if eid is None:
+                print(f"[WARN] line {lineno}: missing '{args.id_field}'", file=sys.stderr)
+                continue
 
-            rec = {
-                "example_id": eid,
-                "same_api_calls": same,
-                "api_calls_gt": calls_gt,
-                "api_calls_pred": calls_pred
+            start = rec.get(args.start_field, "")
+            sol   = rec.get(args.sol_field, "")
+
+            combined = f"{start}\n{sol}"
+            calls = extract_api_calls_with_aliases(combined)
+
+            # check if any call string appears in the solution text
+            solution_api_call = any(call in sol for call in calls)
+
+            out_rec = {
+                args.id_field: eid,
+                "solution_api_call": solution_api_call
             }
-            outf.write(json.dumps(rec, ensure_ascii=False) + "\n")
+            outf.write(json.dumps(out_rec, ensure_ascii=False) + "\n")
 
-    print(f"Comparison written to {Path(args.out / args.pred.name)}")
-
-    # get average of the API call hitrate
-    with open(args.out / args.pred.name, "r", encoding="utf-8") as f:
-        lines = f.readlines()
-        total_calls = 0
-        total_matches = 0
-        for line in lines:
-            rec = json.loads(line)
-            if rec["same_api_calls"]:
-                total_matches += len(rec["api_calls_pred"])
-            total_calls += len(rec["api_calls_gt"])
-        hitrate = total_matches / total_calls if total_calls > 0 else 0
-        print(f"API call hitrate: {hitrate:.2%}")
+    print(f"Wrote detection results to {args.output_jsonl}", file=sys.stderr)
 
 if __name__ == "__main__":
     main()
