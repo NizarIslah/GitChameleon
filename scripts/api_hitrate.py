@@ -21,10 +21,17 @@ def extract_code(text: str) -> str:
             match = None
     return match.group(1) if match else text
 
-def extract_api_calls_with_aliases(code_snippet: str) -> Set[str]:
+import ast
+
+def extract_api_calls_with_aliases(code_snippet):
     """
-    Extract API calls (function calls) from a Python code snippet,
-    considering aliases and direct imports.
+    Extract API calls (function calls) from a Python code snippet, considering aliases and direct imports.
+
+    Args:
+        code_snippet (str): The Python code snippet as a string.
+
+    Returns:
+        set: A set of normalized API calls used in the code snippet.
     """
     class APICallVisitor(ast.NodeVisitor):
         def __init__(self):
@@ -33,47 +40,49 @@ def extract_api_calls_with_aliases(code_snippet: str) -> Set[str]:
 
         def visit_Import(self, node):
             for alias in node.names:
-                name = alias.asname or alias.name
-                self.aliases[name] = alias.name
+                self.aliases[alias.asname or alias.name] = alias.name
 
         def visit_ImportFrom(self, node):
-            module = node.module or ""
+            module = node.module
             for alias in node.names:
-                asname = alias.asname or alias.name
-                fullname = f"{module}.{alias.name}" if module else alias.name
-                self.aliases[asname] = fullname
+                full_name = f"{module}.{alias.name}" if module else alias.name
+                self.aliases[alias.asname or alias.name] = full_name
+
+        def get_full_attr(self, node):
+            if isinstance(node, ast.Name):
+                return self.aliases.get(node.id, node.id)
+            elif isinstance(node, ast.Attribute):
+                return f"{self.get_full_attr(node.value)}.{node.attr}"
+            return ""
 
         def visit_Call(self, node):
-            # Handle module.func() or alias.func()
-            if isinstance(node.func, ast.Attribute):
-                val = node.func.value
-                mod = None
-                if isinstance(val, ast.Name):
-                    mod = self.aliases.get(val.id, val.id)
-                elif isinstance(val, ast.Attribute):
-                    # chained imports: reconstruct e.g. pkg.mod
-                    names = []
-                    cur = val
-                    while isinstance(cur, ast.Attribute):
-                        names.append(cur.attr)
-                        cur = cur.value
-                    if isinstance(cur, ast.Name):
-                        base = self.aliases.get(cur.id, cur.id)
-                        names.append(base)
-                        names.reverse()
-                        mod = ".".join(names)
-                if mod:
-                    self.api_calls.add(f"{mod}.{node.func.attr}")
-            # Handle direct func()
-            elif isinstance(node.func, ast.Name):
-                fn = node.func.id
-                self.api_calls.add(self.aliases.get(fn, fn))
+            full_name = self.get_full_attr(node.func)
+            if full_name:
+                self.api_calls.add(full_name)
             self.generic_visit(node)
 
     tree = ast.parse(code_snippet)
     visitor = APICallVisitor()
     visitor.visit(tree)
     return visitor.api_calls
+
+def compare_api_calls(code_snippet1, code_snippet2):
+    """
+    Compare API calls between two code snippets.
+
+    Args:
+        code_snippet1 (str): The first Python code snippet.
+        code_snippet2 (str): The second Python code snippet.
+
+    Returns:
+        bool: True if the two code snippets use the same API calls, False otherwise.
+    """
+    calls1 = extract_api_calls_with_aliases(code_snippet1)
+    calls2 = extract_api_calls_with_aliases(code_snippet2)
+    # print("Ground Truth API Calls:", calls1)
+    # print("Generated Code API Calls:", calls2)
+    return calls1.issubset(calls2)
+
 
 def load_jsonl(path: Path, code_key: str) -> Dict[str, str]:
     """
@@ -128,7 +137,7 @@ def main():
 
             calls_gt   = sorted(extract_api_calls_with_aliases(gt_code))
             calls_pred = sorted(extract_api_calls_with_aliases(pred_code))
-            same       = set(calls_gt) == set(calls_pred)
+            same       = compare_api_calls(gt_code, pred_code)
             print(f"example_id={eid}: {calls_gt} == {calls_pred} -> {same}")
 
             rec = {
