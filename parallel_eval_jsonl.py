@@ -184,6 +184,7 @@ def main():
         run = wandb.init(
             project="GC_Evals_EMNLP",
             entity="cl4code",
+            name=os.path.basename(args.jsonl_file),
             config={"jsonl_file": args.jsonl_file},
         )
 
