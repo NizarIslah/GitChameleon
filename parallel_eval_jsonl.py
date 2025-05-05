@@ -230,14 +230,14 @@ def main():
     # log to wandb
     if args.wandb:
         run.log({"eval_results": wandb.Table(dataframe=df)})
-        # # log as an artifact
-        # artifact = wandb.Artifact(
-        #     name=os.path.basename(output_csv),
-        #     type="evaluation",
-        #     description="Evaluation results of the model outputs",
-        # )
-        # artifact.add_file(output_csv)
-        # run.log_artifact(artifact)
+        # log as an artifact
+        artifact = wandb.Artifact(
+            name=os.path.basename(output_csv),
+            type="evaluation",
+            description="Evaluation results of the model outputs",
+        )
+        artifact.add_file(output_csv)
+        run.log_artifact(artifact)
 
     # fraction passed
     passed = df["passed"].sum()
