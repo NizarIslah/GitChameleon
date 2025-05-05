@@ -55,7 +55,7 @@ apptainer exec \
       cd /app/repo && \
       python -m venv eval_main_venv && \
       source eval_main_venv/bin/activate && \
-      python src/verify_dataset.py \
+      python verify_dataset.py \
         dataset/final_fix_dataset.jsonl \
         eval_venvs \
         dataset/solutions/tests"
