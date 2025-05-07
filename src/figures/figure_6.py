@@ -77,7 +77,7 @@ def main():
         [overall_data["Baseline"], overall_data["Error Feedback"]],
         bins=bins,
         color=[BASELINE_COLOR, ERROR_FEEDBACK_COLOR],
-        label=["Baseline", "+ Error Feedback"],
+        label=["Baseline", "Self Debug"],
         edgecolor='black',
         alpha=0.9,
         density=False # Show counts, not density
@@ -132,7 +132,7 @@ def main():
                             ha='center', va='bottom', fontsize=10)
 
 
-            ax.set_title(f"{model_label} ({condition if condition == 'Baseline' else '+ Error Feedback'})", fontsize=12, fontweight='bold')
+            ax.set_title(f"{model_label} ({condition if condition == 'Baseline' else 'Self Debug'})", fontsize=12, fontweight='bold')
             ax.set_ylabel("Frequency", fontsize=10)
             # Adjust y-limit based on the counts in the *current* subplot
             ax.set_ylim(0, max(counts) * 1.2 if max(counts) > 0 else 5) # Ensure a minimum y-limit
