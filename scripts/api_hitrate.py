@@ -5,8 +5,20 @@ import json
 import sys
 from pathlib import Path
 from typing import Set
-
+import re
 import ast
+
+def extract_code(text: str) -> str:
+    """Parse raw string into python code"""
+    try:
+        match = re.search(r"```python(.*?)```", text, re.DOTALL)
+    except Exception as e:
+        try:
+            match = re.search(r"```(.*?)```", rf"{text}", re.DOTALL)  # anthropic
+        except Exception as e:
+            print("Error: ", e)
+            match = None
+    return match.group(1) if match else text
 
 def extract_api_calls_with_aliases(code_snippet):
     """
@@ -68,25 +80,11 @@ def compare_api_calls(code_snippet1, code_snippet2):
     print("Generated Code API Calls:", calls2)
     return calls1.issubset(calls2)
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Augment each record in a JSONL with a boolean 'solution_api_call' field."
-    )
-    parser.add_argument("input_jsonl", type=Path,
-                        help="Path to the input JSONL (must contain solution field)")
-    parser.add_argument("output_jsonl", type=Path,
-                        help="Path to write the augmented JSONL")
-    parser.add_argument("--sol-field", default="answer",
-                        help="Field name for solution code (default: solution)")
-    args = parser.parse_args()
-
-    if not args.input_jsonl.is_file():
-        print(f"[ERROR] Input file not found: {args.input_jsonl}", file=sys.stderr)
-        sys.exit(1)
-
+def process_file(input_path: Path, output_path: Path, sol_field: str):
     recs_with_hitrate = []
-
-    with args.input_jsonl.open("r", encoding="utf-8") as infile:
+    total = 0
+    # Read and augment
+    with input_path.open("r", encoding="utf-8") as infile:
         for line in infile:
             line = line.strip()
             if not line:
@@ -94,32 +92,59 @@ def main():
             try:
                 rec = json.loads(line)
             except json.JSONDecodeError as e:
-                print(f"[WARN] JSONL line parse error: {e}", file=sys.stderr)
+                print(f"[WARN] {input_path.name} parse error: {e}", file=sys.stderr)
                 continue
 
-            if not rec["solution_api_call"]:
+            total += 1
+            if not rec.get("solution_api_call", False):
                 continue
 
-            # Extract the solution code
             try:
-                solution_code = rec.get(args.sol_field)
+                solution_code = rec.get(sol_field, "")
+                solution_code = extract_code(solution_code)
                 sol_api_calls = extract_api_calls_with_aliases(solution_code)
-                api_calls = rec.get("api_calls", [])
-                api_hit = 1 if sol_api_calls.issubset(api_calls) else 0
+                api_calls = set(rec.get("api_calls", []))
             except Exception as e:
-                print(f"[ERROR] Error processing record: {e}", file=sys.stderr)
+                # print(f"[WARN] {input_path.name} line {total}: error processing record: {e}", file=sys.stderr)
                 continue
+
+            api_hit = 1 if sol_api_calls.issubset(api_calls) else 0
+
             rec["api_hit"] = api_hit
             recs_with_hitrate.append(rec)
 
-    # Write the augmented record to the output JSONL
-    with args.output_jsonl.open("a", encoding="utf-8") as outfile:
+    # Write out
+    with output_path.open("w", encoding="utf-8") as outfile:
         for rec in recs_with_hitrate:
             outfile.write(json.dumps(rec, ensure_ascii=False) + "\n")
-    # Print summary of processed records
-    print(f"[INFO] Wrote {len(recs_with_hitrate)} records with API hit rate to {args.output_jsonl}")
-    print(f"[INFO] API hitrate: {sum(rec['api_hit'] for rec in recs_with_hitrate)} / {len(recs_with_hitrate)} ({sum(rec['api_hit'] for rec in recs_with_hitrate) / len(recs_with_hitrate):.2%})", file=sys.stderr)
 
+    # Summary
+    hits = sum(r["api_hit"] for r in recs_with_hitrate)
+    count = len(recs_with_hitrate)
+    pct = hits / count * 100 if count else 0.0
+    # print(f"[INFO] {input_path.name}: wrote {count} records, api_hit {hits}/{count} \t")
+    print(f"{str(input_path.name).split('_eval')[0]} \t {pct:.1f}%", file=sys.stderr)
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="For each JSONL in input directory, add 'api_hit' to records and write to output directory"
+    )
+    parser.add_argument("input_dir",  type=Path,
+                        help="Directory containing input .jsonl files")
+    parser.add_argument("output_dir", type=Path,
+                        help="Directory to write augmented .jsonl files")
+    parser.add_argument("--sol-field", default="answer",
+                        help="Field name for solution code (default: answer)")
+    args = parser.parse_args()
+
+    if not args.input_dir.is_dir():
+        print(f"[ERROR] Input directory not found: {args.input_dir}", file=sys.stderr)
+        sys.exit(1)
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+
+    for input_jsonl in sorted(args.input_dir.glob("*.jsonl")):
+        output_jsonl = args.output_dir / input_jsonl.name
+        process_file(input_jsonl, output_jsonl, args.sol_field)
 
 if __name__ == "__main__":
     main()
