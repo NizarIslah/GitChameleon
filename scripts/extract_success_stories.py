@@ -89,16 +89,21 @@ def main():
                 explanation2 = r2.get('explanation', '')
 
                 block = f"""
-python {python_version} library {library}-{version}
-problem: {problem}
-starting code: {starting_code}
-model output: {answer}
-explanation: {explanation1}
-passed: {passed_manual1}
-error traceback: {output_manual}
-model regenerated output: {answer_debugged}
-explanation: {explanation2}
-passed: {passed_manual2}
+# python {python_version} library {library}-{version}
+# problem: 
+{problem}
+# starting code: 
+{starting_code}
+# model output: 
+{answer}
+# explanation: {explanation1}
+# passed: {passed_manual1}
+# error traceback: 
+{output_manual}
+# model regenerated output: 
+{answer_debugged}
+# explanation: {explanation2}
+# passed: {passed_manual2}
 """
                 out_f.write(block + "\n")
 

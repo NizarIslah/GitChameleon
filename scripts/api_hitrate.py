@@ -20,42 +20,54 @@ def extract_code(text: str) -> str:
             match = None
     return match.group(1) if match else text
 
-def extract_api_calls_with_aliases(code_snippet):
+
+def extract_api_calls_with_aliases(code_snippet: str) -> set[str]:
     """
-    Extract API calls (function calls) from a Python code snippet, considering aliases and direct imports.
+    Extract API calls (function calls) from a Python code snippet, considering
+    direct imports, aliases, and attribute chains.
 
     Args:
-        code_snippet (str): The Python code snippet as a string.
+        code_snippet: Python source as a string.
 
     Returns:
-        set: A set of normalized API calls used in the code snippet.
+        A set of fully qualified call names (e.g. 'torch.from_numpy', 'scipy.special.i0').
     """
     class APICallVisitor(ast.NodeVisitor):
         def __init__(self):
-            self.api_calls = set()
-            self.aliases = {}
+            self.api_calls: set[str] = set()
+            self.aliases: dict[str, str] = {}
 
-        def visit_Import(self, node):
+        def visit_Import(self, node: ast.Import) -> None:
             for alias in node.names:
-                self.aliases[alias.asname or alias.name] = alias.name
+                name = alias.name
+                asname = alias.asname or name.split('.')[0]
+                self.aliases[asname] = name
 
-        def visit_ImportFrom(self, node):
-            module = node.module
+        def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
+            module = node.module or ''
             for alias in node.names:
-                full_name = f"{module}.{alias.name}" if module else alias.name
-                self.aliases[alias.asname or alias.name] = full_name
+                fullname = f"{module}.{alias.name}" if module else alias.name
+                asname = alias.asname or alias.name
+                self.aliases[asname] = fullname
 
-        def get_full_attr(self, node):
+        def get_full_attr(self, node: ast.AST) -> str:
             if isinstance(node, ast.Name):
                 return self.aliases.get(node.id, node.id)
-            elif isinstance(node, ast.Attribute):
-                return f"{self.get_full_attr(node.value)}.{node.attr}"
-            return ""
+            if isinstance(node, ast.Attribute):
+                prefix = self.get_full_attr(node.value)
+                return f"{prefix}.{node.attr}" if prefix else node.attr
+            return ''
 
-        def visit_Call(self, node):
-            full_name = self.get_full_attr(node.func)
-            if full_name:
-                self.api_calls.add(full_name)
+        def visit_Call(self, node: ast.Call) -> None:
+            # Handle direct-name calls via alias lookup
+            if isinstance(node.func, ast.Name):
+                name = self.aliases.get(node.func.id, node.func.id)
+                self.api_calls.add(name)
+            else:
+                full_name = self.get_full_attr(node.func)
+                if full_name:
+                    self.api_calls.add(full_name)
+            # Recurse to catch nested calls or calls in args
             self.generic_visit(node)
 
     tree = ast.parse(code_snippet)
@@ -107,8 +119,13 @@ def process_file(input_path: Path, output_path: Path, sol_field: str):
             except Exception as e:
                 # print(f"[WARN] {input_path.name} line {total}: error processing record: {e}", file=sys.stderr)
                 continue
-
-            api_hit = 1 if sol_api_calls.issubset(api_calls) else 0
+            # if total == 33:
+            #     print("ground truth code:", rec.get("solution", ""))
+            #     print("solution code:", solution_code)
+            #     print("solution api calls:", sol_api_calls)
+            #     print("gt api calls:", api_calls)
+            #     print("------------------------------------------------")
+            api_hit = 1 if all(call in sol_api_calls for call in api_calls) else 0
 
             rec["api_hit"] = api_hit
             recs_with_hitrate.append(rec)
