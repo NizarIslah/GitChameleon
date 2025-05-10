@@ -40,8 +40,8 @@ def main():
     # normalize counts to frequencies
     total_baseline = sum(baseline_counts.values())
     total_feedback = sum(feedback_counts.values())
-    baseline_counts = {k: v / total_baseline for k, v in baseline_counts.items()}
-    feedback_counts = {k: v / total_feedback for k, v in feedback_counts.items()}
+    print("Total greedy errors:", total_baseline)
+    print("Total self debug errors:", total_feedback)
 
     # Sort categories by baseline frequency, keep only top 10
     baseline_counts = dict(sorted(baseline_counts.items(), key=lambda item: item[1], reverse=True)[:10])
@@ -52,35 +52,57 @@ def main():
     baseline = [baseline_counts.get(cat, 0) for cat in categories]
     feedback = [feedback_counts.get(cat, 0) for cat in categories]
 
+    # calculate percentage change for each category
+    percentage_change = [
+        -(feedback[i] - baseline[i]) / baseline[i] * 100 if baseline[i] > 0 else 0
+        for i in range(len(baseline))
+    ]
+    print("Percentage change:", percentage_change)
+    
+    # plot percentage change
+
     # Bar positions
     x = np.arange(len(categories))
-    width = 0.35
 
     fig, ax = plt.subplots(figsize=(12, 6))
 
-    # Plot bars
+    # Plot bars for percentage change (bottom subfigure)
+    width = 0.7
     ax.bar(
-        x - width/2, baseline, width,
-        label='Baseline', color='#e0d5f9', edgecolor='black', alpha=0.8
+        x, percentage_change, width,
+        label='Percentage Reduction', color='#3498db', edgecolor='black', alpha=0.8
     )
-    ax.bar(
-        x + width/2, feedback, width,
-        label='+ Self Debug', color='#8e44ad', alpha=0.9
-    )
-
-    # Labels and ticks
     ax.set_xlabel('Error Categories', fontsize=16)
-    ax.set_ylabel('Frequency', fontsize=16)
-    # ax.set_title(args.title, fontsize=14)
+    ax.set_ylabel('Percentage Reduction (%)', fontsize=16)
     ax.set_xticks(x)
     ax.set_xticklabels(categories, rotation=45, ha='right', fontsize=14)
-
-    # Legend
-    ax.legend(frameon=True, fontsize=14)
-
-    # Grid
     ax.grid(True, which='major', axis='y', linestyle='--', linewidth=0.8, alpha=0.7)
     ax.set_axisbelow(True)
+    #     width = 0.35
+
+    # # Plot bars for total counts (top subfigure)
+    # ax.bar(
+    #     x - width/2, baseline, width,
+    #     label='Greedy Decoding', color='#e0d5f9', edgecolor='black', alpha=0.8
+    # )
+    # ax.bar(
+    #     x + width/2, feedback, width,
+    #     label='+ Self Debug', color='#8e44ad', alpha=0.9
+    # )
+
+    # # Labels and ticks
+    # ax.set_xlabel('Error Categories', fontsize=16)
+    # ax.set_ylabel('Total', fontsize=16)
+    # # ax.set_title(args.title, fontsize=14)
+    # ax.set_xticks(x)
+    # ax.set_xticklabels(categories, rotation=45, ha='right', fontsize=14)
+
+    # # Legend
+    # ax.legend(frameon=True, fontsize=14)
+
+    # # Grid
+    # ax.grid(True, which='major', axis='y', linestyle='--', linewidth=0.8, alpha=0.7)
+    # ax.set_axisbelow(True)
 
     plt.tight_layout()
     if args.output:
