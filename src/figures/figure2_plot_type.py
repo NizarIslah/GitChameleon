@@ -111,5 +111,7 @@ ax.set_ylabel('Sample Count', fontsize=16)
 ax.tick_params(axis='y', labelsize=14)
 ax.grid(axis='y', linestyle='--', alpha=0.5)
 
-plt.savefig('type_change.pdf', bbox_inches='tight')
+output_png = 'type_change.png'
+plt.savefig(output_png, bbox_inches='tight', transparent=True)
+
 plt.show()
