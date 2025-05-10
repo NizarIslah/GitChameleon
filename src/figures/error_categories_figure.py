@@ -72,15 +72,15 @@ def main():
         x, percentage_change, width,
         label='Percentage Reduction', color='#3498db', edgecolor='black', alpha=0.8
     )
-    ax.set_xlabel('Error Categories', fontsize=16)
-    ax.set_ylabel('Percentage Reduction (%)', fontsize=16)
+    ax.set_xlabel('Error Categories', fontsize=24)
+    ax.set_ylabel('Error Reduction (%)', fontsize=24)
     ax.set_xticks(x)
-    ax.set_xticklabels(categories, rotation=45, ha='right', fontsize=14)
+    ax.set_xticklabels(categories, rotation=45, ha='right', fontsize=20)
     ax.grid(True, which='major', axis='y', linestyle='--', linewidth=0.8, alpha=0.7)
     ax.set_axisbelow(True)
-    #     width = 0.35
+    # width = 0.35
 
-    # # Plot bars for total counts (top subfigure)
+    # Plot bars for total counts (top subfigure)
     # ax.bar(
     #     x - width/2, baseline, width,
     #     label='Greedy Decoding', color='#e0d5f9', edgecolor='black', alpha=0.8
@@ -91,14 +91,14 @@ def main():
     # )
 
     # # Labels and ticks
-    # ax.set_xlabel('Error Categories', fontsize=16)
-    # ax.set_ylabel('Total', fontsize=16)
+    # ax.set_xlabel('Error Categories', fontsize=24)
+    # ax.set_ylabel('Total', fontsize=24)
     # # ax.set_title(args.title, fontsize=14)
     # ax.set_xticks(x)
-    # ax.set_xticklabels(categories, rotation=45, ha='right', fontsize=14)
+    # ax.set_xticklabels(categories, rotation=45, ha='right', fontsize=20)
 
     # # Legend
-    # ax.legend(frameon=True, fontsize=14)
+    # ax.legend(frameon=True, fontsize=20)
 
     # # Grid
     # ax.grid(True, which='major', axis='y', linestyle='--', linewidth=0.8, alpha=0.7)
