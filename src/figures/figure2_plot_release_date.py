@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 # --- User‑adjustable paths ---
 dataset_path = '/Users/beike/Desktop/Workspace/GitChameleon/dataset/final_fix_dataset.jsonl'
 output_figure_pdf = '/Users/beike/Desktop/Workspace/GitChameleon/release_year_distribution.pdf'
+output_png   = 'release_year_distribution.png'
 
 # 1. Read all release_date strings
 all_dates = []
@@ -58,7 +59,7 @@ ax.set_title('Release Year Distribution', fontsize=18)
 ax.grid(axis='y', linestyle='--', linewidth=1, alpha=0.5)
 
 plt.tight_layout()
-plt.savefig(output_figure_pdf, bbox_inches='tight')
+plt.savefig(output_png, bbox_inches='tight', transparent=True)
 plt.show()
 
 print(f"\nFigure saved to: {output_figure_pdf}")
