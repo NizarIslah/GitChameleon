@@ -166,3 +166,6 @@ eval_venvs/
 generations/
 results/
 wandb/
+
+dataset/fix_dataset_doc.jsonl
+dataset/count_docs.py
