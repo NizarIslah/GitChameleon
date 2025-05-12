@@ -71,19 +71,30 @@ PROMPT_TEMPLATE = f"""1. Required Library:
 </starter_code>"""
 
 
-def main(input_path: Path, output_path: Path):
+def main(input_path: Path, output_path: Path, no_version: bool):
+    """
+    Main function to process the input JSONL file and generate formatted prompts.
+    Args:
+        input_path (Path): Path to the input JSONL file.
+        output_path (Path): Path to the output JSONL file.
+        no_version (bool): Flag to indicate whether to include the library version in the prompt.
+    """
+    # Read the input JSONL file
+    # and parse each line as a JSON object
     with open(input_path, "r") as fin:
         inputs = [json.loads(line) for line in fin]
 
     for line in inputs:
         python_version = line["python_version"]
 
+        # Check if the version should be included in the prompt
+        library_str = line["library"] + "==" + line["version"] if not no_version else line["library"]
         line["messages"] = [
             {"role": "system", "content": SYS_PROMPT},
             {
                 "role": "user",
                 "content": PROMPT_TEMPLATE.format(
-                    library=line["library"] + "==" + line["version"],
+                    library=library_str,
                     python_version=python_version,
                     coding_problem=line["problem"],
                     starter_code=line["starting_code"],
@@ -96,7 +107,7 @@ def main(input_path: Path, output_path: Path):
             {
                 "role": "user",
                 "content": PROMPT_TEMPLATE.format(
-                    library=line["library"] + "==" + line["version"],
+                    library=library_str,
                     python_version=python_version,
                     coding_problem=line["problem"],
                     starter_code=line["starting_code"],
@@ -133,10 +144,15 @@ if __name__ == "__main__":
         help="Path to the output JSONL file where processed prompts will be saved.",
         metavar="OUTPUT_PATH",
     )
+    parser.add_argument(
+        "--no-version",
+        action="store_true",
+        help="If set, the version of the library will not be included in the prompt.",
+    )
 
     # Parse the command-line arguments
     args = parser.parse_args()
     # --- End of CLI Parser ---
 
     # Call the main function with the parsed arguments
-    main(input_path=args.input, output_path=args.output)
+    main(input_path=args.input, output_path=args.output, no_version=args.no_version)

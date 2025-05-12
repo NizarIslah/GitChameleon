@@ -5,6 +5,7 @@ import random
 import pickle
 import statistics
 import openai
+from openai import OpenAI
 from openai import AzureOpenAI
 from joblib import Parallel, delayed
 
@@ -122,7 +123,8 @@ client = AzureOpenAI(
     api_key=args.api_key,
     api_version=args.azure_api_version,
 )
-
+os.environ["OPENAI_API_KEY"] = args.api_key
+client = OpenAI()
 
 # Function to call OpenAI's chat completion with retry logic, including seed and temperature
 def get_completion_with_retry(prompt, seed, args, max_retries=5, delay=10):
@@ -256,7 +258,7 @@ for seed in tqdm(random.sample(range(1, 1000), num_samples), desc="Processing se
 
     output_file = (
         Path(args.output_data)
-        / f"responses_{args.temperature}_{args.struct_output}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{seed}.json"
+        / f"responses_{args.temperature}_{args.struct_output}_{args.model}_{'feedback' if args.feedback else ''}_{'cot' if args.cot else ''}_{seed}.jsonl"
     )
 
     with Path(output_file).open("w", encoding="utf-8") as out:

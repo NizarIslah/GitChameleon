@@ -70,6 +70,35 @@ def process_csv_file(csv_path, gt_map, out_path):
     # Print summary of processed rows
     print(f"[INFO] Wrote {out_path} ({csv_path.name} → {out_path.name})")
 
+def process_jsonl_file(jsonl_path, gt_map, out_path):
+    """
+    For a single JSONL file, join with gt_map on example_id and write out_path JSONL
+    """
+    with jsonl_path.open("r", encoding="utf-8") as jf, \
+         out_path.open("w", encoding="utf-8") as outf:
+        for lineno, line in enumerate(jf, start=1):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                rec = json.loads(line)
+            except json.JSONDecodeError as e:
+                print(f"[WARN] {jsonl_path.name} line {lineno}: invalid JSON: {e}", file=sys.stderr)
+                continue
+            eid = rec.get("example_id")
+            if eid is None:
+                print(f"[WARN] {jsonl_path.name} line {lineno}: missing 'example_id'", file=sys.stderr)
+                continue
+            gt_rec = gt_map.get(eid)
+            if gt_rec is None:
+                print(f"[WARN] {jsonl_path.name} line {lineno}: no GT record for example_id={eid}, skipping", file=sys.stderr)
+                continue
+            # Merge rec (JSON) and gt_rec (JSON), with gt_rec overriding on conflict
+            combined = {**rec, **gt_rec}
+            outf.write(json.dumps(combined, ensure_ascii=False) + "\n")
+    # Print summary of processed lines
+    print(f"[INFO] Wrote {out_path} ({jsonl_path.name} → {out_path.name})")
+
 def main():
     p = argparse.ArgumentParser(
         description="For each CSV in a directory, join with a single GT JSONL on example_id, producing one JSONL per CSV."
@@ -95,6 +124,14 @@ def main():
     for csv_path in sorted(args.csv_dir.glob("*.csv")):
         out_path = args.output_dir / (csv_path.stem + ".jsonl")
         process_csv_file(csv_path, gt_map, out_path)
+
+    # if no csvs, then do .jsonls
+    if not any(args.csv_dir.glob("*.csv")):
+        print(f"[WARN] No CSV files found in {args.csv_dir}, skipping CSV processing", file=sys.stderr)
+        # Process each JSONL file
+        for jsonl_path in sorted(args.csv_dir.glob("*.jsonl")):
+            out_path = args.output_dir / (jsonl_path.stem + ".jsonl")
+            process_jsonl_file(jsonl_path, gt_map, out_path)
 
 if __name__ == "__main__":
     main()

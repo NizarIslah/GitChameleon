@@ -34,12 +34,14 @@ parser.add_argument("--wandb", action="store_true", help="Enable Weights and Bia
 parser.add_argument("--test", action="store_true", help="Enable test mode for debugging.")
 parser.add_argument("--together", action="store_true", help="Use Together API instead of OpenAI.")
 parser.add_argument("--self_debug_file", type=str, default="", help="File to save self-debugging information.")
+parser.add_argument("--non_struct", action="store_true", help="Use non-structured output.")
 args = parser.parse_args()
 
 cot = args.cot
 temperature = args.temperature
 model = args.model
-extra_prompt = "Only answer in JSON." if args.together else ""
+# extra_prompt = "Only answer in JSON." if args.together else ""
+extra_prompt = ""
 
 
 if args.self_debug_file != "":
@@ -66,6 +68,7 @@ else:
     base_url="https://openrouter.ai/api/v1",
     api_key="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",
     )
+print(client)
 
 def get_completion_together_with_retry(prompt, max_retries=5, delay=10):
     retries = 0
@@ -75,6 +78,24 @@ def get_completion_together_with_retry(prompt, max_retries=5, delay=10):
                 response = client.chat.completions.create(model=model, messages=prompt, seed=16, temperature=temperature, response_format={"type": "json_object", "schema": CodeReasoning.model_json_schema()})
             else:
                 response = client.chat.completions.create(model=model, messages=prompt, seed=16, temperature=temperature, response_format={"type": "json_object", "schema": MyResponse.model_json_schema()})
+            return response
+        except openai.RateLimitError as e:
+            retries += 1
+            print(f"Rate limit exceeded. Retrying {retries}/{max_retries} in {delay} seconds...")
+            time.sleep(delay)
+        except Exception as e:
+            return f"Error: {str(e)}"
+    return f"Failed after {max_retries} retries."
+
+
+def get_completion_together_with_retry_nonstruct(prompt, max_retries=5, delay=10):
+    retries = 0
+    while retries < max_retries:
+        try:
+            if cot:
+                response = client.chat.completions.create(model=model, messages=prompt, seed=16, temperature=temperature)
+            else:
+                response = client.chat.completions.create(model=model, messages=prompt, seed=16, temperature=temperature)
             return response
         except openai.RateLimitError as e:
             retries += 1
@@ -110,6 +131,8 @@ if args.test:
     prompts = prompts[:2]
 
 get_completion_fn = get_completion_together_with_retry if args.together else get_completion_with_retry
+if args.non_struct:
+    get_completion_fn = get_completion_together_with_retry_nonstruct if args.together else get_completion_with_retry
 
 with tqdm_joblib(tqdm(desc="Fetching completions", total=len(prompts))) as progress_bar:
     responses = Parallel(n_jobs=-1, prefer="threads")(
@@ -127,13 +150,18 @@ for prompt, response in zip(prompts, responses):
 
         if isinstance(response, str):
             content = response
+            print(content)
         else:
             message = response.choices[0].message
+            print(message)
             
             if args.together:
-                content = json.loads(message.content)
-                explanation = content.get("explanation", "")
-                answer = content.get("answer", "")
+                if args.non_struct:
+                    content = message.content
+                else:
+                    content = json.loads(message.content)
+                    explanation = content.get("explanation", "")
+                    answer = content.get("answer", "")
             else:
                 content = message.parsed
                 explanation = getattr(content, "explanation", "")
@@ -153,13 +181,22 @@ for prompt, response in zip(prompts, responses):
                 }
             )
         else:
-            r_final.append(
-                {
-                    "example_id": prompt["id"],
-                    "prompt": prompt["prompt"],
-                    "answer": answer,
-                    "explanation": explanation,
-                }
+            if args.non_struct:
+                r_final.append(
+                    {
+                        "example_id": prompt["id"],
+                        "prompt": prompt["prompt"],
+                        "output": content,
+                    }
+                )
+            else:
+                r_final.append(
+                    {
+                        "example_id": prompt["id"],
+                        "prompt": prompt["prompt"],
+                        "answer": answer,
+                        "explanation": explanation,
+                    }
             )
     except json.JSONDecodeError as e:
         failed_count += 1

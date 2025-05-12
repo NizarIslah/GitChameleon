@@ -70,12 +70,15 @@ def main():
     width = 0.7
     ax.bar(
         x, percentage_change, width,
-        label='Percentage Reduction', color='#3498db', edgecolor='black', alpha=0.8
+        label='Percentage Reduction', color='#8e44ad', edgecolor='black', alpha=0.8
     )
     ax.set_xlabel('Error Categories', fontsize=24)
     ax.set_ylabel('Error Reduction (%)', fontsize=24)
     ax.set_xticks(x)
     ax.set_xticklabels(categories, rotation=45, ha='right', fontsize=20)
+    # yticks
+    ax.set_yticks(np.arange(0, 101, 20))
+    ax.set_yticklabels(np.arange(0, 101, 20), fontsize=20)
     ax.grid(True, which='major', axis='y', linestyle='--', linewidth=0.8, alpha=0.7)
     ax.set_axisbelow(True)
     # width = 0.35

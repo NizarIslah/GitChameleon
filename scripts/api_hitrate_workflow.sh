@@ -1,5 +1,5 @@
-input_dir=cli_assistant_results/
-python scripts/annotate_csvs.py cli_assistant_results --keys answer --out-dir cli_assistant_results_answers
-python scripts/self_debug_jsonl.py dataset/final_fix_dataset.jsonl cli_assistant_results_answers/ cli_assistant_results_answers/
-python scripts/api_hitrate.py cli_assistant_results_answers/ cli_assistant_results_hitrate/
-# python scripts/pull_results_csv.py cli_assistant_results/ -c passed passed_manual
+input_dir=rag_results/
+python scripts/annotate_csvs.py gemini --keys answer --out-dir gemini_answers
+python scripts/self_debug_jsonl.py dataset/final_fix_dataset_hitrate.jsonl gemini_self_debug_answers_merged/ gemini_self_debug_answers_merged_correct/
+python scripts/api_hitrate.py gemini_self_debug_answers_merged_correct/ gemini_debug_hitrate_correct/
+# python scripts/pull_results_csv.py rag_results/ -c passed passed_manual
