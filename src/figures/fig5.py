@@ -108,10 +108,12 @@ def plot_by_years():
                     xerr=vis_errs[i, col], error_kw=dict(ecolor='black', lw=1, capsize=3))
         ax.set_title(f"{YEARS[col]}", fontsize=30, pad=12, fontweight='bold')
         ax.set_xlim(0, 0.8)
-        ax.set_xlabel("Success Rate", fontsize=30, fontweight='bold')
+        ax.set_xlabel("Success Rate", fontsize=20)
         ax.grid(axis='x', linestyle='--', alpha=0.5)
         ax.set_yticks(y_pos)
-        ax.set_yticklabels(wrapped_labels(), fontsize=24, fontweight='bold')
+        ax.set_yticklabels(wrapped_labels(), fontsize=24)
+        ax.tick_params(axis='x', labelsize=20, direction='out')
+        ax.locator_params(axis='x', nbins=7)
     ax.invert_yaxis()
     hidden_patch = mpatches.Patch(facecolor='gray', label='Hidden')
     visible_patch = mpatches.Patch(facecolor='white', edgecolor='black', hatch='///', label='Visible')
@@ -229,19 +231,27 @@ def plot_by_change_categories():
                     xerr=vis_errs[i,col], error_kw=dict(ecolor='black', lw=1, capsize=3))
         ax.set_title(cat, fontsize=30, pad=10, fontweight='bold')
         ax.set_xlim(0, 0.8)
-        ax.set_xlabel("Success Rate", fontsize=30, fontweight='bold')
+        ax.set_xlabel("Success Rate", fontsize=25)
         ax.grid(axis='x', linestyle='--', alpha=0.5)
         ax.set_yticks(y_pos)
-        ax.set_yticklabels(wrapped_labels(), fontsize=24, fontweight='bold')
+        ax.set_yticklabels(wrapped_labels(), fontsize=20)
+        #ax.set_xticks([0, 0.2, 0,4, 0.6, 0.8], fontsize=30)
+        ax.tick_params(axis='x', labelsize=20, direction='out')
+        ax.locator_params(axis='x', nbins=7)
     ax.invert_yaxis()
 
     hidden_patch = mpatches.Patch(facecolor='gray', label='Hidden')
     visible_patch = mpatches.Patch(facecolor='white', edgecolor='black', hatch='///', label='Visible')
     fig.legend(handles=[hidden_patch, visible_patch], loc="lower center", ncol=2,
-               frameon=False, prop={'size': 30, 'weight': 'bold'},
+               frameon=False, prop={'size': 30},
                handlelength=4, handleheight=1.5, bbox_to_anchor=(0.5, -0.10))
 
-    plt.tight_layout(rect=[0,0.03,1,1])
+    #plt.tight_layout(rect=[0,0.03,1,1])    
+    plt.tight_layout() 
+    plt.subplots_adjust(                  
+                    wspace=0.2, # Increase horizontal space between subplots
+                    ) # Increase vertical space
+    #ax.set_xticklabels(error_categories, rotation=45, ha='right', fontsize=10)
     plt.savefig("model_change.pdf", dpi=300, bbox_inches="tight")
     plt.show()
 
@@ -289,8 +299,9 @@ def compute_rates_and_err_lib(eval_path, lib_map):
 
 def plot_by_libraries():
     lib_map = load_library_map(MASTER_FILE)
+    n_libs   = len(libraries) # Total number of libraries available
     n_models = len(models)
-    n_libs   = len(libraries)
+
     hid_mat   = np.zeros((n_models, n_libs))
     hid_errs  = np.zeros_like(hid_mat)
     vis_mat   = np.zeros_like(hid_mat)
@@ -304,34 +315,58 @@ def plot_by_libraries():
         vis_mat[i,:]   = v_rates
         vis_errs[i,:]  = v_err
 
-    fig, axs = plt.subplots(1, n_libs, figsize=(6*n_libs, 8), sharey=True)
-    fig.subplots_adjust(left=0.3)
+    n_rows = 2
+    n_cols = 3
+    fig, axs = plt.subplots(n_rows, n_cols, figsize=(18, 12), sharey=True)
+    
+    axs = axs.flatten()
+    #fig.subplots_adjust(left=0.3) 
     bar_h = 0.35
     y_pos = np.arange(n_models)
 
-    for col, lib in enumerate(libraries):
-        ax = axs[col]
+    for col_plot_idx, lib in enumerate(libraries):
+        if col_plot_idx >= n_rows * n_cols:
+            # Stop if we've filled all available subplot slots
+            break
+
+        ax = axs[col_plot_idx] # Use the flattened index for the current subplot
+
         for i, (label, color) in enumerate(models):
-            ax.barh(y_pos[i] - bar_h/2, hid_mat[i, col], height=bar_h,
-                    color=color, alpha=0.9, xerr=hid_errs[i, col],
+            # Use col_plot_idx to get the correct data column for the current library
+            ax.barh(y_pos[i] - bar_h/2, hid_mat[i, col_plot_idx], height=bar_h,
+                    color=color, alpha=0.9, xerr=hid_errs[i, col_plot_idx],
                     error_kw=dict(ecolor='black', lw=1, capsize=3))
-            ax.barh(y_pos[i] + bar_h/2, vis_mat[i, col], height=bar_h,
+            ax.barh(y_pos[i] + bar_h/2, vis_mat[i, col_plot_idx], height=bar_h,
                     facecolor='white', edgecolor=color, hatch='///', linewidth=1.5,
-                    xerr=vis_errs[i, col], error_kw=dict(ecolor='black', lw=1, capsize=3))
+                    xerr=vis_errs[i, col_plot_idx], error_kw=dict(ecolor='black', lw=1, capsize=3))
+        
         ax.set_title(lib.capitalize(), fontsize=24, fontweight='bold', pad=10)
         ax.set_xlim(0, 1.0)
-        ax.set_xlabel("Success Rate", fontsize=20, fontweight='bold')
+        ax.set_xlabel("Success Rate", fontsize=20)
         ax.grid(axis='x', linestyle='--', alpha=0.5)
         ax.set_yticks(y_pos)
-        ax.set_yticklabels(wrapped_labels(), fontsize=24, fontweight='bold')
-    ax.invert_yaxis()
+        ax.set_yticklabels(wrapped_labels(30), fontsize=20)
+        ax.tick_params(axis='x', labelsize=20, direction='out')
+        #ax.tick_params(axis='y', labelsize=20, direction='out')
+    
+    num_plots_created = min(n_libs, n_rows * n_cols)
+    for i in range(num_plots_created, n_rows * n_cols):
+        fig.delaxes(axs[i])
+
+    if num_plots_created > 0: # Ensure there was at least one library plotted
+        last_plotted_ax = axs[num_plots_created - 1]
+        last_plotted_ax.invert_yaxis() # This applies only to the last subplot
+
     hidden_patch = mpatches.Patch(facecolor='gray', label='Hidden')
     visible_patch = mpatches.Patch(facecolor='white', edgecolor='black', hatch='///', label='Visible')
     fig.legend(handles=[hidden_patch, visible_patch], loc="lower center", ncol=2,
                frameon=False, prop={'size': 16, 'weight': 'bold'},
                handlelength=4, bbox_to_anchor=(0.5, -0.05))
 
-    plt.tight_layout(rect=[0,0.05,1,1])
+    plt.tight_layout(rect=[0,0.05,1,1]) # rect=[left, bottom, right, top] adjusts the layout box
+    plt.subplots_adjust(                  
+                    wspace=0.2, # Increase horizontal space between subplots
+                    ) # Increase vertical space
     plt.savefig("model_library.pdf", dpi=300, bbox_inches="tight")
     plt.show()
 
