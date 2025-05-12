@@ -5,7 +5,7 @@ import itertools
 from scipy.stats import spearmanr, pearsonr
 
 # --- CONFIGURATION ----------------------------------------------------------
-benchmarks_x = ["BigCodeBench", "SWE-Bench", "LiveCodeBench"]
+benchmarks_x = ["SWE-Bench", "LiveCodeBench"]
 y_bench      = "GitChameleon"
 
 def generate_synthetic_data():
@@ -94,7 +94,7 @@ colors  = itertools.cycle([
 model_styles = {m:(next(markers), next(colors)) for m in model_names}
 
 # Plot 1×3
-fig, axs = plt.subplots(1, len(benchmarks_x), figsize=(18,5), sharey=True)
+fig, axs = plt.subplots(1, len(benchmarks_x), figsize=(10,6), sharey=True)
 
 for ax, x_bench in zip(axs, benchmarks_x):
     # collect valid points
@@ -143,7 +143,7 @@ fig.legend(handles, labels,
            title="Models",
            loc="lower center",
            bbox_to_anchor=(0.5, -0.10),
-           ncol=7,
+           ncol=5,
            frameon=True,
            edgecolor='black',
            prop={'size':10,'weight':'bold'},
@@ -151,5 +151,5 @@ fig.legend(handles, labels,
    .get_title().set_fontweight('bold')
 
 fig.tight_layout(rect=[0, 0.05, 1, 1])
-fig.savefig("figure1.pdf", dpi=300, bbox_inches="tight")
+fig.savefig("figure_bench_corr.pdf", dpi=300, bbox_inches="tight")
 plt.show()
