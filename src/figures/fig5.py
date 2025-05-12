@@ -8,8 +8,8 @@ import matplotlib.patches as mpatches
 import textwrap
 
 # --- CONFIGURATION ----------------------------------------------------------
-DATA_DIR    = "/Users/beike/Desktop/Workspace/GitChameleon/plot/all_eval_data"
-MASTER_FILE = "/Users/beike/Desktop/Workspace/GitChameleon/plot/final_fix_dataset.jsonl"
+DATA_DIR    = "all_eval_data"
+MASTER_FILE = "dataset/final_fix_dataset.jsonl"
 
 eval_files = [
     "gpt_41_t0_eval_results_1.jsonl",
@@ -27,7 +27,7 @@ models = [
     ("Claude 3.7 Sonnet", "#4daf4a"),
     ("Gemini 1.5 Pro", "#984ea3"),
     ("Gemini 2.5 Pro", "#ff7f00"),
-    ("Claude 3.5 DDG‑SB", "#f781bf"),
+    ("DDG‑SB Claude 3.5 ", "#f781bf"),
     ("Goose", "#a65628"),
 ]
 assert len(models) == len(eval_files), "models[] must match eval_files[]"
@@ -106,7 +106,7 @@ def plot_by_years():
             ax.barh(y_pos[i] + bar_h/2, vis_mat[i, col], height=bar_h,
                     facecolor='white', edgecolor=color, hatch='///', linewidth=1.5,
                     xerr=vis_errs[i, col], error_kw=dict(ecolor='black', lw=1, capsize=3))
-        ax.set_title(f"{YEARS[col]}", fontsize=30, pad=12, fontweight='bold')
+        ax.set_title(f"{YEARS[col]}", fontsize=25, pad=12, fontweight='bold')
         ax.set_xlim(0, 0.8)
         ax.set_xlabel("Success Rate", fontsize=20)
         ax.grid(axis='x', linestyle='--', alpha=0.5)
@@ -122,6 +122,9 @@ def plot_by_years():
                handlelength=4, handleheight=1.5, bbox_to_anchor=(0.5, -0.10))
 
     plt.tight_layout(rect=[0,0.03,1,1])
+    plt.subplots_adjust(                  
+                    wspace=0.2, # Increase horizontal space between subplots
+                    ) # Increase vertical space
     plt.savefig("model_date.pdf", dpi=300, bbox_inches="tight")
     plt.show()
 
@@ -360,7 +363,7 @@ def plot_by_libraries():
     hidden_patch = mpatches.Patch(facecolor='gray', label='Hidden')
     visible_patch = mpatches.Patch(facecolor='white', edgecolor='black', hatch='///', label='Visible')
     fig.legend(handles=[hidden_patch, visible_patch], loc="lower center", ncol=2,
-               frameon=False, prop={'size': 16, 'weight': 'bold'},
+               frameon=False, prop={'size': 20, 'weight': 'bold'},
                handlelength=4, bbox_to_anchor=(0.5, -0.05))
 
     plt.tight_layout(rect=[0,0.05,1,1]) # rect=[left, bottom, right, top] adjusts the layout box
@@ -372,8 +375,8 @@ def plot_by_libraries():
 
 # --- MAIN ------------------------------------------------------------------
 def main():
-    plot_by_years()
-    plot_by_change_categories()
+    #plot_by_years()
+    #plot_by_change_categories()
     plot_by_libraries()
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator, MultipleLocator
 
 # --- User‑adjustable paths ---
-dataset_path = '/Users/beike/Desktop/Workspace/GitChameleon/dataset/final_fix_dataset.jsonl'
+dataset_path = 'dataset/final_fix_dataset.jsonl'
 output_png   = 'samples_per_library.pdf'
 
 # 1. Build a mapping: library → count of samples
