@@ -8,16 +8,16 @@ import pandas as pd
 
 # Increase all font sizes by default
 plt.rcParams.update({
-    'font.size': 22,            # base font size
+    'font.size': 24,            # base font size
     'axes.titlesize': 24,
     'axes.labelsize': 24,
-    'xtick.labelsize': 22,
-    'ytick.labelsize': 22,
-    'legend.fontsize': 22,
+    'xtick.labelsize': 24,
+    'ytick.labelsize': 24,
+    'legend.fontsize': 24,
 })
 
 # --- User‑adjustable path ---
-dataset_path = '/Users/beike/Desktop/Workspace/GitChameleon/dataset/final_fix_dataset.jsonl'
+dataset_path = 'dataset/final_fix_dataset.jsonl'
 purple = '#8e44ad'
 
 # 1. Samples per library
@@ -27,13 +27,19 @@ with open(dataset_path, 'r') as f:
         lib = json.loads(line).get('library')
         if lib:
             counts_per_lib[lib] += 1
-libs = list(counts_per_lib.keys())
-samples = [counts_per_lib[l] for l in libs]
+# libs = list(counts_per_lib.keys())
+# samples = [counts_per_lib[l] for l in libs]
+lib_sample_counts = []
+for lib, count in counts_per_lib.items():
+    lib_sample_counts.append((lib, count))
+lib_sample_counts_sorted = sorted(lib_sample_counts, key=lambda x: x[1], reverse=True)
+libs = [item[0] for item in lib_sample_counts_sorted]
+samples = [item[1] for item in lib_sample_counts_sorted]
 
 plt.figure(figsize=(16, 10))
 x = np.arange(len(libs))
 plt.bar(x, samples, width=0.7, color=purple, alpha=0.9)
-plt.xticks(x, libs, rotation=30, ha='right')
+plt.xticks(x, libs, rotation=45, ha='right')
 plt.xlabel('Library')
 plt.ylabel('Number of Samples')
 plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
@@ -50,13 +56,20 @@ with open(dataset_path, 'r') as f:
         obj = json.loads(line)
         if obj.get('library') and obj.get('version'):
             versions_per_lib[obj['library']].add(obj['version'])
-libs_v = list(versions_per_lib.keys())
-unique_counts = [len(versions_per_lib[l]) for l in libs_v]
+#libs_v = list(versions_per_lib.keys())
+#unique_counts = [len(versions_per_lib[l]) for l in libs_v]
+lib_counts = []
+for lib, versions in versions_per_lib.items():
+    lib_counts.append((lib, len(versions)))
+lib_counts_sorted = sorted(lib_counts, key=lambda x: x[1], reverse=True)
+
+libs_v = [item[0] for item in lib_counts_sorted]
+unique_counts = [item[1] for item in lib_counts_sorted]
 
 plt.figure(figsize=(16, 10))
 x = np.arange(len(libs_v))
 plt.bar(x, unique_counts, width=0.7, color=purple, alpha=0.9)
-plt.xticks(x, libs_v, rotation=30, ha='right')
+plt.xticks(x, libs_v, rotation=45, ha='right')
 plt.xlabel('Library')
 plt.ylabel('Number of Unique Versions')
 plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
@@ -81,8 +94,10 @@ year_dist = [yc.get(y, 0) for y in yrange]
 plt.figure(figsize=(16, 10))
 plt.bar(yrange, year_dist, width=0.75, color=purple, alpha=0.9)
 plt.xticks(yrange, yrange, rotation=45)
-plt.xlabel('Version Release Year')
-plt.ylabel('Sample Count')
+plt.tick_params(axis='x', labelsize=25, direction='out')
+plt.tick_params(axis='y', labelsize=25, direction='out')
+plt.xlabel('Version Release Year', fontsize=30)
+plt.ylabel('Sample Count', fontsize=30)
 plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
 plt.grid(True, which='major', axis='y', linestyle='--', linewidth=1, alpha=0.5)
 plt.tight_layout()
@@ -116,8 +131,10 @@ plt.figure(figsize=(16, 10))
 x = np.arange(len(labels))
 plt.bar(x, counts, width=0.7, color=purple, alpha=0.9)
 plt.xticks(x, labels, rotation=30, ha='right')
-plt.xlabel('Change Category')
-plt.ylabel('Sample Count')
+plt.xlabel('Change Category', fontsize=30)
+plt.ylabel('Sample Count', fontsize=30)
+plt.tick_params(axis='x', labelsize=25, direction='out')
+plt.tick_params(axis='y', labelsize=25, direction='out')
 plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
 plt.grid(True, which='major', axis='y', linestyle='--', linewidth=1, alpha=0.5)
 plt.tight_layout()

@@ -13,29 +13,29 @@ def load_counts(json_path):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Plot error category frequencies for baseline vs. error-feedback from two JSON count files."
-    )
-    parser.add_argument(
-        "--baseline", required=True,
-        help="Path to JSON file with baseline counts (category->count)."
-    )
-    parser.add_argument(
-        "--feedback", required=True,
-        help="Path to JSON file with error-feedback counts (category->count)."
-    )
-    parser.add_argument(
-        "--title", default="Error Category Comparison",
-        help="Plot title."
-    )
-    parser.add_argument(
-        "--output", help="File path to save the figure (e.g. .png). If omitted, shows interactively."
-    )
-    args = parser.parse_args()
+    # parser = argparse.ArgumentParser(
+    #     description="Plot error category frequencies for baseline vs. error-feedback from two JSON count files."
+    # )
+    # parser.add_argument(
+    #     "--baseline", required=True,
+    #     help="Path to JSON file with baseline counts (category->count)."
+    # )
+    # parser.add_argument(
+    #     "--feedback", required=True,
+    #     help="Path to JSON file with error-feedback counts (category->count)."
+    # )
+    # parser.add_argument(
+    #     "--title", default="Error Category Comparison",
+    #     help="Plot title."
+    # )
+    # parser.add_argument(
+    #     "--output", help="File path to save the figure (e.g. .png). If omitted, shows interactively."
+    # )
+    # args = parser.parse_args()
 
     # Load counts
-    baseline_counts = load_counts(args.baseline)
-    feedback_counts = load_counts(args.feedback)
+    baseline_counts = load_counts("gpt_errors.json")
+    feedback_counts = load_counts("gpt_debug_errors.json")
 
     # normalize counts to frequencies
     total_baseline = sum(baseline_counts.values())
@@ -78,37 +78,40 @@ def main():
     ax.set_xticklabels(categories, rotation=45, ha='right', fontsize=20)
     ax.grid(True, which='major', axis='y', linestyle='--', linewidth=0.8, alpha=0.7)
     ax.set_axisbelow(True)
-    # width = 0.35
+    
+    
+    width = 0.35
 
-    # Plot bars for total counts (top subfigure)
-    # ax.bar(
-    #     x - width/2, baseline, width,
-    #     label='Greedy Decoding', color='#e0d5f9', edgecolor='black', alpha=0.8
-    # )
-    # ax.bar(
-    #     x + width/2, feedback, width,
-    #     label='+ Self Debug', color='#8e44ad', alpha=0.9
-    # )
+    #Plot bars for total counts (top subfigure)
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.bar(
+        x - width/2, baseline, width,
+        label='Greedy Decoding', color='#e0d5f9', edgecolor='black', alpha=0.8
+    )
+    ax.bar(
+        x + width/2, feedback, width,
+        label='Self-Debug', color='#8e44ad', alpha=0.9
+    )
 
-    # # Labels and ticks
-    # ax.set_xlabel('Error Categories', fontsize=24)
-    # ax.set_ylabel('Total', fontsize=24)
-    # # ax.set_title(args.title, fontsize=14)
-    # ax.set_xticks(x)
-    # ax.set_xticklabels(categories, rotation=45, ha='right', fontsize=20)
+    # Labels and ticks
+    ax.set_xlabel('Error Categories', fontsize=24)
+    ax.set_ylabel('Total', fontsize=24)
+    # ax.set_title(args.title, fontsize=14)
+    ax.set_xticks(x)
+    ax.set_xticklabels(categories, rotation=45, ha='right', fontsize=20)
+    ax.tick_params(axis='y', labelsize=20, direction='out')
 
-    # # Legend
-    # ax.legend(frameon=True, fontsize=20)
+    # Legend
+    ax.legend(frameon=True, fontsize=20)
 
-    # # Grid
-    # ax.grid(True, which='major', axis='y', linestyle='--', linewidth=0.8, alpha=0.7)
-    # ax.set_axisbelow(True)
+    # Grid
+    ax.grid(True, which='major', axis='y', linestyle='--', linewidth=0.8, alpha=0.7)
+    ax.set_axisbelow(True)
 
     plt.tight_layout()
-    if args.output:
-        plt.savefig(args.output, dpi=300)
-    else:
-        plt.show()
+    
+    plt.savefig("error_category_comparison.pdf", dpi=300)
+    plt.show()
 
 
 if __name__ == '__main__':
