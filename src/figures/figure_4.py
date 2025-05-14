@@ -118,14 +118,17 @@ for ax, x_bench in zip(axs, benchmarks_x):
                    marker=mk,
                    color=cl,
                    s=200,
-                   label=m)
+                   label=m)    
 
-    ax.set_xlabel(f"{x_bench} Success Rate (↑)",
-                  fontsize=14, fontweight='bold')
+    ax.set_xlabel(f"{x_bench} (↑)",
+                  fontsize=20, fontweight='bold')
     if ax is axs[0]:
-        ax.set_ylabel(f"{y_bench} Success Rate (↑)",
-                      fontsize=14, fontweight='bold')
+        ax.set_ylabel(f"{y_bench} (↑)",
+                      fontsize=20, fontweight='bold')
     ax.grid(True, linestyle='--', alpha=0.5)
+    ax.tick_params(axis='x', labelsize=20, direction='out')
+    ax.tick_params(axis='y', labelsize=20, direction='out')
+
 
 # Shared legend underneath
 handles, labels = [], []
@@ -142,12 +145,12 @@ for m in model_names:
 fig.legend(handles, labels,
            title="Models",
            loc="lower center",
-           bbox_to_anchor=(0.5, -0.10),
-           ncol=5,
+           bbox_to_anchor=(0.5, -0.25),
+           ncol=4,
            frameon=True,
            edgecolor='black',
-           prop={'size':10,'weight':'bold'},
-           title_fontsize=12)\
+           prop={'size':16,'weight':'bold'},
+           title_fontsize=20)\
    .get_title().set_fontweight('bold')
 
 fig.tight_layout(rect=[0, 0.05, 1, 1])
