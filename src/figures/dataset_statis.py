@@ -94,10 +94,10 @@ year_dist = [yc.get(y, 0) for y in yrange]
 plt.figure(figsize=(16, 10))
 plt.bar(yrange, year_dist, width=0.75, color=purple, alpha=0.9)
 plt.xticks(yrange, yrange, rotation=45)
-plt.tick_params(axis='x', labelsize=25, direction='out')
-plt.tick_params(axis='y', labelsize=25, direction='out')
-plt.xlabel('Version Release Year', fontsize=30)
-plt.ylabel('Sample Count', fontsize=30)
+plt.tick_params(axis='x', labelsize=30, direction='out')
+plt.tick_params(axis='y', labelsize=30, direction='out')
+plt.xlabel('Version Release Year', fontsize=35)
+plt.ylabel('Sample Count', fontsize=35)
 plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
 plt.grid(True, which='major', axis='y', linestyle='--', linewidth=1, alpha=0.5)
 plt.tight_layout()
@@ -110,11 +110,11 @@ def categorize(t):
     if re.search(r'\b(argument|attribute|param)\b', s):
         return 'Argument'
     if re.search(r'\b(name change|rename|function|method|class)\b', s):
-        return 'Function name'
+        return 'Function Name'
     if re.search(r'\b(semantic|behaviour|behavior|breaking|deprecate)\b', s):
         return 'Semantics'
     if re.search(r'\b(new|feature|dependency)\b', s):
-        return 'New feature'
+        return 'New Feature'
     return 'Other'
 
 counter = Counter()
@@ -124,17 +124,17 @@ with open(dataset_path, 'r') as f:
         if raw:
             counter[categorize(raw)] += 1
 
-labels = ['Argument', 'Function name', 'Semantics', 'New feature', 'Other']
+labels = ['Argument', 'Function Name', 'Semantics', 'New Feature', 'Other']
 counts = [counter.get(l, 0) for l in labels]
 
 plt.figure(figsize=(16, 10))
 x = np.arange(len(labels))
 plt.bar(x, counts, width=0.7, color=purple, alpha=0.9)
 plt.xticks(x, labels, rotation=30, ha='right')
-plt.xlabel('Change Category', fontsize=30)
-plt.ylabel('Sample Count', fontsize=30)
-plt.tick_params(axis='x', labelsize=25, direction='out')
-plt.tick_params(axis='y', labelsize=25, direction='out')
+plt.xlabel('Change Category', fontsize=35)
+plt.ylabel('Sample Count', fontsize=35)
+plt.tick_params(axis='x', labelsize=30, direction='out')
+plt.tick_params(axis='y', labelsize=35, direction='out')
 plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
 plt.grid(True, which='major', axis='y', linestyle='--', linewidth=1, alpha=0.5)
 plt.tight_layout()
