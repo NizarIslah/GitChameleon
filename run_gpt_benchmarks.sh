@@ -47,6 +47,3 @@ if [[ -z "$INPUT_DATA" ]]; then
     echo "Error: --input_data is required."
     exit 1
 fi
-
-# Run the gpt_benchmarks.py script with the parsed arguments
-python gpt_benchmarks.py --input_data "$INPUT_DATA" --output_data "$OUTPUT_DATA" --cot "$COT" --feedback "$FEEDBACK" --api_key "$API_KEY" --api_endpoint "$API_ENDPOINT" --temperature "$TEMPERATURE" --struct_output "$STRUCT_OUTPUT" --wandb "$USE_WANDB" --wandb_project "$WANDB_PROJECT" --wandb_entity "$WANDB_ENTITY" --wandb_run_name "$WANDB_RUN_NAME"
