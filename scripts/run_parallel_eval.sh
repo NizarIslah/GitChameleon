@@ -2,7 +2,6 @@
 #SBATCH --job-name=jsonl_eval
 #SBATCH --output=logs_eval/jsonl_eval_%A_%a.out
 #SBATCH --error=logs_eval/jsonl_eval_%A_%a.err
-#SBATCH --array=0-6
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=8G
 #SBATCH --time=00:30:00
@@ -11,6 +10,9 @@ set -euo pipefail
 # Load modules
 module load python/3.10
 
+# 1) Read the JSONL path for *this* array index
+JSONL_FILE=$(sed -n "$((SLURM_ARRAY_TASK_ID+1))p" missing.txt)
+echo "[$SLURM_JOB_ID.$SLURM_ARRAY_TASK_ID] Working on $JSONL_FILE"
 
 # Thread-affinity
 export OMP_NUM_THREADS=1
@@ -26,16 +28,29 @@ export WANDB_CACHE_DIR="$REPO_DIR/wandb_cache/$SLURM_JOB_ID"
 export XDG_CACHE_HOME="$WANDB_CACHE_DIR"
 mkdir -p "$WANDB_CACHE_DIR"
 
-# Build list of JSONL files
-mapfile -t JSONL_LIST < <(find agent_results -type f -name '*.jsonl' | sort)
-JSONL_FILE="${JSONL_LIST[$SLURM_ARRAY_TASK_ID]}"
 JSONL_DIR="$(dirname "$JSONL_FILE")"
 CSV_FILE="${JSONL_DIR}/$(basename "${JSONL_FILE%.jsonl}.csv")"
 
 # Prepare directories
 mkdir -p "$CACHE_DIR" "$TMP_DIR"
 
-# for interactive run this
+# for verification / coverage run this (interactive)
+# apptainer exec \
+#     --bind "$PWD:/app/repo" \
+#     --env PYENV_VERSION=3.10.14 \
+#     --env REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt \
+#     ../gc_1.0.sif \
+#     bash -lc "\
+#       cd /app/repo && \
+#       python -m venv eval_main_venv && \
+#       source eval_main_venv/bin/activate && \
+#       python verify_dataset.py \
+#         dataset/final_fix_dataset.jsonl \
+#         eval_venvs \
+#         dataset/solutions/tests \
+#         --cov"
+
+# for eval interactive run this
 # Execute evaluation inside the container
 # apptainer exec \
 #     --bind "$PWD:/app/repo" \
@@ -46,12 +61,13 @@ mkdir -p "$CACHE_DIR" "$TMP_DIR"
 #       cd /app/repo && \
 #       python -m venv eval_main_venv && \
 #       source eval_main_venv/bin/activate && \
+#       export WANDB_CACHE_DIR=/app/repo/wandb_cache && \
 #       python parallel_eval_jsonl.py \
 #         dataset/final_fix_dataset.jsonl \
-#         agent_results/agent_results_ddg_gpt4o.jsonl \
+#         rag_gpt_4o.jsonl \
 #         eval_venvs \
-#         dataset/solutions/tests"
-
+#         dataset/solutions/tests" \
+#         --wandb"
 
 apptainer exec \
   --bind "$REPO_DIR:/app/repo" \
@@ -62,6 +78,8 @@ apptainer exec \
   cd /app/repo && \
   python -m venv eval_main_venv && \
   source eval_main_venv/bin/activate && \
+  export WANDB_CACHE_DIR=/app/repo/wandb_cache/$SLURM_JOB_ID && \
+  export XDG_CACHE_HOME=/app/repo/wandb_cache/$SLURM_JOB_ID && \
   python parallel_eval_jsonl.py \
     dataset/final_fix_dataset.jsonl \
     "${JSONL_FILE}" \

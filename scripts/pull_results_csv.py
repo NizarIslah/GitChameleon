@@ -45,7 +45,7 @@ def main():
         sys.exit(1)
 
     # collect all CSV and JSONL files
-    files = sorted(input_dir.glob("*.jsonl"))
+    files = sorted(input_dir.glob("*.csv")) # .jsonl
     if not files:
         print(f"No CSV or JSONL files found in {input_dir}", file=sys.stderr)
         sys.exit(1)
