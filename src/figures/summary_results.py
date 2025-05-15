@@ -17,7 +17,8 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="pandas")
 
 SOLUTION_METHODS = [
-    "Model (Enterprise)",
+    "CoT"
+    "Greedy Decoding",
     "Model (OSS)",
     "Agent",
     "Code Assistant",
@@ -30,17 +31,18 @@ def assign_solution_method(df: pd.DataFrame) -> pd.DataFrame:
     """
     # Define a mapping from solution method to its corresponding label
     solution_method_mapping = {
-        "o1": "Model (Enterprise)",
-        "o3": "Model (Enterprise)",
-        "o4": "Model (Enterprise)",
+        "cot": "Zero-Shot CoT",
+        "o1": "Greedy Decoding",
+        "o3": "Greedy Decoding",
+        "o4": "Greedy Decoding",
         "agent_results": "Agent",
-        "gpt": "Model (Enterprise)",
-        "gemini": "Model (Enterprise)",
+        "gpt": "Greedy Decoding",
+        "gemini": "Greedy Decoding",
         "llama": "Model (OSS)",
-        "claude_37": "Model (Enterprise)",
+        "claude_37": "Greedy Decoding",
         "Qwen": "Model (OSS)",
-        "grok": "Model (Enterprise)",
-        "mistral": "Model (Enterprise)",
+        "grok": "Greedy Decoding",
+        "mistral": "Greedy Decoding",
         "DDG": "Agent",
         "goose": "Code Assistant",
         "roocode": "Code Assistant",
