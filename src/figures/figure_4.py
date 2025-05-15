@@ -93,8 +93,9 @@ colors  = itertools.cycle([
 ])
 model_styles = {m:(next(markers), next(colors)) for m in model_names}
 
-# Plot 1×3
-fig, axs = plt.subplots(1, len(benchmarks_x), figsize=(10,6), sharey=True)
+# Plot 1x2
+# Significantly increased figure height to definitively provide space for the legend
+fig, axs = plt.subplots(1, len(benchmarks_x), figsize=(10, 10), sharey=True) # Increased height to 10
 
 for ax, x_bench in zip(axs, benchmarks_x):
     # collect valid points
@@ -119,13 +120,17 @@ for ax, x_bench in zip(axs, benchmarks_x):
                    color=cl,
                    s=200,
                    label=m)
+    ax.set_box_aspect(1) # Make plots square
 
-    ax.set_xlabel(f"{x_bench} Success Rate (↑)",
-                  fontsize=14, fontweight='bold')
+    ax.set_xlabel(f"{x_bench} (↑)",
+                  fontsize=25)
     if ax is axs[0]:
-        ax.set_ylabel(f"{y_bench} Success Rate (↑)",
-                      fontsize=14, fontweight='bold')
+        ax.set_ylabel(f"{y_bench} (↑)",
+                      fontsize=25)
     ax.grid(True, linestyle='--', alpha=0.5)
+    ax.tick_params(axis='x', labelsize=25, direction='out')
+    ax.tick_params(axis='y', labelsize=25, direction='out')
+
 
 # Shared legend underneath
 handles, labels = [], []
@@ -139,17 +144,23 @@ for m in model_names:
     labels.append(m)
     seen.add(m)
 
+# Use tight_layout first to fit elements, then adjust legend placement
+# bbox_to_anchor now uses coordinates relative to the figure,
+# and it's placed far enough down due to the increased figure height.
+fig.tight_layout()
 fig.legend(handles, labels,
            title="Models",
            loc="lower center",
-           bbox_to_anchor=(0.5, -0.10),
-           ncol=5,
+           bbox_to_anchor=(0.5, -0.15), # Adjusted y-coordinate, slightly below the bottom edge of the figure's default layout
+           ncol=3,
            frameon=True,
            edgecolor='black',
-           prop={'size':10,'weight':'bold'},
-           title_fontsize=12)\
+           columnspacing=0.2,
+           prop={'size':25},
+           title_fontsize=25)\
    .get_title().set_fontweight('bold')
 
-fig.tight_layout(rect=[0, 0.05, 1, 1])
-fig.savefig("figure_bench_corr.pdf", dpi=300, bbox_inches="tight")
-plt.show()
+# Removed fig.subplots_adjust and rely on tight_layout with a larger figure size
+# Using bbox_inches="tight" with pad_inches helps capture the legend
+fig.savefig("figure_bench_corr.pdf", dpi=300, bbox_inches="tight", pad_inches=0.5)
+# plt.show()
