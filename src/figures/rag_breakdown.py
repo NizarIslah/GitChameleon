@@ -9,8 +9,8 @@ from pathlib import Path
 import textwrap
 import matplotlib.patches as mpatches
 
-def wrapped_labels(width=12):
-    return [textwrap.fill(label, width=width) for label, _ in models]
+def wrapped_labels(model_names, width=12):
+    return [textwrap.fill(label, width=width) for label in model_names]
 
 
 def load_jsonl(path):
@@ -89,11 +89,13 @@ bar_h = 0.35
 
 models  = [
     ("gpt_41", "#4daf4a"),
-    ("gpt_41_mini", "#984ea3")]
-  #  ("Gemini 2.5 Pro", "#ff7f00"),
-  #  ("GPT-4.1", "#e41a1c"),
-  #  ("O-1", "#377eb8")]
+    ("deepseek_v3", "#984ea3"),
+    ("gemini25_pro", "#ff7f00"),
+    ("claude_37_sonnet", "#e41a1c"),
+    ("qwen3", "#377eb8")]
 #libraries = passed_by_model_library.columns
+model_names = ["GPT-4.1", "Deepseek V3", "Gemini 2.5 Pro", "Claude 3.7 Sonnet", "Qwen 3"]
+
 libraries = ["torch", "numpy", "sympy", "scipy", "django", "flask", "falcon"]
 libraries_case = ["Torch", "NumPy", "SymPy", "SciPy", "Django", "Flask", "Falcon"]
 
@@ -131,7 +133,7 @@ for col_plot_idx, lib in enumerate(libraries):
     ax.set_xlabel("Success Rate", fontsize=20)
     ax.grid(axis='x', linestyle='--', alpha=0.5)
     ax.set_yticks(y_pos)
-    ax.set_yticklabels(wrapped_labels(30), fontsize=20)
+    ax.set_yticklabels(wrapped_labels(model_names, 30), fontsize=20)
     ax.tick_params(axis='x', labelsize=20, direction='out')
     # ax.tick_params(axis='y', labelsize=20, direction='out')
 
