@@ -6,6 +6,12 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator, MultipleLocator
 import pandas as pd
 from pathlib import Path
+import textwrap
+import matplotlib.patches as mpatches
+
+def wrapped_labels(width=12):
+    return [textwrap.fill(label, width=width) for label, _ in models]
+
 
 def load_jsonl(path):
     """Load a single JSON file."""
@@ -67,6 +73,82 @@ rag_combined["library"] = rag_combined["content"].apply(lambda x: x[x.index("<li
 rag_combined = rag_combined[~rag_combined.example_id.isna()]
 rag_combined.example_id = rag_combined.example_id.astype(int)
 merged = rag_eval_combined.merge(rag_combined, on=["filename", "example_id"])
-passed_by_library = merged.groupby("library").passed.mean()
+merged = merged[merged.filename.str.endswith("_k3")]
+merged.filename = merged.filename.apply(lambda x: x.replace("rag_", "").replace("_k3", ""))
+passed_by_model_library = merged.groupby(["filename", "library"]).passed.mean()
+
+passed_by_model_library = passed_by_model_library.to_frame().reset_index().pivot(index="filename", columns=["library"])
+passed_by_model_library.columns = passed_by_model_library.columns.get_level_values(1)
 pass 
 
+n_rows = 2
+n_cols = 3
+fig, axs = plt.subplots(n_rows, n_cols, figsize=(18, 12), sharey=True)
+axs = axs.flatten()
+bar_h = 0.35
+
+models  = [
+    ("gpt_41", "#4daf4a"),
+    ("gpt_41_mini", "#984ea3")]
+  #  ("Gemini 2.5 Pro", "#ff7f00"),
+  #  ("GPT-4.1", "#e41a1c"),
+  #  ("O-1", "#377eb8")]
+#libraries = passed_by_model_library.columns
+libraries = ["torch", "numpy", "sympy", "scipy", "django", "flask", "falcon"]
+libraries_case = ["Torch", "NumPy", "SymPy", "SciPy", "Django", "Flask", "Falcon"]
+
+
+
+n_models = len(models)
+n_libs = len(libraries)
+y_pos = np.arange(n_models)
+
+
+
+
+
+
+hid_dict = passed_by_model_library.to_dict()
+#hid_mat = [] # models x libraries
+
+for col_plot_idx, lib in enumerate(libraries):
+    if col_plot_idx >= n_rows * n_cols:
+        # Stop if we've filled all available subplot slots
+        break
+
+    ax = axs[col_plot_idx]
+    for i, (label, color) in enumerate(models):
+  
+        ax.barh(y_pos[i] - bar_h/2, hid_dict[lib][label], height=bar_h,
+                color=color, alpha=0.9,
+                error_kw=dict(ecolor='black', lw=1, capsize=3))
+    # if model has ddg or goose do not plot self debug
+        # ax.barh(y_pos[i] + bar_h/2, sd_mat[i, col_plot_idx], height=bar_h,
+        #         facecolor='white', edgecolor=color, hatch='///', linewidth=1.5,
+        #         xerr=sd_errs[i, col_plot_idx], error_kw=dict(ecolor='black', lw=1, capsize=3))
+    ax.set_title(libraries_case[col_plot_idx], fontsize=24, fontweight='bold', pad=10)
+    ax.set_xlim(0, 1.0)
+    ax.set_xlabel("Success Rate", fontsize=20)
+    ax.grid(axis='x', linestyle='--', alpha=0.5)
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels(wrapped_labels(30), fontsize=20)
+    ax.tick_params(axis='x', labelsize=20, direction='out')
+    # ax.tick_params(axis='y', labelsize=20, direction='out')
+
+num_plots_created = min(n_libs, n_rows * n_cols)
+for i in range(num_plots_created, n_rows * n_cols):
+    fig.delaxes(axs[i])
+if num_plots_created > 0: # Ensure there was at least one library plotted
+    last_plotted_ax = axs[num_plots_created - 1]
+    last_plotted_ax.invert_yaxis() # This applies only to the last subplot
+hidden_patch = mpatches.Patch(facecolor='gray', label='Greedy Decoding')
+visible_patch = mpatches.Patch(facecolor='white', edgecolor='black', hatch='///', label='Self-Debug')
+fig.legend(handles=[hidden_patch, visible_patch], loc="lower center", ncol=2,
+            frameon=False, prop={'size': 20, 'weight': 'bold'},
+            handlelength=4, bbox_to_anchor=(0.5, -0.05))
+plt.tight_layout(rect=[0,0.05,1,1]) # rect=[left, bottom, right, top] adjusts the layout box
+plt.subplots_adjust(                  
+                wspace=0.2, # Increase horizontal space between subplots
+                ) # Increase vertical space
+plt.savefig("model_library_self_debug.pdf", dpi=300, bbox_inches="tight")
+plt.show()
