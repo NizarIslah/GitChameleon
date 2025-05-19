@@ -8,6 +8,7 @@ import pandas as pd
 from pathlib import Path
 import textwrap
 import matplotlib.patches as mpatches
+import matplotlib.ticker as mtick
 
 def wrapped_labels(model_names, width=12):
     return [textwrap.fill(label, width=width) for label in model_names]
@@ -102,7 +103,7 @@ def get_greedy_result_df(data_path, data_eval_path):
 
     passed_by_model_library = passed_by_model_library.to_frame().reset_index().pivot(index="filename", columns=["library"])
     passed_by_model_library.columns = passed_by_model_library.columns.get_level_values(1)
-    passed_by_model_library = passed_by_model_library[passed_by_model_library.index.str.contains("gpt")]
+    #passed_by_model_library = passed_by_model_library[passed_by_model_library.index.str.contains("gpt")]
     passed_by_model_library = passed_by_model_library[passed_by_model_library.index.str.contains("t0")]
     passed_by_model_library.index = passed_by_model_library.index.str.replace("_t0", "")
     return passed_by_model_library
@@ -124,76 +125,70 @@ greedy_path = Path("all_eval_data")
 greedy_eval_path = Path("all_eval_data")
 
 
-n_rows = 2
+n_rows = 1
 n_cols = 3
-fig, axs = plt.subplots(n_rows, n_cols, figsize=(18, 12), sharey=True)
-axs = axs.flatten()
-bar_h = 0.35
+bar_h = 0.5
 
 models  = [
-    ("gpt_41", "#4daf4a"),
-    ("gpt_41_mini", "#984ea3"),
-    ("gpt_41_nano", "#ff7f00"),]
+    ("gpt_41", "#8C489F"),
+    ("gpt_41_mini", "#8C489F"),
+    ("gpt_41_nano", "#8C489F"),]
    # ("claude_37_sonnet", "#e41a1c"),
    # ("qwen3", "#377eb8")]
 model_names = ["GPT-4.1", "GPT-4.1-mini", "GPT-4.1-nano"] #, "Claude 3.7 Sonnet", "Qwen 3"]
-
-libraries = ["torch", "numpy", "sympy", "scipy", "django", "flask", "falcon"]
-libraries_case = ["Torch", "NumPy", "SymPy", "SciPy", "Django", "Flask", "Falcon"]
 
 passed_by_model_library = get_result_df(rag_path, rag_eval_path)
 passed_by_model_library_greedy = get_greedy_result_df(greedy_path, greedy_eval_path)
 
 n_models = len(models)
-n_libs = len(libraries)
-y_pos = np.arange(n_models)
+n_libs = len(passed_by_model_library.columns.tolist())
 
 hid_dict = passed_by_model_library.to_dict()
 g_dict = passed_by_model_library_greedy.to_dict()
 #hid_mat = [] # models x libraries
 
-for col_plot_idx, lib in enumerate(libraries):
-    if col_plot_idx >= n_rows * n_cols:
-        # Stop if we've filled all available subplot slots
-        break
+libraries = ['django', 'pandas', 'scikit-learn', 'numpy', 'torch', 'falcon', 'flask', 'sympy', 'scipy', 'librosa']
+y_pos = np.arange(len(libraries))
 
-    ax = axs[col_plot_idx]
-    for i, (label, color) in enumerate(models):
-  
-        ax.barh(y_pos[i] - bar_h/2, hid_dict[lib][label], height=bar_h,
-                color=color, alpha=0.9,
-                error_kw=dict(ecolor='black', lw=1, capsize=3))
-        ax.barh(y_pos[i] + bar_h/2, g_dict[lib][label], height=bar_h,
-                 facecolor='white', edgecolor=color, hatch='///', linewidth=1.5, error_kw=dict(ecolor='black', lw=1, capsize=3))
-    ax.set_title(libraries_case[col_plot_idx], fontsize=24, fontweight='bold', pad=10)
-    ax.set_xlim(0, 1.0)
-    ax.set_xlabel("Success Rate", fontsize=20)
+x = passed_by_model_library - passed_by_model_library_greedy
+col_order = x.sum().sort_values().index.tolist()[::-1]
+x = x[col_order].copy()
+
+for col_plot_idx, (model, color) in enumerate(models):
+    fig, ax = plt.subplots(1, 1, figsize=(8, 6), sharey=True)
+    
+    col_order = x[x.index ==model].sum().sort_values().index.tolist()#[::-1]
+    col_order = [x for x in col_order if x in libraries]
+
+    ax.barh(y_pos, x.loc[model,col_order], height=bar_h,
+            color=color, alpha=0.9,
+            error_kw=dict(ecolor='black', lw=1, capsize=3))
+    # for i, lib in enumerate(col_order):
+    #     data = x[x.index == model].to_dict()
+
+    #     ax.barh(y_pos[i], data[lib][model], height=bar_h,
+    #             color=color, alpha=0.9,
+    #             error_kw=dict(ecolor='black', lw=1, capsize=3))
+       
+    #ax.set_title(model_names[col_plot_idx], fontsize=24, fontweight='bold', pad=10)
+    #ax.set_xlim(-1.0, 1.0)
+    ax.set_xlabel("Success Rate Lift", fontsize=16)
     ax.grid(axis='x', linestyle='--', alpha=0.5)
+    ax.xaxis.set_major_formatter(mtick.PercentFormatter(xmax=1.0, decimals=0))
     ax.set_yticks(y_pos)
-    ax.set_yticklabels(wrapped_labels(model_names, 30), fontsize=20)
-    ax.tick_params(axis='x', labelsize=20, direction='out')
+    ax.set_yticklabels(wrapped_labels(col_order, 30), fontsize=16)
+    ax.tick_params(axis='x', labelsize=16, direction='out')
     # ax.tick_params(axis='y', labelsize=20, direction='out')
 
-num_plots_created = min(n_libs, n_rows * n_cols)
-for i in range(num_plots_created, n_rows * n_cols):
-    fig.delaxes(axs[i])
-if num_plots_created > 0: # Ensure there was at least one library plotted
-    last_plotted_ax = axs[num_plots_created - 1]
-    last_plotted_ax.invert_yaxis() # This applies only to the last subplot
-hidden_patch = mpatches.Patch(facecolor='gray', label='RAG')
-visible_patch = mpatches.Patch(facecolor='white', edgecolor='black', hatch='///', label='Greedy Decoding')
-fig.legend(handles=[hidden_patch, visible_patch], loc="lower center", ncol=2,
-            frameon=False, prop={'size': 20, 'weight': 'bold'},
-            handlelength=4, bbox_to_anchor=(0.5, -0.05))
-plt.tight_layout(rect=[0,0.05,1,1]) # rect=[left, bottom, right, top] adjusts the layout box
-plt.subplots_adjust(                  
-                wspace=0.2, # Increase horizontal space between subplots
-                ) # Increase vertical space
-plt.savefig("model_library_self_debug.pdf", dpi=300, bbox_inches="tight")
-plt.show()
+    plt.tight_layout(rect=[0,0.05,1,1]) # rect=[left, bottom, right, top] adjusts the layout box
+    plt.subplots_adjust(                  
+                    wspace=0.2, # Increase horizontal space between subplots
+                    ) # Increase vertical space
+    plt.savefig(f"model_library_rag_{model}.pdf", dpi=300, bbox_inches="tight")
+    #plt.show()
 
 
-
+x = passed_by_model_library - passed_by_model_library_greedy
 # rag_results = {}
 #     for f in data_path.iterdir():
 #         if f.suffix != ".jsonl":
