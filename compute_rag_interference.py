@@ -37,9 +37,10 @@ def evaluate_file(gen_path: Path, gt_docs: Dict[str, Set[str]]) -> Tuple[int, in
     with gen_path.open("r", encoding="utf-8") as f:
         for line in f:
             obj = json.loads(line)
-            if "example_id" not in obj or "used_docs" not in obj:
+            id_key = "example_id" if "example_id" in obj else "id"
+            if id_key not in obj or "used_docs" not in obj:
                 continue  # skip malformed rows
-            example_id = str(obj["example_id"])
+            example_id = str(obj[id_key])
             if example_id not in gt_docs:
                 continue  # skip rows not in ground truth
             retrieved = {normalize_url(u) for u in obj.get("used_docs", [])}
@@ -94,6 +95,8 @@ def main():
 
     for file in jsonl_files:
         stem = file.stem  # e.g. rag_commanda_k1
+        if "gpt_4o_k3" in stem:
+            print()
         if "_k" not in stem:
             continue  # skip unexpected names
         model_part, k_part = stem.rsplit("_k", 1)
