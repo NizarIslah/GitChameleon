@@ -1,35 +1,25 @@
 #!/usr/bin/env python3
-"""count_extra_dep_usage.py
-Analyse extra‑dependency declarations vs. usage **for every model‑output JSONL**
-found in a directory (or for a single file).  Results are assembled into a
-`pandas` DataFrame that can optionally be saved to CSV.
+"""count_extra_dep_usage.py — **v5**
+Analyse extra‑dependency declarations versus usage **for every model‑output
+JSONL** found in a directory (or for a single file). Results are gathered into
+a `pandas` *DataFrame* that can optionally be saved to CSV.
 
-Metrics per file
-----------------
-* **Declared** – total declared extra‑dependency entries.
-* **Used** – number of those references that appear in the code.
-* **Ref %** – 100·Used/Declared (or ``NaN`` when none declared).
-* **Samples w/ Extras** – count of samples that declare at least one extra.
-* **Samples w/out Usage** – among the above, those whose code uses **none** of
-  its declared extras.
-
-Usage
------
-```bash
-python count_extra_dep_usage.py \
-  --fix dataset/final_fix_dataset.jsonl \
-  --orig all_eval_data/ \
-  --out-csv metrics.csv        # optional
-```
+New in v5
+---------
+* **No heuristic fallbacks** – `code_uses_pkg` now relies *solely* on the AST
+  analysis.  If the snippet cannot be parsed, the function simply returns
+  `False`; there is no regex back‑off.
 """
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import re
 import sys
+import textwrap
 from pathlib import Path
-from typing import Dict, Iterable, List, Tuple
+from typing import Dict, Iterable, List, Set, Tuple
 
 import pandas as pd  # type: ignore
 
@@ -44,10 +34,10 @@ CODE_FENCE_RE = re.compile(r"```(?:python)?\n(.*?)```", re.DOTALL)
 # ---------------------------------------------------------------------------
 
 
-def extract_code(answer: str) -> str:
+def extract_code(block: str) -> str:
     """Return the Python snippet inside the first markdown code fence."""
-    m = CODE_FENCE_RE.search(answer)
-    return m.group(1) if m else ""
+    m = CODE_FENCE_RE.search(block or "")
+    return m.group(1) if m else block  # fall back to raw text if no fence
 
 
 def load_jsonl(path: Path) -> Iterable[dict]:
@@ -55,6 +45,113 @@ def load_jsonl(path: Path) -> Iterable[dict]:
         for line in f:
             if line.strip():
                 yield json.loads(line)
+
+
+# ---------------------------------------------------------------------------
+# AST‑based dependency analysis helpers
+# ---------------------------------------------------------------------------
+
+
+def _collect_pkg_aliases(tree: ast.AST, pkg: str) -> Set[str]:
+    """Return all root identifiers that refer to *pkg* (itself or aliased)."""
+    roots: Set[str] = {pkg}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name.split(".")[0] == pkg:
+                    roots.add(alias.asname or alias.name.split(".")[0])
+        elif isinstance(node, ast.ImportFrom):
+            if node.module and node.module.split(".")[0] == pkg:
+                for alias in node.names:
+                    roots.add(alias.asname or alias.name)
+    return roots
+
+
+def code_uses_pkg(code: str, pkg: str) -> bool:
+    """Return *True* if `code` contains a call or attribute access whose *root*
+    identifier resolves to *pkg* or any of its aliases.  The snippet is
+    `textwrap.dedent`‑ed before parsing to tolerate uneven indentation.
+    If the snippet fails to parse, the function returns *False* (no regex
+    fallback)."""
+    try:
+        tree = ast.parse(textwrap.dedent(code))
+    except SyntaxError:
+        return False
+
+    roots = _collect_pkg_aliases(tree, pkg)
+
+    class _UsageVisitor(ast.NodeVisitor):
+        def __init__(self) -> None:
+            self.found = False
+
+        # Detect function calls like `np.zeros()`
+        def visit_Call(self, node: ast.Call):  # noqa: N802
+            if self.found:
+                return
+            root = self._get_root(node.func)
+            if root in roots:
+                self.found = True
+            self.generic_visit(node)
+
+        # Detect attribute access without a Call, e.g. `np.pi`
+        def visit_Attribute(self, node: ast.Attribute):  # noqa: N802
+            if self.found:
+                return
+            root = self._get_root(node)
+            if root in roots:
+                self.found = True
+            self.generic_visit(node)
+
+        @staticmethod
+        def _get_root(n: ast.AST):
+            while isinstance(n, ast.Attribute):
+                n = n.value
+            if isinstance(n, ast.Name):
+                return n.id
+            return None
+
+    v = _UsageVisitor()
+    v.visit(tree)
+    return v.found
+
+
+# ---------------------------------------------------------------------------
+# Ground‑truth (solution) usage annotations
+# ---------------------------------------------------------------------------
+
+
+def annotate_solution_usage(fix_objects: List[dict]) -> dict:
+    extras_declared = extras_used = samples_w_extras = samples_w_usage = 0
+
+    for obj in fix_objects:
+        sol_code = extract_code(obj.get("solution", ""))
+        pkgs = [
+            dep.split("==", 1)[0].strip()
+            for dep in obj.get("extra_dependencies", []) or []
+        ]
+        if pkgs:
+            samples_w_extras += 1
+        used_any = False
+        for pkg in pkgs:
+            extras_declared += 1
+            if code_uses_pkg(sol_code, pkg):
+                extras_used += 1
+                used_any = True
+        if used_any:
+            samples_w_usage += 1
+        obj["_solution_uses"] = used_any
+
+    return {
+        "samples_w_extras": samples_w_extras,
+        "samples_w_usage": samples_w_usage,
+        "extras_declared": extras_declared,
+        "extras_used": extras_used,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Per‑file analysis
+# ---------------------------------------------------------------------------
 
 
 def build_answer_lookup(orig_path: Path) -> Dict[str, str]:
@@ -66,32 +163,19 @@ def build_answer_lookup(orig_path: Path) -> Dict[str, str]:
     return lookup
 
 
-def code_uses_pkg(code: str, pkg: str) -> bool:
-    return bool(re.search(rf"\b{re.escape(pkg)}\.", code))
-
-
-# ---------------------------------------------------------------------------
-# Core logic – single‑file analysis
-# ---------------------------------------------------------------------------
-
-
 def analyse_file(
-    fix_objects: List[dict], orig_path: Path, verbose: bool = False
+    relevant_fix_objects: List[dict], orig_path: Path, verbose: bool = False
 ) -> Tuple[str, int, int, int, int]:
     ans_lookup = build_answer_lookup(orig_path)
     declared = used = swx = swu = 0
-
-    for fix_obj in fix_objects:
+    for fix_obj in relevant_fix_objects:
         code = ans_lookup.get(fix_obj.get("example_id"), "")
         pkgs = [
             dep.split("==", 1)[0].strip()
             for dep in (fix_obj.get("extra_dependencies", []) or [])
         ]
-
-        if pkgs:
-            swx += 1
+        swx += 1
         used_any = False
-
         for pkg in pkgs:
             declared += 1
             if code_uses_pkg(code, pkg):
@@ -99,13 +183,10 @@ def analyse_file(
                 used_any = True
                 if verbose:
                     print(f"USED   {orig_path.name}: {pkg}")
-            else:
-                if verbose:
-                    print(f"UNUSED {orig_path.name}: {pkg}")
-
-        if pkgs and not used_any:
+            elif verbose:
+                print(f"UNUSED {orig_path.name}: {pkg}")
+        if not used_any:
             swu += 1
-
     return orig_path.name, declared, used, swx, swu
 
 
@@ -119,13 +200,16 @@ def main() -> None:
         description="Analyse extra‑dependency usage across model outputs."
     )
     p.add_argument(
-        "--fix", type=Path, required=True, help="JSONL with `extra_dependencies` field."
+        "--fix",
+        type=Path,
+        required=True,
+        help="JSONL with `extra_dependencies` & `solution` fields.",
     )
     p.add_argument(
         "--orig",
         type=Path,
         required=True,
-        help="Single JSONL file **or** directory of files.",
+        help="Single JSONL file *or* directory of files.",
     )
     p.add_argument(
         "--out-csv",
@@ -138,7 +222,29 @@ def main() -> None:
     if not args.fix.is_file():
         sys.exit(f"Fix dataset '{args.fix}' not found.")
 
-    fix_objects = list(load_jsonl(args.fix))
+    fix_objects: List[dict] = list(load_jsonl(args.fix))
+
+    # Analyse ground‑truth solutions
+    soln_stats = annotate_solution_usage(fix_objects)
+    print("\n=== Ground‑truth (solution) stats ===")
+    print(
+        (
+            "Samples w/ extras: {samples_w_extras}\n"
+            "Samples where extras USED: {samples_w_usage} ({p:.1f}%)\n"
+            "Extras declared / used: {extras_declared} / {extras_used} ({q:.1f}%)"
+        ).format(
+            p=100
+            * soln_stats["samples_w_usage"]
+            / max(1, soln_stats["samples_w_extras"]),
+            q=100 * soln_stats["extras_used"] / max(1, soln_stats["extras_declared"]),
+            **soln_stats,
+        )
+    )
+
+    # Keep only examples whose solution truly uses extras
+    relevant_fix_objects = [o for o in fix_objects if o.get("_solution_uses")]
+    if not relevant_fix_objects:
+        sys.exit("No examples where the solution actually uses its extra dependencies.")
 
     orig_paths = (
         sorted(args.orig.glob("*.jsonl")) if args.orig.is_dir() else [args.orig]
@@ -146,7 +252,9 @@ def main() -> None:
     if not orig_paths:
         sys.exit(f"No JSONL files to process in '{args.orig}'.")
 
-    rows = [analyse_file(fix_objects, path, args.verbose) for path in orig_paths]
+    rows = [
+        analyse_file(relevant_fix_objects, path, args.verbose) for path in orig_paths
+    ]
 
     df = pd.DataFrame(
         rows,
@@ -156,7 +264,7 @@ def main() -> None:
         (100 * df["used"] / df["declared"]).round(1).where(df["declared"] != 0)
     )
 
-    # Pretty print to console
+    print("\n=== Model metrics (on solution‑relevant examples) ===")
     print(df.to_markdown(index=False))
 
     if args.out_csv:
