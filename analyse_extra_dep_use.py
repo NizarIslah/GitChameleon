@@ -20,6 +20,7 @@ import sys
 import textwrap
 from pathlib import Path
 from typing import Dict, Iterable, List, Set, Tuple
+import inspect
 
 import pandas as pd  # type: ignore
 
@@ -75,44 +76,44 @@ def code_uses_pkg(code: str, pkg: str) -> bool:
     fallback)."""
     try:
         tree = ast.parse(textwrap.dedent(code))
-    except SyntaxError:
+    except:
+        # If the code cannot be parsed, we assume it doesn't use the package
         return False
-
     roots = _collect_pkg_aliases(tree, pkg)
 
-    class _UsageVisitor(ast.NodeVisitor):
-        def __init__(self) -> None:
-            self.found = False
+    class CallCollector(ast.NodeVisitor):
+        def __init__(self):
+            self.calls = []
+            self._current = []
+            self._in_call = False
 
-        # Detect function calls like `np.zeros()`
-        def visit_Call(self, node: ast.Call):  # noqa: N802
-            if self.found:
-                return
-            root = self._get_root(node.func)
-            if root in roots:
-                self.found = True
+        def visit_Call(self, node):
+            self._current = []
+            self._in_call = True
             self.generic_visit(node)
 
-        # Detect attribute access without a Call, e.g. `np.pi`
-        def visit_Attribute(self, node: ast.Attribute):  # noqa: N802
-            if self.found:
-                return
-            root = self._get_root(node)
-            if root in roots:
-                self.found = True
+        def visit_Attribute(self, node):
+            if self._in_call:
+                self._current.append(node.attr)
             self.generic_visit(node)
 
-        @staticmethod
-        def _get_root(n: ast.AST):
-            while isinstance(n, ast.Attribute):
-                n = n.value
-            if isinstance(n, ast.Name):
-                return n.id
-            return None
+        def visit_Name(self, node):
+            if self._in_call:
+                self._current.append(node.id)
+                self.calls.append(".".join(self._current[::-1]))
+                # Reset the state
+                self._current = []
+                self._in_call = False
+            self.generic_visit(node)
 
-    v = _UsageVisitor()
-    v.visit(tree)
-    return v.found
+    # Get the source code of the function as a string
+    cc = CallCollector()
+    cc.visit(tree)
+    for call in cc.calls:
+        base = call.split(".")[0]
+        if base in roots:
+            return True
+    return False
 
 
 # ---------------------------------------------------------------------------
