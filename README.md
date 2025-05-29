@@ -166,6 +166,8 @@ module load apptainer
 apptainer build gc_1.0.sif docker-archive://gc_1.0.tar.gz
 ```
 4. run the container to create the venvs :
+
+```
 apptainer exec \
   --bind "$PWD:/app/repo" \
   --env PYENV_VERSION=3.10.14 \
@@ -177,8 +179,10 @@ apptainer exec \
     source eval_main_venv/bin/activate && \
     pip install -r requirements.txt && \
     python src/create_venvs.py --dataset dataset/final_fix_dataset.jsonl --base_path eval_venvs"
+```
+6. run the container to verify the dataset :
 
-5. run the container to verify the dataset :
+```
 apptainer exec \
   --bind "$PWD:/app/repo" \
   --env PYENV_VERSION=3.10.14 \
@@ -187,4 +191,4 @@ apptainer exec \
     cd /app/repo  && \
     source eval_main_venv/bin/activate
     python verify_dataset.py dataset/final_fix_dataset.jsonl eval_venvs dataset/solutions/tests"
-
+```
