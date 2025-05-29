@@ -192,3 +192,13 @@ apptainer exec \
     source eval_main_venv/bin/activate
     python verify_dataset.py dataset/final_fix_dataset.jsonl eval_venvs dataset/solutions/tests"
 ```
+
+7. run the parallel eval script (inside docker)
+```
+  python parallel_eval_jsonl.py \
+    dataset/final_fix_dataset.jsonl \
+    "${SOLUTIONS_JSONL_FILE}" \
+    eval_venvs \
+    dataset/solutions/tests \
+    --wandb"
+```
