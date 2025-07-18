@@ -1,4 +1,6 @@
-# GitChameleon: A Benchmark for Version-Conditioned Code Generation
+# NOTE: The project has moved to https://github.com/mrcabbage972/GitChameleonBenchmark. Please use that link for everything related to the GitChameleon benchmark.
+
+# [OUTDATED] GitChameleon: A Benchmark for Version-Conditioned Code Generation
 
 Benchmark associated with the paper ["GitChameleon: Unmasking the Version-Switching Capabilities of Code Generation Models"](https://arxiv.org/abs/2411.05830)
 
